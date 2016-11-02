@@ -1,0 +1,187 @@
+- alias: "Auto heating on"
+  trigger:
+    - platform: state
+      entity_id: group.tracker
+      to: 'home'
+    - platform: state
+      entity_id: script.vekke_lys, switch.movement1, switch.movement2, switch.movement2, switch.movement_do, binary_sensor.door_soverom, binary_sensor.door_do, switch.door
+      state: 'on'
+  condition:
+    - condition: time
+      after: '07:00:00'
+      before: '22:00:00'
+
+    - condition: template
+      value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 300 }}'
+    - condition: template
+      value_template: '{{float(states.input_slider.auto_temp.state) > float(states.climate.termostat_stue.attributes.temperature)}}'
+    - condition: state
+      entity_id: input_boolean.auto_heat
+      state: 'on'
+  action:
+    - service: climate.set_temperature
+      data_template:
+        entity_id: "climate.termostat_stue"
+        temperature: '{{ float(states.input_slider.auto_temp.state) }}'
+
+- alias: "Auto heating on 2"
+  trigger:
+    platform: numeric_state
+    entity_id: proximity.home
+    below: 1000
+    above: 200
+  condition:
+    # Heading home
+    - condition: template
+      value_template: '{{ states.proximity.home.attributes.dir_of_travel == "towards" }}'
+    - condition: time
+      after: '07:00:00'
+      before: '22:00:00'
+
+    - condition: template
+      value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 300 }}'
+    - condition: template
+      value_template: '{{float(states.input_slider.auto_temp.state) > float(states.climate.termostat_stue.attributes.temperature)}}'
+    - condition: state
+      entity_id: input_boolean.auto_heat
+      state: 'on'
+  action:
+    - service: climate.set_temperature
+      data_template:
+        entity_id: "climate.termostat_stue"
+        temperature: '{{ float(states.input_slider.auto_temp.state) }}'
+
+- alias: "Auto heating on 3"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.relative_alarm_time
+      below: 25
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.relative_alarm_time
+      above: 15
+    - condition: state
+      entity_id: automation.wake_me_up
+      state: 'on'
+     
+    - condition: template
+      value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 300 }}'
+    - condition: template
+      value_template: '{{float(states.input_slider.auto_temp.state) > float(states.climate.termostat_stue.attributes.temperature)}}'
+    - condition: state
+      entity_id: input_boolean.auto_heat
+      state: 'on'
+  action:
+    - service: climate.set_temperature
+      data_template:
+        entity_id: "climate.termostat_stue"
+        temperature: '{{ float(states.input_slider.auto_temp.state) }}'
+
+- alias: "Auto heating off"
+  trigger:
+    - platform: state
+      entity_id: group.tracker
+      from: 'home'
+  condition:
+    - condition: template
+      value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 300 }}'
+    - condition: template
+      value_template: '{{float(states.input_slider.auto_temp.state) < float(states.climate.termostat_stue.attributes.temperature)}}'
+    - condition: state
+      entity_id: input_boolean.auto_heat
+      state: 'on'
+  action:
+    - service: climate.set_temperature
+      data_template:
+        entity_id: "climate.termostat_stue"
+        temperature: '{{ float(states.input_slider.auto_temp_low.state) }}'
+
+- alias: "Auto heating off 2"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0xeba768)', 'entity_id': 'switch.main'}
+  condition:
+    - condition: template
+      value_template: '{{float(states.input_slider.auto_temp.state) < float(states.climate.termostat_stue.attributes.temperature)}}'
+    - condition: state
+      entity_id: input_boolean.auto_heat
+      state: 'on'
+  action:
+    - service: climate.set_temperature
+      data_template:
+        entity_id: "climate.termostat_stue"
+        temperature: '{{ float(states.input_slider.auto_temp_low.state) }}'
+
+- alias: "Auto heating enabled"
+  trigger:
+    platform: state
+    entity_id: input_slider.auto_temp, input_slider.auto_temp_low 
+  action:
+  - service: homeassistant.turn_on
+    data: 
+      entity_id: input_boolean.auto_heat
+
+- alias: "Stue too warm"
+  trigger:
+   - platform: time
+     # This will match every 10 minutes
+     minutes: '/10'
+     seconds: 0
+  condition:
+   - condition: numeric_state
+     entity_id: climate.termostat_stue
+     value_template: '{{ state.attributes.current_temperature - state.attributes.temperature}}'
+     above: 0.5
+  action:
+      service: homeassistant.turn_off
+      entity_id: switch.ovn_stue
+
+- alias: "Soverom too warm"
+  trigger:
+   - platform: time
+     # This will match every 10 minutes
+     minutes: '/10'
+     seconds: 0
+  condition:
+   - condition: numeric_state
+     entity_id: climate.soverom
+     value_template: '{{ state.attributes.current_temperature - state.attributes.temperature}}'
+     above: 0.5
+  action:
+      service: homeassistant.turn_off
+      entity_id: switch.ovn_soverom
+
+- alias: "Stue too cold"
+  trigger:
+   - platform: time
+     # This will match every 10 minutes
+     minutes: '/10'
+     seconds: 0
+  condition:
+   - condition: numeric_state
+     entity_id: climate.termostat_stue
+     value_template: '{{ state.attributes.temperature - state.attributes.current_temperature}}'
+     above: 0.5
+  action:
+      service: homeassistant.turn_on
+      entity_id: switch.ovn_stue
+
+- alias: "Soverom too cold"
+  trigger:
+   - platform: time
+     # This will match every 10 minutes
+     minutes: '/10'
+     seconds: 0
+  condition:
+   - condition: numeric_state
+     entity_id: climate.soverom
+     value_template: '{{ state.attributes.temperature - state.attributes.current_temperature}}'
+     above: 0.5
+  action:
+      service: homeassistant.turn_on
+      entity_id: switch.ovn_soverom
+

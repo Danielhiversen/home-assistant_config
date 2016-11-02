@@ -1,0 +1,327 @@
+- alias: "Dark"
+  trigger:
+    - platform: numeric_state
+      entity_id: sun.sun
+      value_template: '{{ state.attributes.elevation }}'
+      below: 5
+    - platform: state
+      entity_id: binary_sensor.stue_lux
+      to: 'off'
+      for:
+        minutes: 15
+  condition:
+    - condition: state
+      entity_id: group.tracker
+      state: 'home'
+    - condition: time
+      after: '14:00:00'
+      before: '23:00:00'
+    - condition: state
+      entity_id: script.light_turned_off_5min
+      state: 'off'
+  action:
+     service: scene.turn_on
+     entity_id: scene.Normal_lys
+
+- alias: "Turn off light"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.stue_lux
+      to: 'on'
+      for:
+        minutes: 15
+    - platform: state
+      entity_id: script.timed_movement
+      to: 'off'
+      for:
+        minutes: 1
+  condition:
+    - condition: state
+      entity_id: group.tracker
+      state: 'not_home'
+    - condition: state
+      entity_id: binary_sensor.stue_lux
+      state: 'on'
+    - condition: state
+      entity_id: script.timed_movement
+      state: 'off'
+  action:
+    - service: homeassistant.turn_off
+      entity_id: group.all_lights
+    - service: script.turn_off
+      data: 
+         entity_id: script.vekke_lys
+    - delay: '00:00:15'
+    - service: homeassistant.turn_off
+      entity_id: group.all_lights
+
+- alias: "Turn off light night"
+  trigger:
+    - platform: time
+      after: '01:30:00'
+    - platform: state
+      entity_id: script.timed_movement
+      to: 'off'
+      for:
+        minutes: 1
+  condition:
+    - condition: time
+      after: '00:00:00'
+      before: '08:00:00'
+    - condition: state
+      entity_id: script.timed_movement
+      state: 'off'
+  action:
+    - service: homeassistant.turn_off
+      entity_id: group.all_lights
+    - delay: '00:00:15'
+    - service: homeassistant.turn_off
+      entity_id: group.all_lights
+
+- alias: "Home"
+  trigger:
+    - platform: state
+      entity_id: group.tracker
+      from: 'not_home'
+      to: 'home'
+  condition:
+    - condition: numeric_state
+      entity_id: sun.sun
+      value_template: '{{ state.attributes.elevation }}'
+      below: 8
+    - condition: state
+      entity_id: light.Lys_stue
+      state: 'off'
+    - condition: state
+      entity_id: light.Lys_TV
+      state: 'off'
+    - condition: time
+      after: '14:00:00'
+      before: '23:00:00'
+    - condition: state
+      entity_id: script.light_turned_off_5min
+      state: 'off'
+  action:
+      service: scene.turn_on
+      entity_id: scene.Normal_lys
+
+- alias: "Home2"
+  trigger:
+    - platform: state
+      entity_id: switch.movement1
+      state: 'on'
+    - platform: state
+      entity_id: switch.movement2
+      state: 'on'
+  condition:
+    - condition: numeric_state
+      entity_id: sun.sun
+      value_template: '{{ state.attributes.elevation }}'
+      below: 8
+    - condition: state
+      entity_id: light.Lys_stue
+      state: 'off'
+    - condition: state
+      entity_id: light.Lys_TV
+      state: 'off'
+    - condition: time
+      after: '14:00:00'
+      before: '23:00:00'
+    - condition: state
+      entity_id: script.light_turned_off_5min
+      state: 'off'
+    - condition: state
+      entity_id: binary.door
+      state: 'off'
+  action:
+      service: scene.turn_on
+      entity_id: scene.Normal_lys
+
+- alias: "Home3"
+  trigger:
+    - platform: state
+      entity_id: switch.movement1
+      state: 'on'
+    - platform: state
+      entity_id: switch.movement2
+      state: 'on'
+    - platform: state
+      entity_id: group.tracker
+      from: 'not_home'
+      to: 'home'
+  condition:
+    - condition: state
+      entity_id: binary_sensor.stue_lux
+      state: 'off'
+      for:
+        minutes: 15
+    - condition: state
+      entity_id: light.Lys_stue
+      state: 'off'
+    - condition: state
+      entity_id: light.Lys_TV
+      state: 'off'
+    - condition: time
+      after: '14:00:00'
+      before: '23:00:00'
+    - condition: state
+      entity_id: script.light_turned_off_5min
+      state: 'off'
+  action:
+      service: scene.turn_on
+      entity_id: scene.Normal_lys
+
+- alias: "Night"
+  trigger:
+    - platform: state
+      entity_id: switch.movement1
+      state: 'on'
+    - platform: state
+      entity_id: switch.movement2
+      state: 'on'
+    - platform: state
+      entity_id: switch.door_bedroom
+      state: 'on'
+    - platform: state
+      entity_id: switch.door
+      state: 'on'
+  condition:
+    - condition: numeric_state
+      entity_id: sun.sun
+      value_template: '{{ state.attributes.elevation }}'
+      below: 8
+    - condition: state
+      entity_id: light.Lys_stue
+      state: 'off'
+    - condition: state
+      entity_id: light.Lys_TV
+      state: 'off'
+    - condition: time
+      after: '00:30:00'
+      before: '07:00:00'
+    - condition: state
+      entity_id: script.light_turned_off_5min
+      state: 'off'
+  action:
+    # Cancel ev. old timers 
+    - service: script.turn_off
+      data: 
+         entity_id: script.timed_lights_5min_off
+    - service: scene.turn_on
+      data:
+        entity_id: scene.Dempet_lys
+    # Set new timer 
+    - service: script.turn_on
+      data:
+        entity_id: script.timed_lights_5min_off
+
+- alias: "All light off"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0xeba768)', 'entity_id': 'switch.main'}
+  condition:
+    - condition: template
+      value_template: '{% if states.automation.all_light_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.all_light_off.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
+  action:
+    - service: homeassistant.turn_off
+      entity_id: group.all_lights
+    - service: homeassistant.turn_off
+      entity_id: automation.wake_me_up
+    - service: homeassistant.turn_off
+      entity_id: script.vekke_lys
+    - delay: '00:00:15'
+    - service: homeassistant.turn_off
+      entity_id: group.all_lights
+
+- alias: "lys stue"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.stue_lux
+      to: 'off'
+      for:
+        hours: 2
+    - platform: state
+      entity_id: group.tracker
+      from: 'not_home'
+      to: 'home'
+  condition:
+    - condition: state
+      entity_id: binary_sensor.stue_lux
+      state: 'off'
+      for:
+        hours: 2
+    - condition: state
+      entity_id: group.tracker
+      state: 'home'
+    - condition: time
+      after: '14:00:00'
+      before: '23:00:00'
+  action:
+      service: homeassistant.turn_on
+      entity_id: 
+      - light.lys_bokhylle
+      - light.lys_bilder
+
+- alias: "lys stue av"
+  trigger:
+    platform: time
+    after: '23:30:00'
+  action:
+      service: homeassistant.turn_off
+      entity_id: 
+      - light.lys_bokhylle
+      - light.lys_bilder
+
+- alias: "Away lights"
+  trigger:
+    - platform: numeric_state
+      entity_id: sun.sun
+      value_template: '{{ state.attributes.elevation }}'
+      below: 2
+  condition:
+    - condition: state
+      entity_id: script.away_48
+      state: 'off'
+  action:
+    # Cancel ev. old timers 
+    - service: script.turn_off
+      data: 
+         entity_id: script.timed_lights_20min_off
+    - service: scene.turn_on
+      data:
+        entity_id: scene.Normal_lys
+    # Set new timer 
+    - service: script.turn_on
+      data:
+        entity_id: script.timed_lights_20min_off
+
+
+- alias: 'Wake Me Up, lys stue'
+  trigger:
+   - platform: time
+     minutes: '/1'
+  condition:
+   - condition: state
+     entity_id: automation.wake_me_up
+     state: 'on'
+   - condition: numeric_state
+     entity_id: sensor.relative_alarm_time
+     below: 5
+     above: 0
+   - condition: numeric_state
+     entity_id: sun.sun
+     value_template: '{{ state.attributes.elevation }}'
+     below: 8
+   - condition: state
+     entity_id: light.Lys_stue
+     state: 'off'
+   - condition: state
+     entity_id: light.Lys_TV
+     state: 'off'
+   - condition: state
+     entity_id: script.light_turned_off_5min
+     state: 'off'
+  action:
+     service: scene.turn_on
+     entity_id: scene.Normal_lys

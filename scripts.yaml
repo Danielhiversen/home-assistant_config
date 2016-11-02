@@ -1,0 +1,236 @@
+timed_lyd_soverom_5s:
+  sequence:
+    - delay:
+        seconds: 5
+
+away_48:
+  sequence:
+    - delay:
+        hours: 48
+
+timed_lights_5min_off:
+  alias: "Turn off lights after 5min"
+  sequence:
+    - delay:
+        minutes: 5
+    - service: homeassistant.turn_off
+      entity_id:
+       - light.Lys_TV
+       - light.Lys_stue
+    - delay:
+        seconds: 1
+    - service: script.turn_off
+      data:
+        entity_id: script.light_turned_off_5min
+ 
+timed_lights_20min_off:
+  alias: "Turn off lights after 20min"
+  sequence:
+   - delay:
+        minutes: 20
+   - service: homeassistant.turn_off
+     entity_id:
+      - light.Lys_TV
+      - light.Lys_stue
+
+light_turned_off_5min:
+  alias: "Light turned off during last 5 min"
+  sequence:
+    - delay:
+        minutes: 5
+
+timed_movement1_1min_off:
+  alias: "Turn off movement after 1min"
+  sequence:
+    - delay:
+        minutes: 1
+    - service: homeassistant.turn_off
+      data:
+        entity_id: switch.movement1
+
+timed_movement2_1min_off:
+  alias: "Turn off movement after 1min"
+  sequence:
+    - delay:
+        minutes: 1
+    - service: homeassistant.turn_off
+      data:
+        entity_id: switch.movement2
+
+timed_movement_do_1min_off:
+  alias: "Turn off movement after 1min"
+  sequence:
+    - delay:
+        minutes: 1
+    - service: homeassistant.turn_off
+      data:
+        entity_id: switch.movement_do
+
+timed_movement3_1min_off:
+  alias: "Turn off movement after 1min"
+  sequence:
+    - service: homeassistant.turn_on
+      data: 
+         entity_id: input_boolean.movement3
+    - delay:
+        seconds: 15
+    - service: homeassistant.turn_off
+      data: 
+         entity_id: input_boolean.movement3
+
+timed_movement:
+  sequence:
+    - delay:
+        hours: 2
+
+leggetid:
+  sequence:
+  - service: scene.turn_on
+    data:
+      entity_id: scene.Dempet_lys
+  - service: homeassistant.turn_off
+    entity_id:
+      - light.lys_bokhylle
+      - light.lys_bilder
+  - service: script.turn_on
+    data:
+      entity_id: script.leggetid_soverom
+  - delay: '00:10:00'
+  - service: homeassistant.turn_off
+    entity_id:
+     - light.Lys_TV
+     - light.Lys_stue
+
+leggetid_soverom:
+  alias: Leggetid soverom
+  sequence:
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+    data:
+      transition: 10
+      brightness: 80
+      xy_color: [0.4288, 0.2335]
+  - delay: '00:00:11'
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+    data:
+      transition: 60
+      brightness: 74
+      xy_color: [0.5931, 0.381]
+  - delay: '00:01:01'
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+    data:
+      transition: 60
+      brightness: 74
+      xy_color: [0.645, 0.3061]
+  - delay: '00:01:01'
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+    data:
+      transition: 60
+      brightness: 80
+      xy_color: [0.4288, 0.2335]
+  - delay: '00:01:01'
+  - service: script.turn_on
+    data: 
+       entity_id: script.leggetid_soverom_temp
+
+leggetid_soverom_temp:
+  sequence:
+  - service: script.turn_on
+    data: 
+       entity_id: script.leggetid_soverom
+
+sove_tid:
+  sequence:
+  - service: script.turn_off
+    data: 
+       entity_id: script.leggetid_soverom
+  - service: script.turn_off
+    data: 
+       entity_id: script.vekke_lys
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+    data:
+      transition: 2
+      brightness: 1
+      xy_color: [0.6661, 0.3279]
+  - delay: 00:00:03
+  - service: homeassistant.turn_off
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+
+vekke_lys:
+  sequence:
+  - service: homeassistant.turn_off
+    data: 
+      entity_id: input_boolean.alarmstatus
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+    data:
+      transition: 0
+      brightness: 1
+      xy_color: [0.6661, 0.3279]
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+    data:
+      transition: 780
+      brightness: 120
+      xy_color: [0.5704, 0.3978]
+  - delay:
+        minutes: 13
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+    data:
+      transition: 60
+      brightness: 165
+      xy_color: [0.5704, 0.3978]
+  - service: homeassistant.turn_off
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+
+#vaskemaskin:
+#  sequence:
+#  - delay: 00:10:00
+#  - service: notify.daniel_telefon
+#    data:
+#      title: "Vaskemaskin ferdig"
+#      target: "device/Xperia_Z3_Compact"
+#      message: " "
+
+#stovsuger:
+#  sequence:
+#  - service: homeassistant.turn_on
+#    entity_id: switch.stovsuger
+#  - service: script.turn_on
+#    data:
+#      entity_id: script.stovsuger_timer
+#  - delay: '01:00:00'
+#  - service: homeassistant.turn_off
+#    entity_id: switch.stovsuger
+#  - delay: '00:00:10'
+#  - service: homeassistant.turn_off
+#    entity_id: switch.stovsuger
+#
+#stovsuger_timer:
+#  sequence:
+#  - delay: '12:00:00'

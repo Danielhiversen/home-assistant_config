@@ -1,0 +1,81 @@
+- platform: rfxtrx
+  automatic_add: False
+  devices:
+    0a52080601010038480349:
+      name: Kjoleskap
+    0a520805020200cb1e0249:
+      name: Stue_Vindu
+    0a52080103010012260259:
+      name: Ute_soverom
+    0a5208030401001f1d0259:
+      name: Ute_veranda
+    0a52080705020095220269:
+      name: Soverom
+    0a520802060100ff0e0269: # 1 06
+      name: Bad
+      data_type: 
+        - Humidity
+        - Temperature
+    0a520800070100d2140269:
+      name: Stue
+      data_type: 
+        - Humidity
+        - Temperature
+    0a5208980a0100d5310169:
+      name: Utepotte
+      data_type: 
+        - Humidity
+
+- platform: yr
+  monitored_conditions:
+    - symbol
+    - precipitation
+    - temperature
+    - lowClouds
+    - mediumClouds
+
+- platform: command_line
+  name: CPU Temperature
+  command: "cat /sys/class/thermal/thermal_zone2/temp"
+  unit_of_measurement: "°C"
+  value_template: '{{ value | multiply(0.001) }}'
+
+- platform: template
+  sensors:
+    alarm_time:
+      friendly_name: 'Alarm'
+      value_template: '{% if states.input_slider.alarmhour.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_slider.alarmhour.state|round(0)|string }}:{% if states.input_slider.alarmminutes.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_slider.alarmminutes.state|round(0)|string }}'
+      entity_id: 
+       - input_slider.alarmminutes
+       - input_slider.alarmhour
+    relative_alarm_time:
+      value_template: '{{ states.input_slider.alarmhour.state|float|multiply(60) + states.input_slider.alarmminutes.state|float - (now().hour|float|multiply(60) + now().minute)}}'
+      unit_of_measurement: "min"
+      entity_id: 
+       - sensor.time
+    phone_battery:
+      friendly_name: 'Telefon batteri'
+      value_template: '{{ states.device_tracker.yt910xvzgp.attributes.battery|float }}'
+      unit_of_measurement: "%"
+      entity_id: 
+       - device_tracker.yt910xvzgp
+    target_temp_stue:
+      value_template: '{{ states.climate.termostat_stue.attributes.temperature }}'
+      entity_id: 
+       - climate.termostat_stue
+       
+- platform: time_date
+  display_options:
+    - 'time'
+
+# platform: tellstick
+# 11: Kjoleskap
+# 22: Blomst_stue
+# 41: Ute_veranda
+# 31: Ute_soverom
+# 52: Soverom
+# 61: Bad
+# 71: Stue
+# only_named: 1
+# temperature_scale: °C
+# datatype_mask: 127

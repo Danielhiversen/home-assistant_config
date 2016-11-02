@@ -1,0 +1,264 @@
+homeassistant:
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret latitude
+  longitude: !secret longitude
+  elevation: 103
+  unit_system: metric
+  # Pick yours from here:
+  # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Europe/Oslo
+  # Name of the location where Home Assistant is running
+  name: _
+  customize: !include customize.yaml
+
+frontend:
+
+http: 
+ api_password: !secret http_password
+  # Set to 1 to enable development mode
+  # development: 1
+ #sessions_enabled: 0
+ approved_ips:
+   - 127.0.0.1
+   - 192.168.1.2
+   - 192.168.1.3
+   - 192.168.1.4
+   - 192.168.1.5
+   - 192.168.1.6
+   - 192.168.1.7
+   - 192.168.1.8
+   - 192.168.1.9
+   - 192.168.1.10
+   - 192.168.1.11
+   - 192.168.1.12
+   - 192.168.1.13
+   - 192.168.1.14
+   - 192.168.1.15
+   - 192.168.1.16
+   - 192.168.1.17
+   - 192.168.1.18
+   - 192.168.1.19
+   - 192.168.1.20
+   - 192.168.1.21
+
+recorder:
+  purge_days: 5
+#  db_url: sqlite:///home/dahoiv/hass.db
+
+logbook:
+
+logger:
+  default: warn
+  logs:
+    homeassistant.components.automation: debug
+#    homeassistant.components.device_tracker: info
+#    homeassistant.components.http: info
+#    homeassistant.components.rfxtrx: debug
+#    homeassistant.components.sensor.rfxtrx: debug
+
+history: 
+
+#updater:
+
+sun:
+
+script: !include scripts.yaml
+
+scene: !include scenes.yaml
+
+automation: !include_dir_merge_list automation
+
+light: !include lights.yaml
+
+sensor: !include sensors.yaml
+
+switch: !include switches.yaml
+
+group: !include group.yaml
+
+movement_light_gang:
+
+movement_light_do:
+
+#update_ip:
+
+proximity:
+  home: 
+    devices:
+      - device_tracker.yt910xvzgp
+    tolerance: 50
+    unit_of_measurement: m
+
+temp_control:
+    target: 'termostat_stue'
+
+notify:
+  platform: pushbullet
+  api_key: !secret pushbullet
+  name: daniel_telefon
+
+device_tracker:
+- platform: netgear
+  host: 192.168.1.1
+  username: admin
+  password: !secret netgear
+  port: 80
+  track_new_devices: no
+  consider_home: 1800
+  interval_seconds: 10
+
+- platform: nmap_tracker
+  hosts: 192.168.1.1-15
+
+- platform: locative
+
+- platform: bluetooth_tracker
+
+- platform: gpslogger
+
+#media_player:
+#  platform: cast
+#  host: 192.168.1.2
+
+rfxtrx:
+  device: /dev/serial/by-id/usb-RFXCOM_RFXtrx433_A1Y0NJGR-if00-port0
+  debug: False
+  dummy: False
+
+climate:
+- platform: generic_thermostat
+  name :  Termostat stue
+  heater :  switch.ovn_stue
+  target_sensor : sensor.Stue_2
+  target_temp : 18
+  min_temp : 10
+  max_temp : 25
+
+- platform: generic_thermostat
+  name :  Soverom
+  heater :  switch.ovn_soverom
+  target_sensor : sensor.Soverom
+  target_temp : 15
+  min_temp : 7
+  max_temp : 25
+
+#-  platform: heat_control
+# name :  Slow cooker
+# heater :  switch.Slow_cooker
+# target_sensor : sensor.temperature_rubicson_61951
+# max_temp : 100
+
+binary_sensor: 
+  platform: template 
+  sensors:
+    movement1:
+      value_template: "{{ states.switch.movement1.state == 'on' }}" 
+      sensor_class: motion
+      entity_id: switch.movement1
+    movement2:
+      value_template: "{{ states.switch.movement2.state == 'on' }}" 
+      sensor_class: motion
+      entity_id: switch.movement2
+    movement_do:
+      value_template: "{{ states.switch.movement_do.state == 'on' }}" 
+      sensor_class: motion
+      entity_id: switch.movement_do
+    movement3:
+      value_template: "{{ states.input_boolean.movement3.state == 'on' }}" 
+      sensor_class: motion
+      entity_id: input_boolean.movement3
+    door:
+      value_template: "{{ states.switch.door.state == 'on' }}" 
+      sensor_class: opening
+      entity_id: switch.door
+    door_soverom:
+      value_template: "{{ states.switch.door_bedroom.state == 'on' }}" 
+      sensor_class: opening
+      entity_id: switch.door_bedroom
+    door_do:
+      value_template: "{{ states.switch.door_do.state == 'on' }}" 
+      entity_id: switch.door_do
+      sensor_class: opening
+    hot_kjoleskap:
+      friendly_name: hot_kjoleskap
+      value_template: '{{ states.sensor.kjoleskap.state | float > 4.0 }}'
+      entity_id: sensor.kjoleskap
+    stue_lux:
+      value_template: "{{ states.switch.lux.state == 'off' }}" 
+      entity_id: switch.lux
+      sensor_class: light
+
+input_slider: 
+  alarmhour:
+    name: Hour
+    icon: mdi:timer
+    initial: 7
+    min: 4
+    max: 11
+    step: 1
+  alarmminutes:
+    name: Minutes
+    icon: mdi:timer
+    initial: 30
+    min: 0
+    max: 55
+    step: 5
+  auto_temp:
+    name: Auto heat high
+    min: 18
+    max: 22
+    initial: 20.5
+    step: 0.5
+    icon: mdi:fire
+    unit_of_measurement: '°C'    
+  auto_temp_low:
+    name: Auto heat low
+    min: 14
+    max: 19
+    initial: 15
+    step: 0.5
+    icon: mdi:fire
+    unit_of_measurement: '°C'  
+
+input_boolean: 
+  movement3:
+    initial: off
+  auto_heat:
+    name: Auto heat
+    initial: off
+
+sensor miflora1:
+  platform: miflora
+  mac: C4:7C:8D:61:7E:3B 
+  name: Blomst tv
+  force_update: false
+  median: 3
+  monitored_conditions:
+   - moisture
+   - light
+   - temperature
+   - conductivity
+
+sensor miflora2:
+  platform: miflora
+  mac: C4:7C:8D:61:7F:EC 
+  name: Blomst sofa
+  force_update: false
+  median: 3
+  monitored_conditions:
+   - moisture
+   - light
+   - temperature
+   - conductivity
+
+sensor miflora3:
+  platform: miflora
+  mac: C4:7C:8D:61:7E:5D 
+  name: Blomst bokhylle
+  force_update: false
+  median: 3
+  monitored_conditions:
+   - moisture
+   - light
+   - temperature
+   - conductivity

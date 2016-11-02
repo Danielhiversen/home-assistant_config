@@ -1,0 +1,22 @@
+- platform: rfxtrx
+  automatic_add: False
+  signal_repetitions: 2
+  devices:
+    0b11000e00e9e5660b010f70:
+      name: Lys_stue
+    0b11001000e9e5660c010f70:
+      name: Lys_TV
+    0b11000c00e6ce7603010f50:
+      name: lys_bokhylle
+    0b11000100e6ce7609010f70:
+      name: lys_bilder
+
+- platform: hue
+  host: 192.168.1.9
+
+- platform: flux_led
+  automatic_add: False
+  devices:
+    192.168.1.15:
+      name: do
+

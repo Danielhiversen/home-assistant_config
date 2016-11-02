@@ -1,0 +1,117 @@
+- alias: 'Wake Me Up'
+  initial_state: False
+  trigger:
+   - platform: time
+     minutes: '/1'
+  condition:
+   - condition: template
+     value_template: '{{ now().hour == (states.input_slider.alarmhour.state  | round(0))  and  now().minute == (states.input_slider.alarmminutes.state  | round(0) )  }}'
+  action:
+    - service: script.turn_on
+      data:
+        entity_id: script.vekke_lys
+    - service: homeassistant.turn_off
+      data: 
+        entity_id: automation.wake_me_up
+
+- alias: "alarm enabled"
+  trigger:
+    platform: state
+    entity_id: input_slider.alarmhour, input_slider.alarmminutes
+  action:
+  - service: homeassistant.turn_on
+    data: 
+      entity_id:
+       - automation.wake_me_up
+
+- alias: "Lys av pA soverom"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'off', 'entity_id': 'switch.soverom_switch1'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'entity_id': 'switch.lyd_soverom', 'state': 'unknown command (0xd744fc)'}
+  condition:
+    - condition: state
+      entity_id: script.timed_lyd_soverom_5s
+      state: 'off'
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: light.soverom1
+        state: 'on'
+      - condition: state
+        entity_id: light.soverom2
+        state: 'on'
+  action:
+    - service: script.turn_on
+      data:
+        entity_id: script.sove_tid
+
+- alias: "Lys soverom"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'entity_id': 'switch.lyd_soverom', 'state': 'unknown command (0xd744fc)'}
+  condition:
+    - condition: state
+      entity_id: light.soverom1
+      state: 'off'
+    - condition: state
+      entity_id: light.soverom2
+      state: 'off'
+  action:
+    - service: script.turn_off
+      data: 
+         entity_id: script.timed_lyd_soverom_5s
+    # Set new timer
+    - service: script.turn_on
+      data:
+        entity_id: script.timed_lyd_soverom_5s
+
+- alias: "Lys soverom"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'entity_id': 'switch.lyd_soverom', 'state': 'unknown command (0xd744fc)'}
+  condition:
+    - condition: state
+      entity_id: script.timed_lyd_soverom_5s
+      state: 'on'
+  action:
+  - service: script.turn_off
+    data: 
+       entity_id: script.sove_tid
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+    data:
+      transition: 1
+      brightness: 216
+      xy_color: [0.5458, 0.4159]
+  
+- alias: "Lys soverom"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'on', 'entity_id': 'switch.soverom_switch1'}
+  action:
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+    data:
+      transition: 0
+      brightness: 1
+      xy_color: [0.5458, 0.4159]
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+      - light.soverom2
+    data:
+      transition: 15
+      brightness: 216
+      xy_color: [0.5458, 0.4159]
+ 

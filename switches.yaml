@@ -1,0 +1,48 @@
+- platform: rfxtrx
+  automatic_add: False
+  signal_repetitions: 2
+  devices:
+    0b1100cd0213c7f210010f70:
+      name: Movement1
+    0b11000a02ef9ff210010f50:
+      name: Movement2
+    0b1100000213b3f210010f70:
+      name: Movement_do
+    0b1100e003af16aa10000060:
+      name: Door
+    0b11001d00c9277801010f70: 
+      name: ovn_soverom
+    0b11001901f973ca01010f70: 
+      name: ovn_stue
+    0b11000300932eaa10000060:
+      name: door_bedroom
+    0b110086035f46aa10000050:
+      name: door_do
+    09130006545503020e60:
+      name: leggetid
+      fire_event: True
+    0913000e9da2da015270:
+      name: Movement3
+      fire_event: True
+    0b11000d00e6ce760d010f60:
+      name: soverom_switch1
+      fire_event: True
+    09130004d55555019870:
+      name: vaskemaskin
+      fire_event: True
+    09130009d744fc01a870:
+      name: lyd_soverom
+      fire_event: True
+    09130001eba768023e70:
+      name: main
+      fire_event: True
+    0b110002012c299a0a000070:
+      name: lux
+    0b11000466bc0cfe05010f70:
+      name: mobillader
+
+#- platform: command_line
+#  switches:
+#    stovsuger:
+#      oncmd:  "python /home/dahoiv/.homeassistant/orvibo/orvibo.py -i 192.168.1.18 -e /home/dahoiv/.homeassistant/orvibo/start_stovsuger.ir"
+#      offcmd: "python /home/dahoiv/.homeassistant/orvibo/orvibo.py -i 192.168.1.18 -e /home/dahoiv/.homeassistant/orvibo/stop_stovsuger.ir"

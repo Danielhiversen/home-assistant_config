@@ -1,0 +1,68 @@
+stue:
+  name: Stue 
+  view: yes
+  entities:
+  - light.Lys_stue
+  - light.Lys_TV
+  - light.lys_bokhylle
+  - light.lys_bilder
+  - sensor.stue
+  - sensor.stue_2
+  - sensor.stue_vindu
+  - sensor.ute_soverom
+  - sensor.ute_veranda
+  - scene.dempet_lys
+  - scene.normal_lys
+  - script.stovsuger
+  - sun.sun
+  - sensor.yr_symbol
+  - sensor.yr_condition
+  - group.stue_heater
+
+Soverom:
+  view: yes
+  entities:
+  - group.alarmclock
+  - light.soverom1
+  - light.soverom2
+  - climate.soverom
+  - sensor.soverom
+  - script.leggetid_soverom
+  - switch.mobillader
+
+Bad:
+  view: yes
+  entities:
+  - sensor.bad
+  - sensor.bad_2
+  - light.do
+  - light.gang
+
+tracker:
+ - device_tracker.daniel
+ - device_tracker.41d423a5778bcb1a
+ - device_tracker.dhi
+ - device_tracker.yt910xvzgp
+
+alarmclock:
+  name: Wake Me Up
+  entities: 
+   - sensor.alarm_time
+   - input_slider.alarmhour
+   - input_slider.alarmminutes
+   - automation.wake_me_up
+
+stue_heater:
+  name: Thermotstat stue
+  entities: 
+   - climate.termostat_stue
+   - group.temp_control_termostat_stue
+   - group.auto_heat_stue
+
+auto_heat_stue:
+  name: Auto heat
+  entities: 
+   - input_boolean.auto_heat
+   - input_slider.auto_temp
+   - input_slider.auto_temp_low
+

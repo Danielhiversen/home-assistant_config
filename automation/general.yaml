@@ -1,0 +1,369 @@
+- alias: "HA started"
+  trigger:
+      platform: event
+      event_type: homeassistant_start
+  action:
+      service: homeassistant.turn_on
+      entity_id: script.away_48
+
+- alias: "Kjoleskap for varmt"
+  trigger:
+    platform: state
+    entity_id: binary_sensor.hot_kjoleskap
+    to: 'on'
+    for:
+      hours: 4
+  action:
+    service: notify.daniel_telefon
+    data:
+      title: "Kjoleskap for varmt"
+      target: "device/Xperia_Z3_Compact"
+      message: " "
+
+- alias: "Leggetid"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
+  action:
+    - service: script.turn_off
+      data: 
+         entity_id: script.leggetid
+    - service: script.turn_on
+      data:
+        entity_id: script.leggetid
+
+- alias: "Away 48"
+  trigger:
+    - platform: state
+      entity_id: group.tracker
+      to: 'home'
+    - platform: state
+      entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.movement1, binary_sensor.movement2, binary_sensor.movement_do
+      state: 'on'
+  action:
+    - service: script.turn_off
+      data: 
+         entity_id: script.away_48
+    # Set new timer  
+    - service: script.turn_on
+      data:
+         entity_id: script.away_48
+
+- alias: "movement"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.movement1, binary_sensor.movement2, binary_sensor.movement_do
+      state: 'on'
+  action:
+    - service: script.turn_off
+      data: 
+         entity_id: 
+          - script.timed_movement
+    # Set new timer
+    - service: script.turn_on
+      data:
+        entity_id: 
+          - script.timed_movement
+
+- alias: "movement alert"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.movement1, binary_sensor.movement2, binary_sensor.movement_do
+      state: 'on'
+  condition:
+    - condition: state
+      entity_id: group.tracker
+      state: 'not_home'
+    - condition: template
+      value_template: '{% if states.automation.movement_alert.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.movement_alert.attributes.last_triggered)) > 1800 }}  {% else %}  true {% endif %}'
+  action:
+    service: notify.daniel_telefon
+    data:
+      title: "Bevegelse hjemme"
+      target: "device/Xperia_Z3_Compact"
+      message: " "
+
+- alias: "movement1"
+  trigger:
+    - platform: state
+      entity_id: switch.movement1
+      state: 'on'
+  action:
+    - service: script.turn_off
+      data: 
+         entity_id: 
+          - script.timed_movement1_1min_off
+    # Set new timer
+    - service: script.turn_on
+      data:
+        entity_id: 
+          - script.timed_movement1_1min_off
+
+- alias: "movement2"
+  trigger:
+    - platform: state
+      entity_id: switch.movement2
+      state: 'on'
+  action:
+    - service: script.turn_off
+      data: 
+         entity_id: 
+          - script.timed_movement2_1min_off
+    # Set new timer 
+    - service: script.turn_on
+      data:
+        entity_id: 
+          - script.timed_movement2_1min_off
+
+- alias: "movement do"
+  trigger:
+    - platform: state
+      entity_id: switch.movement_do
+      state: 'on'
+  action:
+    - service: script.turn_off
+      data: 
+         entity_id: 
+          - script.timed_movement_do_1min_off
+    # Set new timer 
+    - service: script.turn_on
+      data:
+        entity_id: 
+          - script.timed_movement_do_1min_off
+
+- alias: "Movement3"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'entity_id': 'switch.movement3', 'state': 'unknown command (0x9da2da)'}
+    - platform: state
+      entity_id: switch.movement3
+      state: 'on'
+  action:
+    - service: script.turn_off
+      data: 
+         entity_id: script.timed_movement3_1min_off
+    # Set new timer 
+    - service: script.turn_on
+      data:
+        entity_id: 
+          - script.timed_movement3_1min_off
+
+- alias: "light"
+  trigger:
+    - platform: state
+      entity_id: light.Lys_stue
+      state: 'off'
+    - platform: state
+      entity_id: light.Lys_TV
+      state: 'off'
+  action:
+      service: homeassistant.turn_on
+      entity_id: script.light_turned_off_5min
+
+- alias: "Close dor"
+  trigger:
+    platform: state
+    entity_id: switch.door
+    to: 'on'
+    for:
+      minutes: 5
+  action:
+      service: homeassistant.turn_off
+      entity_id: switch.door
+
+- alias: "Close do dor"
+  trigger:
+    platform: state
+    entity_id: switch.door_do
+    to: 'on'
+    for:
+      minutes: 5
+  action:
+      service: homeassistant.turn_off
+      entity_id: 
+      - switch.door_do
+
+- alias: "Close soverom dor"
+  trigger:
+    platform: state
+    entity_id: switch.door_bedroom
+    to: 'on'
+    for:
+      minutes: 60
+  action:
+      service: homeassistant.turn_off
+      entity_id: 
+      - switch.door_bedroom
+
+- alias: "Mobillader on"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.phone_battery
+      below: 91
+    - platform: numeric_state
+      entity_id: sensor.phone_battery
+      below: 40
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
+    - platform: numeric_state
+      entity_id: sensor.relative_alarm_time
+      below: 25
+      above: 15
+  condition:
+    - condition: state
+      entity_id: group.tracker
+      state: 'home'
+  action:
+      service: homeassistant.turn_on
+      entity_id: switch.mobillader
+
+- alias: "Mobillader off"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.phone_battery
+      above: 99
+    - platform: state
+      entity_id: group.tracker
+      to: 'not_home'
+      for:
+        hours: 2
+  action:
+      service: homeassistant.turn_off
+      entity_id: switch.mobillader
+      
+# - alias: "Media player paused/stopped"
+#   trigger:
+#     - platform: state
+#       entity_id: media_player.chromecast1877
+#       from: 'playing'
+#   condition:
+#     - condition: state
+#       entity_id: light.Lys_stue
+#       state: 'on'
+#     - condition: state
+#       entity_id: light.Lys_TV
+#       state: 'on'
+#     - condition: template
+#       value_template: >
+#         {% if is_state('media_player.chromecast1877', 'unknown') %}
+#           false
+#         {% else %}
+#           true
+#         {% endif %}
+#   action:
+#       service: scene.turn_on
+#       entity_id: scene.Normal_lys
+#
+# - alias: "Media player playing"
+#   trigger:
+#     - platform: state
+#       entity_id: media_player.chromecast1877
+#       to: 'playing'
+#   condition:
+#     - condition: state
+#       entity_id: light.Lys_stue
+#       state: 'on'
+#     - condition: state
+#       entity_id: light.Lys_TV
+#       state: 'on'
+#   action:
+#       service: scene.turn_on
+#       entity_id: scene.Dempet_lys
+#
+#- alias: "Vaskemaskin"
+#  trigger:
+#    platform: event
+#    event_type: button_pressed
+#    event_data: {'entity_id': 'switch.vaskemaskin', 'state': 'unknown command (0xd55555)'}
+#  action:
+#    - service: script.turn_off
+#      data: 
+#         entity_id: script.vaskemaskin
+#    # Set new timer
+#    - service: script.turn_on
+#      data:
+#        entity_id: script.vaskemaskin
+#
+#- alias: "Stop Stovsuger"
+#  trigger:
+#    - platform: state
+#      entity_id: group.tracker
+#      from: 'not_home'
+#      to: 'home'
+#    - platform: state
+#      entity_id: switch.movement1
+#      state: 'on'
+#    - platform: state
+#      entity_id: switch.movement2
+#      state: 'on'
+#    - platform: state
+#      entity_id: switch.movement3
+#      state: 'on'
+#  condition:
+#    - condition: state
+#      entity_id: switch.stovsuger
+#      state: 'on'
+#  action:
+#    - service: script.turn_off
+#      data:
+#        entity_id: script.stovsuger
+#    - service: homeassistant.turn_off
+#      entity_id: switch.stovsuger
+#    - delay: '00:00:30'
+#    - service: homeassistant.turn_off
+#      entity_id: switch.stovsuger
+#
+#- alias: "Start Stovsuger"
+#  trigger:
+#    - platform: state
+#      entity_id: group.tracker
+#      state: 'not_home'
+#      for:
+#        hours: 1
+#    - platform: state
+#      entity_id: switch.movement1
+#      state: 'off'
+#      for:
+#        hours: 1
+#    - platform: state
+#      entity_id: switch.movement2
+#      state: 'off'
+#      for:
+#        hours: 1
+#    - platform: state
+#      entity_id: switch.movement3
+#      state: 'off'
+#      for:
+#        hours: 1
+#  condition:
+#    - condition: state
+#      entity_id: switch.stovsuger
+#      state: 'off'
+#    - condition: state
+#      entity_id: group.tracker
+#      state: 'away'
+#    - condition: state
+#      entity_id: switch.movement1
+#      state: 'off'
+#    - condition: state
+#      entity_id: switch.movement2
+#      state: 'off'
+#    - condition: state
+#      entity_id: switch.movement3
+#      state: 'off'
+#    - condition: time
+#      after: '09:00:00'
+#      before: '21:00:00'
+#    - condition: state
+#      entity_id: script.stovsuger_timer
+#      state: 'off'
+#  action:
+#    - service: script.turn_off
+#      data:
+#    #    entity_id: script.stovsuger
+#    - service: script.turn_on
+#      data:
+#        entity_id: script.stovsuger

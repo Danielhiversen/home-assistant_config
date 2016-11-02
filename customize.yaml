@@ -1,0 +1,25 @@
+  light.soverom1:
+    friendly_name: Soverom 1
+  light.soverom2:
+    friendly_name: Soverom 2
+  light.do:
+    friendly_name: Do
+  light.gang:
+    friendly_name: Gang
+  light.lys_bokhylle:
+    friendly_name: Bokhylle
+  light.lys_bilder:
+    friendly_name: Bilder
+  light.lys_stue:
+    friendly_name: Stue
+  light.lys_tv:
+    friendly_name: Tv
+  sensor.bad:
+    friendly_name: Bad fuktighet
+  scene.dempet_lys:
+    friendly_name: Dempet lys
+  scene.normal_lys:
+    friendly_name: Normalt lys
+  sensor.yr_symbol:
+    friendly_name: _
+
