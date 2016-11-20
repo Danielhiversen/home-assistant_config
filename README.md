@@ -2,4 +2,4 @@
 Example Home Assistant Configs, home-assistant.io
 
 
-Tested with version 0.30.2
+Tested with version 0.33.0

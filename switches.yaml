@@ -33,13 +33,13 @@
     09130009d744fc01a870:
       name: lyd_soverom
       fire_event: True
-    09130001eba768023e70:
+    09130007cc0d68023770:
       name: main
       fire_event: True
     0b110002012c299a0a000070:
       name: lux
-    0b11000466bc0cfe05010f70:
-      name: mobillader
+#    0b11000689bc0cfe05010f70:
+#      name: mobillader
 
 #- platform: command_line
 #  switches:

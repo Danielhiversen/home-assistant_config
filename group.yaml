@@ -1,3 +1,13 @@
+div:
+  name: Div
+  view: yes
+  entities:
+#  - switch.mobillader
+  - sensor.phone_battery
+  - sensor.mean_lux
+  - group.tracker
+  - script.borte
+  
 stue:
   name: Stue 
   view: yes
@@ -6,6 +16,9 @@ stue:
   - light.Lys_TV
   - light.lys_bokhylle
   - light.lys_bilder
+  - light.yttergang
+  - light.vindu
+  - light.veranda
   - sensor.stue
   - sensor.stue_2
   - sensor.stue_vindu
@@ -25,10 +38,10 @@ Soverom:
   - group.alarmclock
   - light.soverom1
   - light.soverom2
-  - climate.soverom
+  - group.soverom_heater
   - sensor.soverom
   - script.leggetid_soverom
-  - switch.mobillader
+#  - switch.mobillader
 
 Bad:
   view: yes
@@ -43,6 +56,8 @@ tracker:
  - device_tracker.41d423a5778bcb1a
  - device_tracker.dhi
  - device_tracker.yt910xvzgp
+ - device_tracker.tine
+ - device_tracker.nokia_130
 
 alarmclock:
   name: Wake Me Up
@@ -52,17 +67,41 @@ alarmclock:
    - input_slider.alarmminutes
    - automation.wake_me_up
 
+soverom_heater:
+  name: Thermotstat soverom
+  entities: 
+   - climate.soverom
+   - group.temp_control_soverom_morgen
+   - group.temp_control_soverom_kveld
+temp_control_soverom_morgen:
+    name: Temp control soverom morgen
+    entities: 
+     - automation.temp_control_soverom_morgen
+     - input_slider.temp_control_soverom_morgen_hour
+     - input_slider.temp_control_soverom_morgen_temp
+temp_control_soverom_kveld:
+    name: Temp control soverom kveld
+    entities: 
+     - automation.temp_control_soverom_kveld
+     - input_slider.temp_control_soverom_kveld_hour
+     - input_slider.temp_control_soverom_kveld_temp
+
 stue_heater:
   name: Thermotstat stue
   entities: 
    - climate.termostat_stue
-   - group.temp_control_termostat_stue
+   - group.temp_control_stue
    - group.auto_heat_stue
-
 auto_heat_stue:
   name: Auto heat
   entities: 
    - input_boolean.auto_heat
    - input_slider.auto_temp
    - input_slider.auto_temp_low
+temp_control_stue:
+    name: Temp control stue
+    entities: 
+     - automation.temp_control_stue
+     - input_slider.temp_control_stue_hour
+     - input_slider.temp_control_stue_temp
 

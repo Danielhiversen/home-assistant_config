@@ -159,7 +159,9 @@
       entity_id: light.Lys_TV
       state: 'off'
   action:
-      service: homeassistant.turn_on
+    - service: homeassistant.turn_off
+      entity_id: script.light_turned_off_5min
+    - service: homeassistant.turn_on
       entity_id: script.light_turned_off_5min
 
 - alias: "Close dor"
@@ -197,42 +199,42 @@
       entity_id: 
       - switch.door_bedroom
 
-- alias: "Mobillader on"
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.phone_battery
-      below: 91
-    - platform: numeric_state
-      entity_id: sensor.phone_battery
-      below: 40
-    - platform: event
-      event_type: button_pressed
-      event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
-    - platform: numeric_state
-      entity_id: sensor.relative_alarm_time
-      below: 25
-      above: 15
-  condition:
-    - condition: state
-      entity_id: group.tracker
-      state: 'home'
-  action:
-      service: homeassistant.turn_on
-      entity_id: switch.mobillader
+#- alias: "Mobillader on"
+#  trigger:
+#    - platform: numeric_state
+#      entity_id: sensor.phone_battery
+#      below: 91
+#    - platform: numeric_state
+#      entity_id: sensor.phone_battery
+#      below: 40
+#    - platform: event
+#      event_type: button_pressed
+#      event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
+#    - platform: numeric_state
+#      entity_id: sensor.relative_alarm_time
+#      below: 25
+#      above: 15
+#  condition:
+#    - condition: state
+#      entity_id: group.tracker
+#      state: 'home'
+#  action:
+#      service: homeassistant.turn_on
+#      entity_id: switch.mobillader
 
-- alias: "Mobillader off"
-  trigger:
-    - platform: numeric_state
-      entity_id: sensor.phone_battery
-      above: 99
-    - platform: state
-      entity_id: group.tracker
-      to: 'not_home'
-      for:
-        hours: 2
-  action:
-      service: homeassistant.turn_off
-      entity_id: switch.mobillader
+#- alias: "Mobillader off"
+#  trigger:
+#    - platform: numeric_state
+#      entity_id: sensor.phone_battery
+#      above: 99
+#    - platform: state
+#      entity_id: group.tracker
+#      to: 'not_home'
+#      for:
+#        hours: 2
+#  action:
+#      service: homeassistant.turn_off
+#      entity_id: switch.mobillader
       
 # - alias: "Media player paused/stopped"
 #   trigger:

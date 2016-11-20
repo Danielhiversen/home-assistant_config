@@ -165,7 +165,7 @@ sove_tid:
     data:
       transition: 2
       brightness: 1
-      xy_color: [0.6661, 0.3279]
+      rgb_color: [1, 0, 0]
   - delay: 00:00:03
   - service: homeassistant.turn_off
     entity_id:
@@ -184,7 +184,7 @@ vekke_lys:
     data:
       transition: 0
       brightness: 1
-      xy_color: [0.6661, 0.3279]
+      rgb_color: [1, 0, 0]
   - service: homeassistant.turn_on
     entity_id:
       - light.soverom1
@@ -207,6 +207,36 @@ vekke_lys:
     entity_id:
       - light.soverom1
       - light.soverom2
+
+timed_lys_yttergang:
+  alias: "Turn off lights after 3 min"
+  sequence:
+    - delay:
+        minutes: 3
+    - service: homeassistant.turn_off
+      data:
+        entity_id: light.yttergang
+        transition: 20
+
+all_light_off:
+  sequence:
+    - service: homeassistant.turn_off
+      entity_id:
+       - group.all_lights
+       - automation.wake_me_up
+       - script.vekke_lys
+    - delay: '00:01:15'
+    - service: homeassistant.turn_off
+      entity_id: group.all_lights
+
+borte:
+  sequence:
+    - service: climate.set_temperature
+      data_template:
+        entity_id: "climate.termostat_stue"
+        temperature: '{{ float(states.input_slider.auto_temp_low.state) }}'
+    - service: homeassistant.turn_on
+      entity_id: script.all_light_off
 
 #vaskemaskin:
 #  sequence:

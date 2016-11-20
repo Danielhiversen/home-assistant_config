@@ -18,7 +18,7 @@ http:
   # Set to 1 to enable development mode
   # development: 1
  #sessions_enabled: 0
- approved_ips:
+ trusted_networks:
    - 127.0.0.1
    - 192.168.1.2
    - 192.168.1.3
@@ -42,10 +42,12 @@ http:
    - 192.168.1.21
 
 recorder:
-  purge_days: 5
+  purge_days: 2
 #  db_url: sqlite:///home/dahoiv/hass.db
 
 logbook:
+
+restore_states:
 
 logger:
   default: warn
@@ -54,7 +56,7 @@ logger:
 #    homeassistant.components.device_tracker: info
 #    homeassistant.components.http: info
 #    homeassistant.components.rfxtrx: debug
-#    homeassistant.components.sensor.rfxtrx: debug
+#    homeassistant.components.sensor.miflora: debug
 
 history: 
 
@@ -89,8 +91,17 @@ proximity:
     tolerance: 50
     unit_of_measurement: m
 
-temp_control:
-    target: 'termostat_stue'
+#temp_control:
+#  - target: 'termostat_stue'
+#    name: 'auto timer'
+
+#  - target: 'soverom'
+#    name: 'morgen'
+#    keep_on: true
+    
+#  - target: 'soverom'
+#    name: 'kveld'
+#    keep_on: true
 
 notify:
   platform: pushbullet
@@ -108,17 +119,18 @@ device_tracker:
   interval_seconds: 10
 
 - platform: nmap_tracker
-  hosts: 192.168.1.1-15
+  hosts: 192.168.1.1-25
 
-- platform: locative
+# - platform: locative
 
 - platform: bluetooth_tracker
 
-- platform: gpslogger
+#- platform: gpslogger
+#  consider_home: 1800
 
-#media_player:
-#  platform: cast
-#  host: 192.168.1.2
+media_player:
+  platform: cast
+  host: 192.168.1.2
 
 rfxtrx:
   device: /dev/serial/by-id/usb-RFXCOM_RFXtrx433_A1Y0NJGR-if00-port0
@@ -142,7 +154,7 @@ climate:
   min_temp : 7
   max_temp : 25
 
-#-  platform: heat_control
+#-  platform: generic_thermostat
 # name :  Slow cooker
 # heater :  switch.Slow_cooker
 # target_sensor : sensor.temperature_rubicson_61951
@@ -205,8 +217,8 @@ input_slider:
     step: 5
   auto_temp:
     name: Auto heat high
-    min: 18
-    max: 22
+    min: 20
+    max: 23
     initial: 20.5
     step: 0.5
     icon: mdi:fire
@@ -214,11 +226,57 @@ input_slider:
   auto_temp_low:
     name: Auto heat low
     min: 14
-    max: 19
-    initial: 15
+    max: 20
+    initial: 16
     step: 0.5
     icon: mdi:fire
+    unit_of_measurement: '°C'
+  temp_control_stue_hour:
+    name: Hour
+    icon: mdi:timer
+    initial: 15
+    min: 7
+    max: 23
+    step: 1
+  temp_control_stue_temp:
+    name: Temp
+    min: 12
+    max: 22
+    initial: 20
+    step: 1
+    icon: mdi:fire
     unit_of_measurement: '°C'  
+  temp_control_soverom_morgen_hour:
+    name: Hour
+    icon: mdi:timer
+    initial: 7
+    min: 5
+    max: 15
+    step: 1
+  temp_control_soverom_morgen_temp:
+    name: Temp
+    min: 12
+    max: 18
+    initial: 14
+    step: 1
+    icon: mdi:fire
+    unit_of_measurement: '°C'  
+  temp_control_soverom_kveld_hour:
+    name: Hour
+    icon: mdi:timer
+    initial: 21
+    min: 15
+    max: 23
+    step: 1
+  temp_control_soverom_kveld_temp:
+    name: Temp
+    min: 14
+    max: 20
+    initial: 17
+    step: 1
+    icon: mdi:fire
+    unit_of_measurement: '°C'  
+
 
 input_boolean: 
   movement3:

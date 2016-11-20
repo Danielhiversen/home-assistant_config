@@ -63,10 +63,46 @@
       value_template: '{{ states.climate.termostat_stue.attributes.temperature }}'
       entity_id: 
        - climate.termostat_stue
-       
+    mean_lux:
+      friendly_name: 'Avg lux'
+      value_template: >
+                      {% set sum = 0 %}
+                      {% set num = 0 %}
+                      {% for state in [states.sensor.blomst_bokhylle_light_intensity, states.sensor.blomst_sofa_light_intensity, states.sensor.blomst_tv_light_intensity] %}
+                          {%- if  as_timestamp(now()) - as_timestamp(state.last_updated) < 1800 -%}
+                              {% set sum = sum + state.state|float %}
+                              {% set num = num + 1|float %}
+                          {%- endif %}
+                          {%- if loop.last %}
+                              {%- if  num > 0  -%}
+                              {{ sum/num }}
+                              {%- else -%}
+                                  None
+                              {%- endif %}
+                              {%- endif %}
+                      {%- endfor -%}
+      unit_of_measurement: "lux"
+      entity_id: 
+       - sensor.blomst_bokhylle_light_intensity
+       - sensor.blomst_sofa_light_intensity
+       - sensor.blomst_tv_light_intensity
+
 - platform: time_date
   display_options:
     - 'time'
+
+- platform: broadlink
+  update_interval: 300
+  host: 192.168.1.20
+  mac: 'B4:43:0D:D1:02:F7'
+  name: "Stue"
+  monitored_conditions:
+    - temperature
+    - humidity
+    - air_quality
+    - light
+    - noise
+
 
 # platform: tellstick
 # 11: Kjoleskap
