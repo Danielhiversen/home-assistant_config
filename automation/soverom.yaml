@@ -49,7 +49,7 @@
       data:
         entity_id: script.sove_tid
 
-- alias: "Lys soverom"
+- alias: "Lys soverom lyd 0"
   trigger:
     - platform: event
       event_type: button_pressed
@@ -70,7 +70,7 @@
       data:
         entity_id: script.timed_lyd_soverom_5s
 
-- alias: "Lys soverom"
+- alias: "Lys soverom lyd"
   trigger:
     - platform: event
       event_type: button_pressed
@@ -115,3 +115,115 @@
       brightness: 216
       xy_color: [0.5458, 0.4159]
  
+
+- alias: "Lys soverom door timer"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.door_soverom
+      state: 'on'
+  condition:
+    - condition: time
+      after: '11:00:00'
+      before: '21:00:00'
+  action:
+    # Cancel ev. old timers 
+    - service: script.turn_off
+      data: 
+        entity_id: script.timed_lys_soverom
+    # Set new timer 
+    - service: script.turn_on
+      data:
+        entity_id: script.timed_lys_soverom
+
+- alias: "Lys soverom door trigger"
+  trigger:
+#    - platform: state
+#      entity_id: binary_sensor.door_soverom
+#      state: 'on'
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
+  condition:
+   - condition: or
+     conditions:
+   - condition: time
+     after: '11:00:00'
+     before: '21:00:00'
+   - condition: state
+     entity_id: light.soverom1
+     state: 'off'
+   - condition: state
+     entity_id: light.soverom2
+     state: 'off'
+  action:
+   - service: homeassistant.turn_on
+     entity_id:
+       - light.soverom1
+       - light.soverom2
+     data:
+       brightness: 216
+       xy_color: [0.5458, 0.4159]
+       transition: 2
+
+- alias: "Lys soverom door trigger natt"
+  trigger:
+#    - platform: state
+#      entity_id: binary_sensor.door_soverom
+#      state: 'on'
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
+  condition:
+   - condition: or
+     conditions:
+   - condition: time
+     before: '11:00:00'
+     after: '21:00:00'
+   - condition: state
+     entity_id: input_boolean.tine_home
+     state: 'off'
+   - condition: state
+     entity_id: light.soverom1
+     state: 'off'
+   - condition: state
+     entity_id: light.soverom2
+     state: 'off'
+  action:
+   - service: homeassistant.turn_on
+     entity_id:
+       - light.soverom1
+       - light.soverom2
+     data:
+       brightness: 10
+       xy_color: [0.675,0.322]
+       transition: 2
+
+
+- alias: "Lys soverom door trigger off"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.door_soverom
+      state: 'off'
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'off', 'entity_id': 'switch.door_bedroom'}
+  condition:
+   - condition: state
+     entity_id: light.soverom1
+     state: 'on'
+   - condition: state
+     entity_id: light.soverom2
+     state: 'on'
+   - condition: state
+     entity_id: script.leggetid_soverom
+     state: 'off'
+  action:
+   - delay:
+        seconds: 5
+   - service: homeassistant.turn_off
+     entity_id:
+       - light.soverom1
+       - light.soverom2
+     data:
+       transition: 10
+

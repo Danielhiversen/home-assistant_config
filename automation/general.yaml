@@ -193,11 +193,36 @@
     entity_id: switch.door_bedroom
     to: 'on'
     for:
-      minutes: 60
+      minutes: 30
   action:
       service: homeassistant.turn_off
       entity_id: 
       - switch.door_bedroom
+
+
+- alias: "Tine home"
+  trigger:
+    - platform: state
+      entity_id: device_tracker.tine
+      to: 'home'
+  action:
+      service: homeassistant.turn_on
+      entity_id: 
+      - input_boolean.tine_home
+
+
+- alias: "Tine home"
+  trigger:
+    - platform: state
+      entity_id: device_tracker.tine
+      to: 'not_home'
+      for:
+        hours: 20
+  action:
+      service: homeassistant.turn_off
+      entity_id: 
+      - input_boolean.tine_home
+
 
 #- alias: "Mobillader on"
 #  trigger:

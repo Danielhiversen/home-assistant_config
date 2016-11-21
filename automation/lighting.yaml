@@ -311,14 +311,17 @@
 
 - alias: "Lys yttergang timer"
   trigger:
-    - platform: state
-      entity_id: switch.movement1, binary_sensor.door
-      state: 'on'
+   - platform: event
+     event_type: button_pressed
+     event_data: {'state': 'on', 'entity_id': 'switch.movement1'}
+   - platform: event
+     event_type: button_pressed
+     event_data: {'state': 'on', 'entity_id': 'switch.door'}
   action:
     # Cancel ev. old timers 
     - service: script.turn_off
       data: 
-         entity_id: script.timed_lys_yttergang
+        entity_id: script.timed_lys_yttergang
     # Set new timer 
     - service: script.turn_on
       data:
@@ -326,23 +329,22 @@
 
 - alias: "Lys yttergang"
   trigger:
-    - platform: state
-      entity_id: switch.movement1, binary_sensor.door
-      state: 'on'
+   - platform: event
+     event_type: button_pressed
+     event_data: {'state': 'on', 'entity_id': 'switch.movement1'}
+   - platform: event
+     event_type: button_pressed
+     event_data: {'state': 'on', 'entity_id': 'switch.door'}
   condition:
    - condition: state
      entity_id: light.yttergang
      state: 'off'
   action:
-    # Cancel ev. old timers 
-    - service: script.turn_off
-      data: 
-         entity_id: script.timed_lys_yttergang
-    - service: homeassistant.turn_on
-      data:
-        entity_id: light.yttergang
-        transition: 0
-        brightness: 90
+   - service: homeassistant.turn_on
+     data:
+       entity_id: light.yttergang
+       transition: 0
+       brightness: 90
 
 - alias: 'Wake Me Up, lys stue'
   trigger:

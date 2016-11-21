@@ -51,8 +51,8 @@ restore_states:
 
 logger:
   default: warn
-  logs:
-    homeassistant.components.automation: debug
+#  logs:
+#    homeassistant.components.core: warn
 #    homeassistant.components.device_tracker: info
 #    homeassistant.components.http: info
 #    homeassistant.components.rfxtrx: debug
@@ -128,9 +128,9 @@ device_tracker:
 #- platform: gpslogger
 #  consider_home: 1800
 
-media_player:
-  platform: cast
-  host: 192.168.1.2
+#media_player:
+#  platform: cast
+#  host: 192.168.1.2
 
 rfxtrx:
   device: /dev/serial/by-id/usb-RFXCOM_RFXtrx433_A1Y0NJGR-if00-port0
@@ -277,12 +277,14 @@ input_slider:
     icon: mdi:fire
     unit_of_measurement: '°C'  
 
-
 input_boolean: 
   movement3:
     initial: off
   auto_heat:
     name: Auto heat
+    initial: off
+  tine_home:
+    name: Tine hjemme
     initial: off
 
 sensor miflora1:

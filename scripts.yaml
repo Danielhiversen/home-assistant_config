@@ -90,8 +90,8 @@ leggetid:
       entity_id: scene.Dempet_lys
   - service: homeassistant.turn_off
     entity_id:
-      - light.lys_bokhylle
-      - light.lys_bilder
+     - light.lys_bokhylle
+     - light.lys_bilder
   - service: script.turn_on
     data:
       entity_id: script.leggetid_soverom
@@ -106,8 +106,8 @@ leggetid_soverom:
   sequence:
   - service: homeassistant.turn_on
     entity_id:
-      - light.soverom1
-      - light.soverom2
+     - light.soverom1
+     - light.soverom2
     data:
       transition: 10
       brightness: 80
@@ -115,8 +115,8 @@ leggetid_soverom:
   - delay: '00:00:11'
   - service: homeassistant.turn_on
     entity_id:
-      - light.soverom1
-      - light.soverom2
+     - light.soverom1
+     - light.soverom2
     data:
       transition: 60
       brightness: 74
@@ -124,8 +124,8 @@ leggetid_soverom:
   - delay: '00:01:01'
   - service: homeassistant.turn_on
     entity_id:
-      - light.soverom1
-      - light.soverom2
+     - light.soverom1
+     - light.soverom2
     data:
       transition: 60
       brightness: 74
@@ -133,8 +133,8 @@ leggetid_soverom:
   - delay: '00:01:01'
   - service: homeassistant.turn_on
     entity_id:
-      - light.soverom1
-      - light.soverom2
+     - light.soverom1
+     - light.soverom2
     data:
       transition: 60
       brightness: 80
@@ -142,13 +142,14 @@ leggetid_soverom:
   - delay: '00:01:01'
   - service: script.turn_on
     data: 
-       entity_id: script.leggetid_soverom_temp
+      entity_id: script.leggetid_soverom_temp
 
 leggetid_soverom_temp:
   sequence:
+  - delay: '00:00:10'
   - service: script.turn_on
     data: 
-       entity_id: script.leggetid_soverom
+      entity_id: script.leggetid_soverom
 
 sove_tid:
   sequence:
@@ -164,8 +165,7 @@ sove_tid:
       - light.soverom2
     data:
       transition: 2
-      brightness: 1
-      rgb_color: [1, 0, 0]
+      xy_color: [0.675,0.322]
   - delay: 00:00:03
   - service: homeassistant.turn_off
     entity_id:
@@ -180,11 +180,19 @@ vekke_lys:
   - service: homeassistant.turn_on
     entity_id:
       - light.soverom1
+    data:
+      transition: 2
+      xy_color: [0.675,0.322]
+  - delay:
+        seconds: 5
+  - service: homeassistant.turn_on
+    entity_id:
       - light.soverom2
     data:
-      transition: 0
-      brightness: 1
-      rgb_color: [1, 0, 0]
+      transition: 2
+      xy_color: [0.675,0.322]
+  - delay:
+        minutes: 1
   - service: homeassistant.turn_on
     entity_id:
       - light.soverom1
@@ -201,15 +209,17 @@ vekke_lys:
       - light.soverom2
     data:
       transition: 60
-      brightness: 165
+      brightness: 255
       xy_color: [0.5704, 0.3978]
+  - delay:
+        minutes: 60
   - service: homeassistant.turn_off
     entity_id:
       - light.soverom1
       - light.soverom2
 
 timed_lys_yttergang:
-  alias: "Turn off lights after 3 min"
+  alias: "Turn off yttergang lights after 3 min"
   sequence:
     - delay:
         minutes: 3
@@ -217,6 +227,18 @@ timed_lys_yttergang:
       data:
         entity_id: light.yttergang
         transition: 20
+
+timed_lys_soverom:
+  alias: "Turn off soverom lights after 3 min"
+  sequence:
+    - delay:
+        minutes: 3
+    - service: homeassistant.turn_off
+      entity_id:
+        - light.soverom1
+        - light.soverom2
+      data:
+        transition: 10
 
 all_light_off:
   sequence:
