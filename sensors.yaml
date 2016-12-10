@@ -55,10 +55,22 @@
        - sensor.time
     phone_battery:
       friendly_name: 'Telefon batteri'
-      value_template: '{{ states.device_tracker.yt910xvzgp.attributes.battery|float }}'
+      value_template: '{{ states.device_tracker.daniel.attributes.battery|float }}'
       unit_of_measurement: "%"
       entity_id: 
-       - device_tracker.yt910xvzgp
+       - device_tracker.daniel
+    phone_latitude:
+      friendly_name: 'Telefon latitude'
+      value_template: '{{ states.device_tracker.daniel.attributes.latitude|float }}'
+      unit_of_measurement: " "
+      entity_id: 
+       - device_tracker.daniel
+    phone_longitude:
+      friendly_name: 'Telefon longitude'
+      value_template: '{{ states.device_tracker.daniel.attributes.longitude|float }}'
+      unit_of_measurement: " "
+      entity_id: 
+       - device_tracker.daniel
     target_temp_stue:
       value_template: '{{ states.climate.termostat_stue.attributes.temperature }}'
       entity_id: 
@@ -79,23 +91,49 @@
                               {%- else -%}
                                   None
                               {%- endif %}
-                              {%- endif %}
+                          {%- endif %}
                       {%- endfor -%}
       unit_of_measurement: "lux"
       entity_id: 
        - sensor.blomst_bokhylle_light_intensity
        - sensor.blomst_sofa_light_intensity
        - sensor.blomst_tv_light_intensity
+    mean_stue_temp:
+      friendly_name: 'Avg stue temp'
+      value_template: >
+                      {% set sum = 0 %}
+                      {% set num = 0 %}
+                      {% for state in [states.sensor.blomst_tv_temperature, states.sensor.blomst_sofa_temperature, states.sensor.blomst_bokhylle_temperature, states.sensor.stue_temperature, states.sensor.stue_tvbenk_temperature] %}
+                          {%- if  as_timestamp(now()) - as_timestamp(state.last_updated) < 300  and not (state.state == "unknown")-%}
+                              {% set sum = sum + state.state|float %}
+                              {% set num = num + 1|float %}
+                          {%- endif %}
+                          {%- if loop.last %}
+                              {%- if  num > 0  -%}
+                              {{ sum/num }}
+                              {%- else -%}
+                               {{   states.sensor.stue_temperature.state }}
+                              {%- endif %}
+                          {%- endif %}
+                      {%- endfor -%}
+      unit_of_measurement: "°C"
+      entity_id: 
+       - sensor.blomst_tv_temperature
+       - sensor.blomst_sofa_temperature
+       - sensor.blomst_bokhylle_temperature
+       - sensor.stue_temperature
+       - sensor.stue_tvbenk_temperature
 
 - platform: time_date
   display_options:
     - 'time'
 
 - platform: broadlink
-  update_interval: 300
-  host: 192.168.1.20
+  update_interval: 120
+  host: 192.168.1.173
   mac: 'B4:43:0D:D1:02:F7'
-  name: "Stue"
+  name: "Stue_tvbenk"
+  timeout: 15
   monitored_conditions:
     - temperature
     - humidity

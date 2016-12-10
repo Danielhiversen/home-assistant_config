@@ -12,7 +12,7 @@
       before: '22:00:00'
 
     - condition: template
-      value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 600 }}'
+      value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 1800 }}'
     - condition: template
       value_template: '{{float(states.input_slider.auto_temp.state) > float(states.climate.termostat_stue.attributes.temperature)}}'
     - condition: state
@@ -26,10 +26,11 @@
 
 - alias: "Auto heating on 2"
   trigger:
-    platform: numeric_state
-    entity_id: proximity.home
-    below: 1000
-    above: 200
+    platform: state
+    entity_id: binary_sensor.low_home_dist
+    to: 'on'
+    for:
+      minutes: 3
   condition:
     # Heading home
     - condition: template
@@ -39,7 +40,7 @@
       before: '22:00:00'
 
     - condition: template
-      value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 600 }}'
+      value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 1800 }}'
     - condition: template
       value_template: '{{float(states.input_slider.auto_temp.state) > float(states.climate.termostat_stue.attributes.temperature)}}'
     - condition: state
@@ -82,7 +83,7 @@
       event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
     - platform: event
       event_type: button_pressed
-      event_data: {'state': 'unknown command (0xeba768)', 'entity_id': 'switch.main'}
+      event_data: {'state': 'group on', 'entity_id': 'switch.main'}
   condition:
     - condition: template
       value_template: '{{float(states.input_slider.auto_temp_low.state) < float(states.climate.termostat_stue.attributes.temperature)}}'

@@ -115,17 +115,38 @@
       brightness: 216
       xy_color: [0.5458, 0.4159]
  
-
-- alias: "Lys soverom door timer"
+- alias: "Lys soverom door trigger dag"
   trigger:
-    - platform: state
-      entity_id: binary_sensor.door_soverom
-      state: 'on'
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0xdb153a)', 'entity_id': 'switch.movement_soverom'}
   condition:
-    - condition: time
-      after: '11:00:00'
-      before: '21:00:00'
+   - condition: template
+     value_template: '{{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.last_updated)) > 3600*4 }}'
+   - condition: or
+     conditions:
+     - condition: template
+       value_template: '{{(as_timestamp(now())-as_timestamp(states.script.vekke_lys.last_updated)) < 3600*4 }}'
+     - condition: time
+       after: '11:00:00'
+       before: '23:00:00'
+   - condition: state
+     entity_id: light.soverom1
+     state: 'off'
+   - condition: state
+     entity_id: light.soverom2
+     state: 'off'
   action:
+    - service: homeassistant.turn_on
+      entity_id:
+        - light.soverom1
+        - light.soverom2
+      data:
+        brightness: 216
+        xy_color: [0.5458, 0.4159]
     # Cancel ev. old timers 
     - service: script.turn_off
       data: 
@@ -135,50 +156,24 @@
       data:
         entity_id: script.timed_lys_soverom
 
-- alias: "Lys soverom door trigger"
-  trigger:
-#    - platform: state
-#      entity_id: binary_sensor.door_soverom
-#      state: 'on'
-    - platform: event
-      event_type: button_pressed
-      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
-  condition:
-   - condition: or
-     conditions:
-   - condition: time
-     after: '11:00:00'
-     before: '21:00:00'
-   - condition: state
-     entity_id: light.soverom1
-     state: 'off'
-   - condition: state
-     entity_id: light.soverom2
-     state: 'off'
-  action:
-   - service: homeassistant.turn_on
-     entity_id:
-       - light.soverom1
-       - light.soverom2
-     data:
-       brightness: 216
-       xy_color: [0.5458, 0.4159]
-       transition: 2
-
 - alias: "Lys soverom door trigger natt"
   trigger:
-#    - platform: state
-#      entity_id: binary_sensor.door_soverom
-#      state: 'on'
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0xdb153a)', 'entity_id': 'switch.movement_soverom'}
   condition:
+   - condition: template
+     value_template: '{{(as_timestamp(now())-as_timestamp(states.script.vekke_lys.last_updated)) > 3600*4 }}'
    - condition: or
      conditions:
-   - condition: time
-     before: '11:00:00'
-     after: '21:00:00'
+     - condition: template
+       value_template: '{{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.last_updated)) < 3600*4 }}'
+     - condition: time
+       before: '11:00:00'
+       after: '23:00:00'
    - condition: state
      entity_id: input_boolean.tine_home
      state: 'off'
@@ -189,15 +184,21 @@
      entity_id: light.soverom2
      state: 'off'
   action:
-   - service: homeassistant.turn_on
-     entity_id:
-       - light.soverom1
-       - light.soverom2
-     data:
-       brightness: 10
-       xy_color: [0.675,0.322]
-       transition: 2
-
+    - service: homeassistant.turn_on
+      entity_id:
+        - light.soverom1
+        - light.soverom2
+      data:
+        brightness: 10
+        xy_color: [0.675,0.322]
+    # Cancel ev. old timers 
+    - service: script.turn_off
+      data: 
+        entity_id: script.timed_lys_soverom
+    # Set new timer 
+    - service: script.turn_on
+      data:
+        entity_id: script.timed_lys_soverom
 
 - alias: "Lys soverom door trigger off"
   trigger:
@@ -226,4 +227,3 @@
        - light.soverom2
      data:
        transition: 10
-

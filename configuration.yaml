@@ -40,6 +40,8 @@ http:
    - 192.168.1.19
    - 192.168.1.20
    - 192.168.1.21
+ ip_ban_enabled: True
+ login_attempts_threshold: 5
 
 recorder:
   purge_days: 2
@@ -51,8 +53,8 @@ restore_states:
 
 logger:
   default: warn
-#  logs:
-#    homeassistant.components.core: warn
+  logs:
+    custom_components.switch.broadlink: info
 #    homeassistant.components.device_tracker: info
 #    homeassistant.components.http: info
 #    homeassistant.components.rfxtrx: debug
@@ -72,6 +74,10 @@ automation: !include_dir_merge_list automation
 
 light: !include lights.yaml
 
+input_slider: !include input_slider.yaml
+
+binary_sensor: !include binary_sensor.yaml
+
 sensor: !include sensors.yaml
 
 switch: !include switches.yaml
@@ -82,55 +88,50 @@ movement_light_gang:
 
 movement_light_do:
 
-#update_ip:
+update_ip:
 
 proximity:
   home: 
     devices:
-      - device_tracker.yt910xvzgp
+      - device_tracker.daniel
     tolerance: 50
     unit_of_measurement: m
-
-#temp_control:
-#  - target: 'termostat_stue'
-#    name: 'auto timer'
-
-#  - target: 'soverom'
-#    name: 'morgen'
-#    keep_on: true
-    
-#  - target: 'soverom'
-#    name: 'kveld'
-#    keep_on: true
 
 notify:
   platform: pushbullet
   api_key: !secret pushbullet
-  name: daniel_telefon
+  name: pushbullet
 
 device_tracker:
-- platform: netgear
-  host: 192.168.1.1
-  username: admin
-  password: !secret netgear
-  port: 80
-  track_new_devices: no
-  consider_home: 1800
-  interval_seconds: 10
-
 - platform: nmap_tracker
-  hosts: 192.168.1.1-25
+  hosts: 192.168.1.1-255
+  track_new_devices: no
+  consider_home: 900
+  interval_seconds: 10
+  home_interval: 5
+  scan_options: " --privileged -sP "
+  # sudo setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap 
 
-# - platform: locative
+#- platform: luci
+#  host: 192.168.1.1
+#  username: root
+#  password: 
+#  track_new_devices: no
+#  consider_home: 900
+#  interval_seconds: 10
 
 - platform: bluetooth_tracker
 
-#- platform: gpslogger
-#  consider_home: 1800
+- platform: gpslogger
+  consider_home: 1800
+  # http://:8123/api/gpslogger?api_password=XXX&latitude=%LAT&longitude=%LON&battery=%BATT&device=daniel&accuracy=%ACC
 
-#media_player:
-#  platform: cast
-#  host: 192.168.1.2
+media_player:
+- platform: cast
+  host: 192.168.1.160
+
+- platform: vlc
+  name: Stue
 
 rfxtrx:
   device: /dev/serial/by-id/usb-RFXCOM_RFXtrx433_A1Y0NJGR-if00-port0
@@ -141,7 +142,7 @@ climate:
 - platform: generic_thermostat
   name :  Termostat stue
   heater :  switch.ovn_stue
-  target_sensor : sensor.Stue_2
+  target_sensor : sensor.mean_stue_temp
   target_temp : 18
   min_temp : 10
   max_temp : 25
@@ -149,7 +150,7 @@ climate:
 - platform: generic_thermostat
   name :  Soverom
   heater :  switch.ovn_soverom
-  target_sensor : sensor.Soverom
+  target_sensor : sensor.Soverom_temperature
   target_temp : 15
   min_temp : 7
   max_temp : 25
@@ -160,125 +161,10 @@ climate:
 # target_sensor : sensor.temperature_rubicson_61951
 # max_temp : 100
 
-binary_sensor: 
-  platform: template 
-  sensors:
-    movement1:
-      value_template: "{{ states.switch.movement1.state == 'on' }}" 
-      sensor_class: motion
-      entity_id: switch.movement1
-    movement2:
-      value_template: "{{ states.switch.movement2.state == 'on' }}" 
-      sensor_class: motion
-      entity_id: switch.movement2
-    movement_do:
-      value_template: "{{ states.switch.movement_do.state == 'on' }}" 
-      sensor_class: motion
-      entity_id: switch.movement_do
-    movement3:
-      value_template: "{{ states.input_boolean.movement3.state == 'on' }}" 
-      sensor_class: motion
-      entity_id: input_boolean.movement3
-    door:
-      value_template: "{{ states.switch.door.state == 'on' }}" 
-      sensor_class: opening
-      entity_id: switch.door
-    door_soverom:
-      value_template: "{{ states.switch.door_bedroom.state == 'on' }}" 
-      sensor_class: opening
-      entity_id: switch.door_bedroom
-    door_do:
-      value_template: "{{ states.switch.door_do.state == 'on' }}" 
-      entity_id: switch.door_do
-      sensor_class: opening
-    hot_kjoleskap:
-      friendly_name: hot_kjoleskap
-      value_template: '{{ states.sensor.kjoleskap.state | float > 4.0 }}'
-      entity_id: sensor.kjoleskap
-    stue_lux:
-      value_template: "{{ states.switch.lux.state == 'off' }}" 
-      entity_id: switch.lux
-      sensor_class: light
-
-input_slider: 
-  alarmhour:
-    name: Hour
-    icon: mdi:timer
-    initial: 7
-    min: 4
-    max: 11
-    step: 1
-  alarmminutes:
-    name: Minutes
-    icon: mdi:timer
-    initial: 30
-    min: 0
-    max: 55
-    step: 5
-  auto_temp:
-    name: Auto heat high
-    min: 20
-    max: 23
-    initial: 20.5
-    step: 0.5
-    icon: mdi:fire
-    unit_of_measurement: '°C'    
-  auto_temp_low:
-    name: Auto heat low
-    min: 14
-    max: 20
-    initial: 16
-    step: 0.5
-    icon: mdi:fire
-    unit_of_measurement: '°C'
-  temp_control_stue_hour:
-    name: Hour
-    icon: mdi:timer
-    initial: 15
-    min: 7
-    max: 23
-    step: 1
-  temp_control_stue_temp:
-    name: Temp
-    min: 12
-    max: 22
-    initial: 20
-    step: 1
-    icon: mdi:fire
-    unit_of_measurement: '°C'  
-  temp_control_soverom_morgen_hour:
-    name: Hour
-    icon: mdi:timer
-    initial: 7
-    min: 5
-    max: 15
-    step: 1
-  temp_control_soverom_morgen_temp:
-    name: Temp
-    min: 12
-    max: 18
-    initial: 14
-    step: 1
-    icon: mdi:fire
-    unit_of_measurement: '°C'  
-  temp_control_soverom_kveld_hour:
-    name: Hour
-    icon: mdi:timer
-    initial: 21
-    min: 15
-    max: 23
-    step: 1
-  temp_control_soverom_kveld_temp:
-    name: Temp
-    min: 14
-    max: 20
-    initial: 17
-    step: 1
-    icon: mdi:fire
-    unit_of_measurement: '°C'  
-
 input_boolean: 
   movement3:
+    initial: off
+  movement_soverom:
     initial: off
   auto_heat:
     name: Auto heat
@@ -298,6 +184,7 @@ sensor miflora1:
    - light
    - temperature
    - conductivity
+   - battery
 
 sensor miflora2:
   platform: miflora
@@ -310,6 +197,7 @@ sensor miflora2:
    - light
    - temperature
    - conductivity
+   - battery
 
 sensor miflora3:
   platform: miflora
@@ -322,3 +210,15 @@ sensor miflora3:
    - light
    - temperature
    - conductivity
+   - battery
+
+input_select:
+  radio_stue:
+    name: Radio
+    options:
+     - P3
+     - P1
+     - Alltid Nyheter
+     - Av
+    initial: Av
+    icon: mdi:music-note

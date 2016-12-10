@@ -8,7 +8,8 @@ div:
   - group.tracker
   - script.borte
   - input_boolean.tine_home
-  
+  - group.stovsuger
+
 stue:
   name: Stue 
   view: yes
@@ -20,11 +21,15 @@ stue:
   - light.yttergang
   - light.vindu
   - light.veranda
-  - sensor.stue
-  - sensor.stue_2
-  - sensor.stue_vindu
-  - sensor.ute_soverom
-  - sensor.ute_veranda
+  - binary_sensor.door
+  - binary_sensor.movement1
+  - binary_sensor.movement2
+  - sensor.stue_temperature
+  - sensor.mean_stue_temp
+  - sensor.stue_humidity
+  - sensor.stue_vindu_temperature
+  - sensor.ute_soverom_temperature
+  - sensor.ute_veranda_temperature
   - scene.dempet_lys
   - scene.normal_lys
   - script.stovsuger
@@ -32,6 +37,8 @@ stue:
   - sensor.yr_symbol
   - sensor.yr_condition
   - group.stue_heater
+  - switch.tv
+  - group.media_stue
 
 Soverom:
   view: yes
@@ -40,23 +47,25 @@ Soverom:
   - light.soverom1
   - light.soverom2
   - group.soverom_heater
-  - sensor.soverom
+  - sensor.soverom_temperature
   - script.leggetid_soverom
+  - binary_sensor.door_soverom
 #  - switch.mobillader
 
 Bad:
   view: yes
   entities:
-  - sensor.bad
-  - sensor.bad_2
+  - sensor.bad_temperature
+  - sensor.bad_humidity
   - light.do
   - light.gang
+  - binary_sensor.door_do
+  - binary_sensor.movement3
 
 tracker:
  - device_tracker.daniel
- - device_tracker.41d423a5778bcb1a
- - device_tracker.dhi
- - device_tracker.yt910xvzgp
+ - device_tracker.soren
+ - device_tracker.daniel_2
  - device_tracker.tine
  - device_tracker.nokia_130
 
@@ -106,3 +115,24 @@ temp_control_stue:
      - input_slider.temp_control_stue_hour
      - input_slider.temp_control_stue_temp
 
+stovsuger:
+  name: Støvsuger
+  entities: 
+   - switch.stovsuger
+   - binary_sensor.stovsuger
+   
+media_stue:
+  name: Media
+  entities:
+   - media_player.chromecast1877
+   - input_select.radio_stue
+
+hw_devices:
+  entities:
+   - device_tracker.broadlink_remote
+   - device_tracker.broadlink_sensor
+   - device_tracker.chromecast
+   - device_tracker.lys_do
+   - device_tracker.lys_veranda
+   - device_tracker.lys_yttergang
+   - device_tracker.philipshue

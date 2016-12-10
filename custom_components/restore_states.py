@@ -81,6 +81,8 @@ def setup(hass, config):
                     service = SERVICE_TURN_ON
                 else:
                     continue
+                if state.domain == light.DOMAIN:
+                   continue
                 if state.domain == automation.DOMAIN:
                    last_services.append((state.domain, service, data))
                    continue

@@ -14,14 +14,14 @@
       name: vindu
 
 - platform: hue
-  host: 192.168.1.9
+  host: 192.168.1.170
 
 - platform: flux_led
   automatic_add: False
   devices:
-    192.168.1.15:
-      name: Do
-    192.168.1.10:
+    192.168.1.136:
+      name: Gang
+    192.168.1.164:
       name: Yttergang
-    192.168.1.16:
+    192.168.1.110:
       name: Veranda

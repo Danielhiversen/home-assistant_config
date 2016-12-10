@@ -19,6 +19,11 @@
     - condition: state
       entity_id: script.light_turned_off_5min
       state: 'off'
+    - condition: state
+      entity_id: script.stovsuger_running
+      state: 'off'
+      for:
+        minutes: 2
   action:
      service: scene.turn_on
      entity_id: scene.Normal_lys
@@ -46,14 +51,11 @@
       entity_id: script.timed_movement
       state: 'off'
   action:
-    - service: homeassistant.turn_off
-      entity_id: group.all_lights
     - service: script.turn_off
       data: 
          entity_id: script.vekke_lys
-    - delay: '00:00:15'
-    - service: homeassistant.turn_off
-      entity_id: group.all_lights
+    - service: homeassistant.turn_on
+      entity_id: script.all_light_off
 
 - alias: "Home"
   trigger:
@@ -78,6 +80,11 @@
     - condition: state
       entity_id: script.light_turned_off_5min
       state: 'off'
+    - condition: state
+      entity_id: script.leggetid
+      state: 'off'
+      for:
+        hours: 2
   action:
       service: scene.turn_on
       entity_id: scene.Normal_lys
@@ -88,6 +95,11 @@
       entity_id: switch.movement1, switch.movement2, switch.movement2, switch.movement_do, binary_sensor.door_soverom, binary_sensor.door_do, switch.door
       state: 'on'
   condition:
+    - condition: state
+      entity_id: script.stovsuger_running
+      state: 'off'
+      for:
+        minutes: 2
     - condition: numeric_state
       entity_id: sun.sun
       value_template: '{{ state.attributes.elevation }}'
@@ -107,6 +119,11 @@
     - condition: state
       entity_id: binary.door
       state: 'off'
+    - condition: state
+      entity_id: script.leggetid
+      state: 'off'
+      for:
+        hours: 2
   action:
       service: scene.turn_on
       entity_id: scene.Normal_lys
@@ -121,6 +138,11 @@
       from: 'not_home'
       to: 'home'
   condition:
+    - condition: state
+      entity_id: script.stovsuger_running
+      state: 'off'
+      for:
+        minutes: 2
     - condition: state
       entity_id: binary_sensor.stue_lux
       state: 'off'
@@ -138,6 +160,11 @@
     - condition: state
       entity_id: script.light_turned_off_5min
       state: 'off'
+    - condition: state
+      entity_id: script.leggetid
+      state: 'off'
+      for:
+        hours: 2
   action:
       service: scene.turn_on
       entity_id: scene.Normal_lys
@@ -145,42 +172,54 @@
 - alias: "Night"
   trigger:
     - platform: state
-      entity_id: switch.movement1
+      entity_id: switch.movement1, switch.movement2, switch.movement2, switch.movement_do, binary_sensor.door_soverom, binary_sensor.door_do, switch.door
       state: 'on'
-    - platform: state
-      entity_id: switch.movement2
-      state: 'on'
-    - platform: state
-      entity_id: switch.door_bedroom
-      state: 'on'
-    - platform: state
-      entity_id: switch.door
-      state: 'on'
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0xdb153a)', 'entity_id': 'switch.movement_soverom'}
   condition:
     - condition: numeric_state
       entity_id: sun.sun
       value_template: '{{ state.attributes.elevation }}'
       below: 8
-    - condition: state
-      entity_id: light.Lys_stue
-      state: 'off'
-    - condition: state
-      entity_id: light.Lys_TV
-      state: 'off'
-    - condition: time
-      after: '00:00:00'
-      before: '08:00:00'
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: light.Lys_stue
+        state: 'off'
+      - condition: template
+        value_template: '{{states.light.Lys_stue.attributes.brightness == 101}}'
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: light.Lys_TV
+        state: 'off'
+      - condition: template
+        value_template: '{{states.light.Lys_TV.attributes.brightness == 101}}'
     - condition: state
       entity_id: script.light_turned_off_5min
       state: 'off'
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.last_updated)) < 60*60*2 }}'
+      - condition: time
+        after: '23:00:00'
+        before: '08:00:00'
   action:
     # Cancel ev. old timers 
     - service: script.turn_off
       data: 
          entity_id: script.timed_lights_5min_off
-    - service: scene.turn_on
+    - service: homeassistant.turn_on
+      entity_id:
+       - light.Lys_TV
+       - light.Lys_stue
       data:
-        entity_id: scene.Dempet_lys
+        brightness: 101
     # Set new timer 
     - service: script.turn_on
       data:
@@ -233,24 +272,20 @@
       entity_id: script.timed_movement
       state: 'off'
   action:
-    - service: homeassistant.turn_off
-      entity_id: group.all_lights
-    - delay: '00:00:15'
-    - service: homeassistant.turn_off
-      entity_id: group.all_lights
+    - service: homeassistant.turn_on
+      entity_id: script.all_light_off
 
 - alias: "All light off"
   trigger:
     - platform: event
       event_type: button_pressed
-      event_data: {'state': 'unknown command (0xeba768)', 'entity_id': 'switch.main'}
+      event_data: {'state': 'group on', 'entity_id': 'switch.main'}
   condition:
     - condition: template
       value_template: '{% if states.automation.all_light_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.all_light_off.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
   action:
     - service: homeassistant.turn_on
-      data:
-        entity_id: script.all_light_off
+      entity_id: script.all_light_off
 
 - alias: "lys bokhylle og bilder av"
   trigger:
@@ -273,26 +308,25 @@
       entity_id: script.away_48
       state: 'off'
   action:
-    - delay: '00:0{{ range(0,1) | random | int }}:{{ range(20,59) | random | int }}'
+    - delay: '0{{ range(0,1) | random | int }}:{{ range(20,59) | random | int }}:00'
     - service: scene.turn_on
       data:
         entity_id: scene.Normal_lys   
-    - delay: '00:0{{ range(0,2) | random | int }}:{{ range(20,59) | random | int }}'
+    - delay: '0{{ range(0,2) | random | int }}:{{ range(20,59) | random | int }}:00'
     - service: homeassistant.turn_on
       entity_id: 
       - light.lys_bokhylle
       - light.lys_bilder
-    - delay: '00:00:{{ range(2,10) | random | int }}'
-    - service: homeassistant.turn_off
-      entity_id:
-       - group.all_lights
-
+    - delay: '00:0{{ range(2,10) | random | int }}:00'
+    - service: homeassistant.turn_on
+      entity_id: script.all_light_off
+ 
 - alias: "Away lights veranda"
   trigger:
     - platform: numeric_state
       entity_id: sun.sun
       value_template: '{{ state.attributes.elevation }}'
-      below: 0
+      below: 2
   condition:
     - condition: state
       entity_id: script.away_48
@@ -304,7 +338,7 @@
         entity_id: light.veranda
         transition: 10
         brightness: 150
-    - delay: '00:00:{{ range(2,10) | random | int }}'
+    - delay: '00:{{ range(10,40) | random | int }}:00'
     - service: homeassistant.turn_off
       entity_id:
        - light.veranda
@@ -317,12 +351,16 @@
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door'}
+  condition:
+   - condition: state
+     entity_id: script.stovsuger_running
+     state: 'off'
+     for:
+       minutes: 1
   action:
-    # Cancel ev. old timers 
     - service: script.turn_off
       data: 
         entity_id: script.timed_lys_yttergang
-    # Set new timer 
     - service: script.turn_on
       data:
         entity_id: script.timed_lys_yttergang
@@ -336,6 +374,11 @@
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door'}
   condition:
+   - condition: state
+     entity_id: script.stovsuger_running
+     state: 'off'
+     for:
+       minutes: 1
    - condition: state
      entity_id: light.yttergang
      state: 'off'

@@ -9,6 +9,9 @@
       name: Movement2
     0b1100000213b3f210010f70:
       name: Movement_do
+    09130000db153a012670:
+      name: Movement_soverom
+      fire_event: True      
     0b1100e003af16aa10000060:
       name: Door
       fire_event: True
@@ -31,21 +34,48 @@
       name: soverom_switch1
       fire_event: True
     09130004d55555019870:
-      name: vaskemaskin
+      name: stovsuger_running
       fire_event: True
     09130009d744fc01a870:
       name: lyd_soverom
       fire_event: True
-    09130007cc0d68023770:
+    0b11003d0097251e01040f50:
       name: main
       fire_event: True
     0b110002012c299a0a000070:
       name: lux
 #    0b11000689bc0cfe05010f70:
 #      name: mobillader
+    091300381cd55001f670:
+      name: vann_kjokken
+      fire_event: True
+
 
 #- platform: command_line
 #  switches:
 #    stovsuger:
 #      oncmd:  "python /home/dahoiv/.homeassistant/orvibo/orvibo.py -i 192.168.1.18 -e /home/dahoiv/.homeassistant/orvibo/start_stovsuger.ir"
 #      offcmd: "python /home/dahoiv/.homeassistant/orvibo/orvibo.py -i 192.168.1.18 -e /home/dahoiv/.homeassistant/orvibo/stop_stovsuger.ir"
+
+- platform: broadlink
+  host: 192.168.1.243
+  mac: 'B4:43:0D:CC:0F:57'
+  timeout: 15
+  switches:
+    tv:
+      friendly_name: "Tv"
+      command_on: 'JgB+AFUfDR4NEA0QKywNEA0PDg8NEA0QDRANEA0QDRANEA4PGxANHg0QDQAKrVYdDR4ODw4PKi0NEA0QDg8NEA0PDg8ODw0QDRANEA0QHA8NHw0QDQAKrFUeDh4ODw0QKiwNEA0QDRANEA0QDg8NEA0PDg8ODw0QHBANHg4PDQANBQAAAAAAAAAAAAA='
+      command_off: 'JgB+AFUfDR4NEA0QKywNEA0PDg8NEA0QDRANEA0QDRANEA4PGxANHg0QDQAKrVYdDR4ODw4PKi0NEA0QDg8NEA0PDg8ODw0QDRANEA0QHA8NHw0QDQAKrFUeDh4ODw0QKiwNEA0QDRANEA0QDg8NEA0PDg8ODw0QHBANHg4PDQANBQAAAAAAAAAAAAA='
+    stovsuger:
+      friendly_name: "Stovsuger"
+      command_on: 'JgBgAAABJZMUNhMTERMSExITEhQRFBAUFBESOBE4EzcSNxI4EjcUNhMTERQROBEUEhMSFBAVERMROBI4ERQSNxI4EjgSNxM3EQAFEQABJUoSAAxCAAEnSRIADEIAASVLEQANBQAAAAAAAAAA'
+      command_off: 'JgBQAAABJZMTNxITEhMSExITEhMSExITEhMSNxI4EjgROBI4EjcSOBITEjcSOBITEhMSExITEhMSOBQREhMROBI4EjcSOBI3EgAFEAABJkoSAA0FAAAAAAAAAAA='
+    lydplanke:
+      friendly_name: "lydplanke"
+      command_on: 'JgB+AFYeDh4NEA0QDh4cEA0QDRAcHg4PDhANEA0QDg8ODw4QHA8OHg0QDgAKsVYfDR4ODw4QDR4cEA4PEA0cHw0QDRANEA4QDRANEA0QHBANHw0QDQAKslYeDh4NEA0QDh4cEA0QDRAeHA4PDhANEA0QDg8ODw4QHA8OHg4PDgANBQAAAAAAAAAAAAA='
+      command_off: 'JgB+AFYeDh4NEA0QDh4cEA0QDRAcHg4PDhANEA0QDg8ODw4QHA8OHg0QDgAKsVYfDR4ODw4QDR4cEA4PEA0cHw0QDRANEA4QDRANEA0QHBANHw0QDQAKslYeDh4NEA0QDh4cEA0QDRAeHA4PDhANEA0QDg8ODw4QHA8OHg4PDgANBQAAAAAAAAAAAAA='
+    lydplanke_aux:
+      friendly_name: "lydplanke aux"
+      command_on: 'JgB+AFYeDh4NEA4PDh4cDg8QDRAcHg4QDQ4PEA0QDhAbEA4PDh4ODw4QDQAKslUfDR8NEA0QDR8cDRAQDRAcHg0QDg8OEA0QDRAcEA0QDR8NEA0QDgAKsVYfDR4ODw4QDR4cEA0QDg8cHw0QDRANEA4QDRAcEA0QDR4OEA0QDQANBQAAAAAAAAAAAAA=
+'
+
