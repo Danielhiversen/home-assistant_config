@@ -25,6 +25,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x1cd550)', 'entity_id': 'switch.vann_kjokken'}
+  condition:
+    - condition: template
+      value_template: '{% if states.automation.vannlekasje_kjokken.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.vannlekasje_kjokken.attributes.last_triggered)) > 3600*12 }}  {% else %}true{% endif %}'
   action:
     service: notify.pushbullet
     data:
@@ -37,6 +40,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'group on', 'entity_id': 'switch.leggeid_stue'}
   action:
     - service: script.turn_off
       data: 
@@ -44,6 +50,19 @@
     - service: script.turn_on
       data:
         entity_id: script.leggetid
+
+- alias: "Leggetid soverom"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
+  action:
+    - service: script.turn_off
+      data: 
+         entity_id: script.leggetid_soverom
+    - service: script.turn_on
+      data:
+        entity_id: script.leggetid_soverom
 
 - alias: "Away 48"
   trigger:
@@ -235,21 +254,9 @@
       entity_id: device_tracker.tine
       to: 'home'
   action:
-      service: homeassistant.turn_on
-      entity_id: 
-      - input_boolean.tine_home
-
-- alias: "Tine not home"
-  trigger:
-    - platform: state
-      entity_id: device_tracker.tine
-      to: 'not_home'
-      for:
-        hours: 30
-  action:
       service: homeassistant.turn_off
       entity_id: 
-      - input_boolean.tine_home
+      - automation.nattlys
 
 #- alias: "Mobillader on"
 #  trigger:
@@ -417,7 +424,7 @@
   trigger:
    - platform: state
      entity_id: input_select.radio_stue
-     to: 'P3'
+     state: 'P3'
   action:
    - service: media_player.play_media
      entity_id: media_player.chromecast1877
@@ -429,7 +436,7 @@
   trigger:
    - platform: state
      entity_id: input_select.radio_stue
-     to: 'P1'
+     state: 'P1'
   action:
    - service: media_player.play_media
      entity_id: media_player.chromecast1877
@@ -441,7 +448,7 @@
   trigger:
    - platform: state
      entity_id: input_select.radio_stue
-     to: 'Alltid Nyheter'
+     state: 'Alltid Nyheter'
   action:
    - service: media_player.play_media
      entity_id: media_player.chromecast1877
@@ -453,7 +460,7 @@
   trigger:
    - platform: state
      entity_id: input_select.radio_stue
-     to: 'Av'
+     state: 'Av'
   action:
    - service: media_player.turn_off
      entity_id: media_player.chromecast1877
@@ -482,10 +489,11 @@
 - alias: "Offline device"
   trigger:
     platform: time
-    hours: '1'
+    minutes: '/15'
+    seconds: 12
   condition:
    - condition: template
-     value_template: '{% if states.automation..offline_device.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation..offline_device.attributes.last_triggered)) > 24*3600 }}  {% else %}  true {% endif %}'
+     value_template: '{% if states.automation.offline_device.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.offline_device.attributes.last_triggered)) > 24*3600 }}  {% else %}  true {% endif %}'
    - condition: template
      value_template: >  
        {% for state in states.device_tracker if state.entity_id in states.group.hw_devices.attributes.entity_id and state.state == 'not_home' %}
@@ -505,3 +513,36 @@
         {% for state in states.device_tracker if state.entity_id in states.group.hw_devices.attributes.entity_id  %}
         {%- if state.state == 'not_home'-%} {{ state.name | lower }} {% endif -%}
         {% endfor %}
+
+- alias: "Ny ip"
+  trigger:
+   - platform: state
+     entity_id: sensor.external_ip
+  condition:
+   - condition: template
+     value_template: '{% if states.automation.ha_started.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.ha_started.attributes.last_triggered)) > 5*60 }}  {% else %}false{% endif %}'
+  action:
+    service: notify.pushbullet
+    data:
+      title: "Ny ip"
+      target: "device/daniel_telefon"
+      message: Home IP Address was changed. The new home IP address is "{{ states('sensor.external_ip') }}"
+
+- alias: "Offline sensor"
+  trigger:
+    platform: time
+    minutes: '/48'
+    seconds: 10
+  condition:
+   - condition: template
+     value_template: '{% if states.automation.ha_started.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.ha_started.attributes.last_triggered)) > 60*60*10 }}  {% else %}false{% endif %}'
+   - condition: template
+     value_template: '{% if states.sensor.no_updates.state == False  %} false {% else %} true {% endif %}'
+  action:
+    service: notify.pushbullet
+    data:
+      title: "Offline sensor"
+      target: "device/daniel_telefon"
+      message: >
+        Sensor is offline: 
+        {{states("sensor.no_updates")}}

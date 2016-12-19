@@ -2,6 +2,6 @@
 Example Home Assistant Configs, home-assistant.io
 
 
-Tested with version 0.34.4
+Tested with version 0.35
 
 [Buy me a beer :)](http://paypal.me/dahoiv)

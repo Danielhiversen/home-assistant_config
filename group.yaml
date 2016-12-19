@@ -7,7 +7,6 @@ div:
   - sensor.mean_lux
   - group.tracker
   - script.borte
-  - input_boolean.tine_home
   - group.stovsuger
 
 stue:
@@ -20,7 +19,6 @@ stue:
   - light.lys_bilder
   - light.yttergang
   - light.vindu
-  - light.veranda
   - binary_sensor.door
   - binary_sensor.movement1
   - binary_sensor.movement2
@@ -50,7 +48,7 @@ Soverom:
   - sensor.soverom_temperature
   - script.leggetid_soverom
   - binary_sensor.door_soverom
-#  - switch.mobillader
+  - automation.nattlys
 
 Bad:
   view: yes
@@ -61,6 +59,13 @@ Bad:
   - light.gang
   - binary_sensor.door_do
   - binary_sensor.movement3
+
+Kjokken:
+  view: yes
+  entities:
+  - sensor.kjoleskap_temperature
+  - light.veranda
+  - group.steketermometer
 
 tracker:
  - device_tracker.daniel
@@ -136,3 +141,10 @@ hw_devices:
    - device_tracker.lys_veranda
    - device_tracker.lys_yttergang
    - device_tracker.philipshue
+
+steketermometer:
+  name: Steketermometer
+  entities: 
+   - input_select.steketermometer
+   - input_slider.temp_steketermometer
+   - input_boolean.steketermometer_notify_daniel

@@ -1,0 +1,21 @@
+- alias: "steketermometer fisk"
+  trigger:
+   - platform: state
+     entity_id: input_select.steketermometer
+     state: 'Fisk (50*)'
+  action:
+  - service: input_slider.select_value
+    data:
+      entity_id: "input_slider.steketermometer"
+      value: 50
+        
+- alias: "steketermometer kylling"
+  trigger:
+   - platform: state
+     entity_id: input_select.steketermometer
+     state: 'Kylling (70*)'
+  action:
+  - service: input_slider.select_value
+    data:
+      entity_id: "input_slider.steketermometer"
+      value: 70

@@ -102,6 +102,10 @@ timed_movement:
 
 leggetid:
   sequence:
+  - service: input_select.select_option
+    entity_id: input_select.radio_stue
+    data:
+      option: "Av"
   - service: scene.turn_on
     data:
       entity_id: scene.Dempet_lys
@@ -110,9 +114,6 @@ leggetid:
      - light.lys_bokhylle
      - light.lys_bilder
      - light.vindu
-  - service: script.turn_on
-    data:
-      entity_id: script.leggetid_soverom
   - delay: '00:00:05'
   - service: homeassistant.turn_off
     entity_id:
@@ -134,7 +135,7 @@ leggetid_soverom:
      - light.soverom2
     data:
       transition: 10
-      brightness: 80
+      brightness: 60
       xy_color: [0.4288, 0.2335]
   - delay: '00:00:11'
   - service: homeassistant.turn_on
@@ -161,7 +162,7 @@ leggetid_soverom:
      - light.soverom2
     data:
       transition: 30
-      brightness: 80
+      brightness: 70
       xy_color: [0.4288, 0.2335]
   - delay: '00:00:21'
   - service: script.turn_on
@@ -339,3 +340,22 @@ borte:
 stovsuger_running:
   sequence:
    - delay: 00:00:30
+
+
+timed_lys_gang:
+  alias: "Turn off gang lights after 4 min"
+  sequence:
+    - delay:
+        minutes: 4
+    - service: homeassistant.turn_off
+      data:
+        entity_id: light.gang
+
+timed_lys_do:
+  alias: "Turn off do lights after 15 min"
+  sequence:
+    - delay:
+        minutes: 15
+    - service: homeassistant.turn_off
+      data:
+        entity_id: light.do

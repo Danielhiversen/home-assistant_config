@@ -214,16 +214,16 @@
     - service: script.turn_off
       data: 
          entity_id: script.timed_lights_5min_off
+    - service: script.turn_on
+      data:
+        entity_id: script.timed_lights_5min_off
+    # Set new timer 
     - service: homeassistant.turn_on
       entity_id:
        - light.Lys_TV
        - light.Lys_stue
       data:
         brightness: 101
-    # Set new timer 
-    - service: script.turn_on
-      data:
-        entity_id: script.timed_lights_5min_off
 
 - alias: "lys bokhylle og bilder"
   initial_state: False
@@ -254,6 +254,18 @@
       entity_id: 
       - light.lys_bokhylle
       - light.lys_bilder
+      - light.vindu
+
+- alias: "lys bokhylle og bilder av"
+  trigger:
+    platform: time
+    after: '23:30:00'
+  action:
+      service: homeassistant.turn_off
+      entity_id: 
+      - light.lys_bokhylle
+      - light.lys_bilder
+      - light.vindu
 
 - alias: "Turn off light night"
   trigger:
@@ -274,6 +286,10 @@
   action:
     - service: homeassistant.turn_on
       entity_id: script.all_light_off
+    - service: input_select.select_option
+      entity_id: input_select.radio_stue
+      data:
+        option: "Av"
 
 - alias: "All light off"
   trigger:
@@ -287,16 +303,6 @@
     - service: homeassistant.turn_on
       entity_id: script.all_light_off
 
-- alias: "lys bokhylle og bilder av"
-  trigger:
-    platform: time
-    after: '23:30:00'
-  action:
-      service: homeassistant.turn_off
-      entity_id: 
-      - light.lys_bokhylle
-      - light.lys_bilder
-
 - alias: "Away lights"
   trigger:
     - platform: numeric_state
@@ -307,12 +313,14 @@
     - condition: state
       entity_id: script.away_48
       state: 'off'
+      for:
+        minutes: 1
   action:
     - delay: '0{{ range(0,1) | random | int }}:{{ range(20,59) | random | int }}:00'
     - service: scene.turn_on
       data:
         entity_id: scene.Normal_lys   
-    - delay: '0{{ range(0,2) | random | int }}:{{ range(20,59) | random | int }}:00'
+    - delay: '0{{ range(0,3) | random | int }}:{{ range(20,59) | random | int }}:00'
     - service: homeassistant.turn_on
       entity_id: 
       - light.lys_bokhylle
@@ -331,14 +339,16 @@
     - condition: state
       entity_id: script.away_48
       state: 'off'
+      for:
+        minutes: 1
   action:
-    - delay: '00:0{{ range(0,1) | random | int }}:{{ range(20,59) | random | int }}'
+    - delay: '00:{{ range(10,59) | random | int }}:{{ range(20,59) | random | int }}'
     - service: homeassistant.turn_on
       data:
         entity_id: light.veranda
         transition: 10
         brightness: 150
-    - delay: '00:{{ range(10,40) | random | int }}:00'
+    - delay: '0{{ range(0,2) | random | int }}:{{ range(20,59) | random | int }}:00'
     - service: homeassistant.turn_off
       entity_id:
        - light.veranda
@@ -393,6 +403,7 @@
   trigger:
    - platform: time
      minutes: '/5'
+     seconds: 2
   condition:
    - condition: state
      entity_id: automation.vekke_lys
@@ -418,27 +429,3 @@
      service: scene.turn_on
      entity_id: scene.Normal_lys
 
-
-- alias: "light vindu på"
-  trigger:
-    - platform: state
-      entity_id: light.Lys_TV
-      from: 'off'
-      to: 'on'
-  condition:
-    - condition: time
-      after: '14:00:00'
-      before: '23:00:00'
-  action:
-    - service: homeassistant.turn_on
-      entity_id: light.vindu
-
-
-- alias: "light vindu av"
-  trigger:
-    - platform: state
-      entity_id: light.Lys_TV
-      state: 'off'
-  action:
-    - service: homeassistant.turn_off
-      entity_id: light.vindu

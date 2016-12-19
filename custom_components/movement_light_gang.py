@@ -47,9 +47,9 @@ def setup(hass, config):
 
         now = dt_util.now()
         if now.hour >= 22 or now.hour < 7:
-            light.turn_on(hass, light_entity_id,  xy_color = [0.6461, 0.3426], brightness=64, transition=3)
+            light.turn_on(hass, light_entity_id,  rgb_color = [162, 27, 0])
         elif entity_id == 'binary_sensor.movement3':
-            light.turn_on(hass, light_entity_id,  xy_color = [0.4607, 0.43], brightness=81, transition=1)
+            light.turn_on(hass, light_entity_id, brightness=225)
         else:
             return
 

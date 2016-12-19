@@ -2,7 +2,8 @@
   initial_state: False
   trigger:
    - platform: time
-     minutes: '/1'
+     minutes: '/5'
+     seconds: 2
   condition:
    - condition: template
      value_template: '{{ now().hour == (states.input_slider.alarmhour.state  | round(0))  and  now().minute == (states.input_slider.alarmminutes.state  | round(0) )  }}'
@@ -33,6 +34,9 @@
       event_type: button_pressed
       event_data: {'entity_id': 'switch.lyd_soverom', 'state': 'unknown command (0xd744fc)'}
   condition:
+    - condition: state
+      entity_id: script.vekke_lys
+      state: 'off'
     - condition: state
       entity_id: script.timed_lyd_soverom_5s
       state: 'off'
@@ -156,7 +160,7 @@
       data:
         entity_id: script.timed_lys_soverom
 
-- alias: "Lys soverom door trigger natt"
+- alias: "Nattlys"
   trigger:
     - platform: event
       event_type: button_pressed
@@ -174,9 +178,6 @@
      - condition: time
        before: '11:00:00'
        after: '23:00:00'
-   - condition: state
-     entity_id: input_boolean.tine_home
-     state: 'off'
    - condition: state
      entity_id: light.soverom1
      state: 'off'

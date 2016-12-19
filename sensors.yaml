@@ -1,5 +1,5 @@
 - platform: rfxtrx
-  automatic_add: False
+  automatic_add: True
   devices:
     0a52080601010038480349:
       name: Kjoleskap
@@ -25,6 +25,8 @@
       name: Utepotte
       data_type: 
         - Humidity
+    08500902cbff017469:
+      name: Steketermometer
 
 - platform: yr
   monitored_conditions:
@@ -57,18 +59,6 @@
       friendly_name: 'Telefon batteri'
       value_template: '{{ states.device_tracker.daniel.attributes.battery|float }}'
       unit_of_measurement: "%"
-      entity_id: 
-       - device_tracker.daniel
-    phone_latitude:
-      friendly_name: 'Telefon latitude'
-      value_template: '{{ states.device_tracker.daniel.attributes.latitude|float }}'
-      unit_of_measurement: " "
-      entity_id: 
-       - device_tracker.daniel
-    phone_longitude:
-      friendly_name: 'Telefon longitude'
-      value_template: '{{ states.device_tracker.daniel.attributes.longitude|float }}'
-      unit_of_measurement: " "
       entity_id: 
        - device_tracker.daniel
     target_temp_stue:
@@ -110,7 +100,7 @@
                           {%- endif %}
                           {%- if loop.last %}
                               {%- if  num > 0  -%}
-                              {{ sum/num }}
+                              {{ (sum/num) | round(1) }}
                               {%- else -%}
                                {{   states.sensor.stue_temperature.state }}
                               {%- endif %}
@@ -123,17 +113,33 @@
        - sensor.blomst_bokhylle_temperature
        - sensor.stue_temperature
        - sensor.stue_tvbenk_temperature
+    no_updates:
+      friendly_name: 'No updates'
+      value_template: >
+          {% set val = "" %}
+          {% for state in states.sensor%}
+                 {%- if  as_timestamp(now()) - as_timestamp(state.last_updated) > 60*60*10-%}
+                    {% set val = val + state.entity_id + "\n"  %}
+                 {%- endif %}
+                 {%- if loop.last %}
+                         {%- if  val == ""  -%}
+                               {{ False }}
+                         {%- else -%}
+                               {{ val }}
+                         {%- endif %} 
+                  {%- endif %}
+          {%- endfor-%}
 
 - platform: time_date
   display_options:
     - 'time'
 
 - platform: broadlink
-  update_interval: 120
+  update_interval: 160
   host: 192.168.1.173
   mac: 'B4:43:0D:D1:02:F7'
   name: "Stue_tvbenk"
-  timeout: 15
+  timeout: 10
   monitored_conditions:
     - temperature
     - humidity
@@ -141,6 +147,10 @@
     - light
     - noise
 
+- platform: rest
+  resource: http://ip.jsontest.com
+  name: External IP
+  value_template: '{{ value_json.ip }}'
 
 # platform: tellstick
 # 11: Kjoleskap

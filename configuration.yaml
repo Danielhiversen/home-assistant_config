@@ -20,31 +20,13 @@ http:
  #sessions_enabled: 0
  trusted_networks:
    - 127.0.0.1
-   - 192.168.1.2
-   - 192.168.1.3
-   - 192.168.1.4
-   - 192.168.1.5
-   - 192.168.1.6
-   - 192.168.1.7
-   - 192.168.1.8
-   - 192.168.1.9
-   - 192.168.1.10
-   - 192.168.1.11
-   - 192.168.1.12
-   - 192.168.1.13
-   - 192.168.1.14
-   - 192.168.1.15
-   - 192.168.1.16
-   - 192.168.1.17
-   - 192.168.1.18
-   - 192.168.1.19
-   - 192.168.1.20
-   - 192.168.1.21
+   - 192.168.1.0/24
  ip_ban_enabled: True
  login_attempts_threshold: 5
 
 recorder:
   purge_days: 2
+  db_url: !secret db_url
 #  db_url: sqlite:///home/dahoiv/hass.db
 
 logbook:
@@ -52,12 +34,12 @@ logbook:
 restore_states:
 
 logger:
-  default: warn
+  default: warning
   logs:
-    custom_components.switch.broadlink: info
+    homeassistant.components.switch.broadlink: info
 #    homeassistant.components.device_tracker: info
 #    homeassistant.components.http: info
-#    homeassistant.components.rfxtrx: debug
+    homeassistant.components.rfxtrx: info
 #    homeassistant.components.sensor.miflora: debug
 
 history: 
@@ -84,11 +66,7 @@ switch: !include switches.yaml
 
 group: !include group.yaml
 
-movement_light_gang:
-
-movement_light_do:
-
-update_ip:
+# update_ip:
 
 proximity:
   home: 
@@ -130,8 +108,8 @@ media_player:
 - platform: cast
   host: 192.168.1.160
 
-- platform: vlc
-  name: Stue
+#- platform: vlc
+#  name: Stue
 
 rfxtrx:
   device: /dev/serial/by-id/usb-RFXCOM_RFXtrx433_A1Y0NJGR-if00-port0
@@ -169,9 +147,9 @@ input_boolean:
   auto_heat:
     name: Auto heat
     initial: off
-  tine_home:
-    name: Tine hjemme
-    initial: off
+  steketermometer_notify_daniel:
+    name: Notify Daniel
+    initial: off  
 
 sensor miflora1:
   platform: miflora
@@ -222,3 +200,22 @@ input_select:
      - Av
     initial: Av
     icon: mdi:music-note
+  steketermometer:
+    name: Steketermometer
+    options:
+     - "Fisk (50*)"
+     - "Kylling (70*)"
+     - " "
+    initial: " "
+    icon: mdi:fish
+#camera:
+#  - platform: generic
+#    still_image_url: http://raspberrypi:8082/index.html
+
+tts:
+  - platform: google
+    language: 'no'
+
+feedreader:
+  urls:
+    - http://feeds.feedburner.com/adressa/stAa

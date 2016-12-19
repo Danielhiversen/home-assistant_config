@@ -26,15 +26,22 @@
 
 - alias: "Auto heating on 2"
   trigger:
-    platform: state
-    entity_id: binary_sensor.low_home_dist
-    to: 'on'
-    for:
-      minutes: 3
+   - platform: numeric_state
+     entity_id: proximity.home
+     below: 1300
+   - platform: numeric_state
+     entity_id: proximity.home
+     below: 150
   condition:
     # Heading home
     - condition: template
       value_template: '{{ states.proximity.home.attributes.dir_of_travel == "towards" }}'
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ states.device_tracker.daniel.attributes.activity |lower != "in vehicle" }}'
+      - condition: template
+        value_template: '{{ states.proximity.home.state | float < 150 }}'
     - condition: time
       after: '07:00:00'
       before: '22:00:00'
@@ -63,13 +70,21 @@
       for:
         minutes: 2
   condition:
+    - condition: state
+      entity_id: input_boolean.auto_heat
+      state: 'on'
+    - condition: or
+      conditions:
+      - condition: time
+        after: '23:00:00'
+        before: '07:00:00'
+      - condition: state
+        entity_id: group.tracker
+        state: 'not_home'
     - condition: template
       value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 180 }}'
     - condition: template
       value_template: '{{float(states.input_slider.auto_temp_low.state) < float(states.climate.termostat_stue.attributes.temperature)}}'
-    - condition: state
-      entity_id: input_boolean.auto_heat
-      state: 'on'
   action:
     - service: climate.set_temperature
       data_template:
@@ -84,6 +99,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'group on', 'entity_id': 'switch.main'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'group on', 'entity_id': 'switch.leggetid_stue'}
   condition:
     - condition: template
       value_template: '{{float(states.input_slider.auto_temp_low.state) < float(states.climate.termostat_stue.attributes.temperature)}}'
