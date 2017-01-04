@@ -1,0 +1,209 @@
+
+leggetid:
+  sequence:
+  - service: input_select.select_option
+    entity_id: input_select.radio_stue
+    data:
+      option: "Av"
+  - service: scene.turn_on
+    data:
+      entity_id: scene.Dempet_lys
+  - service: homeassistant.turn_off
+    entity_id:
+     - light.lys_bokhylle
+     - light.lys_bilder
+     - light.vindu
+  - delay: '00:00:05'
+  - service: homeassistant.turn_off
+    entity_id:
+     - light.lys_bokhylle
+     - light.lys_bilder
+     - light.vindu
+  - delay: '00:10:00'
+  - service: homeassistant.turn_off
+    entity_id:
+     - light.Lys_TV
+     - light.Lys_stue
+
+leggetid_soverom:
+  alias: Leggetid soverom
+  sequence:
+  - service: homeassistant.turn_on
+    entity_id:
+     - light.soverom
+    data:
+      transition: 10
+      brightness: 60
+      xy_color: [0.4288, 0.2335]
+  - delay: '00:00:11'
+  - service: homeassistant.turn_on
+    entity_id:
+     - light.soverom
+    data:
+      transition: 30
+      brightness: 74
+      xy_color: [0.5931, 0.381]
+  - delay: '00:00:31'
+  - service: homeassistant.turn_on
+    entity_id:
+     - light.soverom
+    data:
+      transition: 30
+      brightness: 74
+      xy_color: [0.645, 0.3061]
+  - delay: '00:00:31'
+  - service: homeassistant.turn_on
+    entity_id:
+     - light.soverom
+    data:
+      transition: 30
+      brightness: 70
+      xy_color: [0.4288, 0.2335]
+  - delay: '00:00:21'
+  - service: script.turn_on
+    data: 
+      entity_id: script.leggetid_soverom_temp
+
+leggetid_soverom_temp:
+  sequence:
+  - delay: '00:00:10'
+  - service: script.turn_on
+    data: 
+      entity_id: script.leggetid_soverom
+
+sove_tid:
+  sequence:
+  - service: script.turn_off
+    data: 
+       entity_id: script.leggetid_soverom
+  - service: script.turn_off
+    data: 
+       entity_id: script.vekke_lys
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom
+    data:
+      transition: 2
+      xy_color: [0.675,0.322]
+  - delay: 00:00:03
+  - service: homeassistant.turn_off
+    entity_id:
+      - light.soverom
+
+vekke_lyd:
+  sequence:
+    - delay: 00:00:03
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.soverom
+        volume_level: 0.4
+    - service: media_player.play_media
+      data:
+        entity_id: media_player.soverom
+        media_content_type: audio/mp3
+        media_content_id: "http://192.168.1.140:8123/local/Wake_Up_fade_in.mp3"
+    - delay: 00:12:00
+    - service: homeassistant.turn_on
+      entity_id: script.news_soverom
+
+sove_lyd:
+  sequence:
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.soverom
+        volume_level: 0.4
+    - service: media_player.play_media
+      data:
+        entity_id: media_player.soverom
+        media_content_type: audio/mp3
+        media_content_id: >- {{states.sensor.brainfm_relax.state}}
+
+news_soverom:
+  sequence:
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.soverom
+        volume_level: 0.4
+    - service: homeassistant.turn_on
+      data: 
+        entity_id: automation.auto_radio_soverom
+    - service: news.read_news
+      data:
+        entity_id: media_player.bad
+
+vekke_lys:
+  sequence:
+  - service: homeassistant.turn_off
+    data: 
+      entity_id: input_boolean.alarmstatus
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom1
+    data:
+      transition: 180
+      xy_color: [0.675,0.322]
+  - delay:
+        seconds: 10
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom2
+    data:
+      transition: 170
+      xy_color: [0.675,0.322]
+  - delay:
+        minutes: 3
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom
+    data:
+      transition: 780
+      brightness: 120
+      xy_color: [0.5704, 0.3978]
+  - delay:
+        minutes: 12
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom
+    data:
+      transition: 100
+      brightness: 255
+      xy_color: [0.3138,0.3238]
+  - delay:
+        minutes: 2
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom
+    data:
+      flash: long
+  - delay:
+        seconds: 1
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom
+    data:
+      effect: colorloop
+  - delay:
+        minutes: 10
+  - service: homeassistant.turn_off
+    entity_id:
+      - light.soverom
+  - delay:
+        seconds: 1
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom
+    data:
+      flash: long
+  - delay:
+        seconds: 10
+  - service: homeassistant.turn_on
+    entity_id:
+      - light.soverom
+    data:
+      flash: long
+  - delay:
+        seconds: 10
+  - service: homeassistant.turn_off
+    entity_id:
+      - light.soverom        
+

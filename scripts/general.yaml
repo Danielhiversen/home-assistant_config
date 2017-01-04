@@ -1,0 +1,43 @@
+away_48:
+  sequence:
+    - delay:
+        hours: 48
+alert:
+  sequence:
+   - delay: 00:02:00
+   - condition: and
+     conditions:
+      - condition: state
+        entity_id: group.tracker
+        state: 'not_home'
+   - service: notify.pushbullet
+     data:
+       title: "Bevegelse hjemme"
+       target: "device/daniel_telefon"
+       message: " "
+
+all_devices_off:
+  sequence:
+    - service: homeassistant.turn_off
+      entity_id: group.all_lights
+    - service: medida_player.turn_off
+    - delay: '00:00:10'
+    - service: homeassistant.turn_off
+      entity_id: group.all_lights
+    - delay: '00:00:10'
+    - service: homeassistant.turn_off
+      entity_id: group.all_lights
+
+borte:
+  sequence:
+    - service: climate.set_temperature
+      data_template:
+        entity_id: "climate.termostat_stue"
+        temperature: '{{ float(states.input_slider.auto_temp_low.state) }}'
+    - service: homeassistant.turn_on
+      entity_id: script.all_devices_off
+
+stovsuger_running:
+  sequence:
+   - delay: 00:00:30
+
