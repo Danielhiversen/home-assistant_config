@@ -55,7 +55,7 @@
       data: 
          entity_id: script.vekke_lys
     - service: homeassistant.turn_on
-      entity_id: script.all_light_off
+      entity_id: script.all_devices_off
 
 - alias: "Home"
   trigger:
@@ -285,11 +285,7 @@
       state: 'off'
   action:
     - service: homeassistant.turn_on
-      entity_id: script.all_light_off
-    - service: input_select.select_option
-      entity_id: input_select.radio_stue
-      data:
-        option: "Av"
+      entity_id: script.all_devices_off
 
 - alias: "All light off"
   trigger:
@@ -298,17 +294,17 @@
       event_data: {'state': 'group on', 'entity_id': 'switch.main'}
   condition:
     - condition: template
-      value_template: '{% if states.automation.all_light_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.all_light_off.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
+      value_template: '{% if states.automation.all_devices_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.all_devices_off.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
   action:
     - service: homeassistant.turn_on
-      entity_id: script.all_light_off
+      entity_id: script.all_devices_off
 
 - alias: "Away lights"
   trigger:
     - platform: numeric_state
       entity_id: sun.sun
       value_template: '{{ state.attributes.elevation }}'
-      below: 2
+      below: -1
   condition:
     - condition: state
       entity_id: script.away_48
@@ -325,16 +321,16 @@
       entity_id: 
       - light.lys_bokhylle
       - light.lys_bilder
-    - delay: '00:0{{ range(2,10) | random | int }}:00'
+    - delay: '00:0{{ range(4,10) | random | int }}:00'
     - service: homeassistant.turn_on
-      entity_id: script.all_light_off
+      entity_id: script.all_devices_off
  
 - alias: "Away lights veranda"
   trigger:
     - platform: numeric_state
       entity_id: sun.sun
       value_template: '{{ state.attributes.elevation }}'
-      below: 2
+      below: -4
   condition:
     - condition: state
       entity_id: script.away_48
@@ -348,7 +344,7 @@
         entity_id: light.veranda
         transition: 10
         brightness: 150
-    - delay: '0{{ range(0,2) | random | int }}:{{ range(20,59) | random | int }}:00'
+    - delay: '0{{ range(0,3) | random | int }}:{{ range(20,59) | random | int }}:00'
     - service: homeassistant.turn_off
       entity_id:
        - light.veranda

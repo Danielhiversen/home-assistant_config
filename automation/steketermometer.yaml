@@ -6,8 +6,8 @@
   action:
   - service: input_slider.select_value
     data:
-      entity_id: "input_slider.steketermometer"
-      value: 50
+      entity_id: "input_slider.temp_steketermometer"
+      value: "50"
         
 - alias: "steketermometer kylling"
   trigger:
@@ -17,5 +17,5 @@
   action:
   - service: input_slider.select_value
     data:
-      entity_id: "input_slider.steketermometer"
-      value: 70
+      entity_id: "input_slider.temp_steketermometer"
+      value: "70"

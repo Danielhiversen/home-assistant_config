@@ -99,7 +99,9 @@
                               {% set num = num + 1|float %}
                           {%- endif %}
                           {%- if loop.last %}
-                              {%- if  num > 0  -%}
+                              {%- if   as_timestamp(now()) - as_timestamp(states.sensor.stue_temperature.last_updated) < 180 -%}
+                               {{   states.sensor.stue_temperature.state }}
+                              {%- elif  num > 0  -%}
                               {{ (sum/num) | round(1) }}
                               {%- else -%}
                                {{   states.sensor.stue_temperature.state }}
@@ -113,22 +115,22 @@
        - sensor.blomst_bokhylle_temperature
        - sensor.stue_temperature
        - sensor.stue_tvbenk_temperature
-    no_updates:
-      friendly_name: 'No updates'
-      value_template: >
-          {% set val = "" %}
-          {% for state in states.sensor%}
-                 {%- if  as_timestamp(now()) - as_timestamp(state.last_updated) > 60*60*10-%}
-                    {% set val = val + state.entity_id + "\n"  %}
-                 {%- endif %}
-                 {%- if loop.last %}
-                         {%- if  val == ""  -%}
-                               {{ False }}
-                         {%- else -%}
-                               {{ val }}
-                         {%- endif %} 
-                  {%- endif %}
-          {%- endfor-%}
+#    no_updates:
+#      friendly_name: 'No updates'
+#      value_template: >
+#          {% set val = "" %}
+#          {% for state in states.sensor%}
+#                 {%- if  as_timestamp(now()) - as_timestamp(state.last_updated) > 60*60*10-%}
+#                    {% set val = val + state.entity_id + "\n"  %}
+#                 {%- endif %}
+#                 {%- if loop.last %}
+#                         {%- if  val == ""  -%}
+#                               {{ False }}
+#                         {%- else -%}
+#                               {{ val }}
+#                         {%- endif %} 
+#                  {%- endif %}
+#          {%- endfor-%}
 
 - platform: time_date
   display_options:
@@ -151,6 +153,10 @@
   resource: http://ip.jsontest.com
   name: External IP
   value_template: '{{ value_json.ip }}'
+
+- platform: brain_fm
+  email: !secret email
+  password: !secret brain_fm_password
 
 # platform: tellstick
 # 11: Kjoleskap

@@ -22,7 +22,7 @@ http:
    - 127.0.0.1
    - 192.168.1.0/24
  ip_ban_enabled: True
- login_attempts_threshold: 5
+ login_attempts_threshold: 50
 
 recorder:
   purge_days: 2
@@ -43,12 +43,20 @@ logger:
 #    homeassistant.components.sensor.miflora: debug
 
 history: 
+  exclude:
+    entities:
+      - sensor.no_updates
+    domains:
+      - device_tracker
+      - script
+      - automation
+      - proximity
 
 #updater:
 
 sun:
 
-script: !include scripts.yaml
+script: !include_dir_merge_list scripts
 
 scene: !include scenes.yaml
 
@@ -65,6 +73,8 @@ sensor: !include sensors.yaml
 switch: !include switches.yaml
 
 group: !include group.yaml
+
+input_select: !include input_select.yaml
 
 # update_ip:
 
@@ -98,7 +108,7 @@ device_tracker:
 #  consider_home: 900
 #  interval_seconds: 10
 
-- platform: bluetooth_tracker
+#- platform: bluetooth_tracker
 
 - platform: gpslogger
   consider_home: 1800
@@ -110,6 +120,12 @@ media_player:
 
 #- platform: vlc
 #  name: Stue
+
+- platform: cast
+  host: 192.168.1.218
+
+- platform: cast
+  host: 192.168.1.144
 
 rfxtrx:
   device: /dev/serial/by-id/usb-RFXCOM_RFXtrx433_A1Y0NJGR-if00-port0
@@ -124,6 +140,7 @@ climate:
   target_temp : 18
   min_temp : 10
   max_temp : 25
+  tolerance: 0.1
 
 - platform: generic_thermostat
   name :  Soverom
@@ -132,6 +149,7 @@ climate:
   target_temp : 15
   min_temp : 7
   max_temp : 25
+  tolerance: 0.1
 
 #-  platform: generic_thermostat
 # name :  Slow cooker
@@ -190,24 +208,6 @@ sensor miflora3:
    - conductivity
    - battery
 
-input_select:
-  radio_stue:
-    name: Radio
-    options:
-     - P3
-     - P1
-     - Alltid Nyheter
-     - Av
-    initial: Av
-    icon: mdi:music-note
-  steketermometer:
-    name: Steketermometer
-    options:
-     - "Fisk (50*)"
-     - "Kylling (70*)"
-     - " "
-    initial: " "
-    icon: mdi:fish
 #camera:
 #  - platform: generic
 #    still_image_url: http://raspberrypi:8082/index.html
@@ -216,6 +216,5 @@ tts:
   - platform: google
     language: 'no'
 
-feedreader:
-  urls:
-    - http://feeds.feedburner.com/adressa/stAa
+news:
+ token: !secret endomondo

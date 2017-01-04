@@ -11,9 +11,27 @@
     - service: script.turn_on
       data:
         entity_id: script.vekke_lys
+    - service: script.turn_on
+      data:
+        entity_id: script.vekke_lyd
     - service: homeassistant.turn_off
       data: 
         entity_id: automation.wake_me_up
+
+- alias: "Auto radio soverom"
+  initial_state: False
+  trigger:
+   - platform: state
+     entity_id: media_player.soverom
+     from: 'playing'
+  action:
+    - service: homeassistant.turn_off
+      data: 
+        entity_id: automation.auto_radio_soverom
+    - service: input_select.select_option
+      entity_id: input_select.radio_soverom
+      data:
+        option: "P3"
 
 - alias: "alarm enabled"
   trigger:
@@ -53,6 +71,21 @@
       data:
         entity_id: script.sove_tid
 
+- alias: "News pA soverom"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'entity_id': 'switch.lyd_soverom', 'state': 'unknown command (0xd744fc)'}
+  condition:
+    - condition: state
+      entity_id: script.vekke_lys
+      state: 'on'
+  action:
+    - service: homeassistant.turn_off
+      entity_id: script.vekke_lyd
+    - service: homeassistant.turn_on
+      entity_id: script.news_soverom
+
 - alias: "Lys soverom lyd 0"
   trigger:
     - platform: event
@@ -89,8 +122,7 @@
        entity_id: script.sove_tid
   - service: homeassistant.turn_on
     entity_id:
-      - light.soverom1
-      - light.soverom2
+      - light.soverom
     data:
       transition: 1
       brightness: 216
@@ -104,16 +136,14 @@
   action:
   - service: homeassistant.turn_on
     entity_id:
-      - light.soverom1
-      - light.soverom2
+      - light.soverom
     data:
       transition: 0
       brightness: 1
       xy_color: [0.5458, 0.4159]
   - service: homeassistant.turn_on
     entity_id:
-      - light.soverom1
-      - light.soverom2
+      - light.soverom
     data:
       transition: 15
       brightness: 216
@@ -146,8 +176,7 @@
   action:
     - service: homeassistant.turn_on
       entity_id:
-        - light.soverom1
-        - light.soverom2
+        - light.soverom
       data:
         brightness: 216
         xy_color: [0.5458, 0.4159]
@@ -187,8 +216,7 @@
   action:
     - service: homeassistant.turn_on
       entity_id:
-        - light.soverom1
-        - light.soverom2
+        - light.soverom
       data:
         brightness: 10
         xy_color: [0.675,0.322]
@@ -224,7 +252,6 @@
         seconds: 5
    - service: homeassistant.turn_off
      entity_id:
-       - light.soverom1
-       - light.soverom2
+       - light.soverom
      data:
        transition: 10

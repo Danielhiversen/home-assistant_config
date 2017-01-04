@@ -8,6 +8,7 @@ div:
   - group.tracker
   - script.borte
   - group.stovsuger
+  - input_select.radio
 
 stue:
   name: Stue 
@@ -49,6 +50,8 @@ Soverom:
   - script.leggetid_soverom
   - binary_sensor.door_soverom
   - automation.nattlys
+  - group.media_soverom
+  - script.sove_lyd
 
 Bad:
   view: yes
@@ -59,13 +62,14 @@ Bad:
   - light.gang
   - binary_sensor.door_do
   - binary_sensor.movement3
+  - group.media_bad
 
 Kjokken:
   view: yes
   entities:
   - sensor.kjoleskap_temperature
   - light.veranda
-  - group.steketermometer
+#  - group.steketermometer
 
 tracker:
  - device_tracker.daniel
@@ -125,7 +129,19 @@ stovsuger:
   entities: 
    - switch.stovsuger
    - binary_sensor.stovsuger
-   
+
+media_soverom:
+  name: Media
+  entities:
+   - media_player.soverom
+   - input_select.radio_soverom
+
+media_bad:
+  name: Media
+  entities:
+   - media_player.bad
+   - input_select.radio_bad
+
 media_stue:
   name: Media
   entities:
@@ -137,6 +153,8 @@ hw_devices:
    - device_tracker.broadlink_remote
    - device_tracker.broadlink_sensor
    - device_tracker.chromecast
+   - device_tracker.chromecast_soverom
+   - device_tracker.chromecast_bad
    - device_tracker.lys_do
    - device_tracker.lys_veranda
    - device_tracker.lys_yttergang
