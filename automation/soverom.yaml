@@ -9,29 +9,11 @@
      value_template: '{{ now().hour == (states.input_slider.alarmhour.state  | round(0))  and  now().minute == (states.input_slider.alarmminutes.state  | round(0) )  }}'
   action:
     - service: script.turn_on
-      data:
-        entity_id: script.vekke_lys
+      entity_id: script.vekke_lys
     - service: script.turn_on
-      data:
-        entity_id: script.vekke_lyd
+      entity_id: script.vekke_lyd
     - service: homeassistant.turn_off
-      data: 
-        entity_id: automation.wake_me_up
-
-- alias: "Auto radio soverom"
-  initial_state: False
-  trigger:
-   - platform: state
-     entity_id: media_player.soverom
-     from: 'playing'
-  action:
-    - service: homeassistant.turn_off
-      data: 
-        entity_id: automation.auto_radio_soverom
-    - service: input_select.select_option
-      entity_id: input_select.radio_soverom
-      data:
-        option: "P3"
+      entity_id: automation.wake_me_up
 
 - alias: "alarm enabled"
   trigger:
@@ -42,6 +24,24 @@
     data: 
       entity_id:
        - automation.wake_me_up
+
+- alias: "Auto radio soverom"
+  initial_state: False
+  trigger:
+   - platform: state
+     entity_id: media_player.soverom
+     state: 'idle'
+     for:
+       seconds: 1
+  action:
+    - service: homeassistant.turn_off
+      entity_id: automation.auto_radio_soverom
+    - service: input_select.select_option
+      entity_id: input_select.radio_soverom
+      data:
+        option: "P3"
+    - service: automation.trigger
+      entity_id: automation.radio_soverom
 
 - alias: "Lys av pA soverom"
   trigger:
@@ -83,8 +83,25 @@
   action:
     - service: homeassistant.turn_off
       entity_id: script.vekke_lyd
+    - service: homeassistant.turn_off
+      entity_id: script.vekke_lys
     - service: homeassistant.turn_on
       entity_id: script.news_soverom
+
+- alias: "Radio av soverom"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'entity_id': 'switch.lyd_soverom', 'state': 'unknown command (0xd744fc)'}
+  condition:
+    - condition: state
+      entity_id: script.vekke_lys
+      state: 'off'
+    - condition: template
+      value_template: '{{(as_timestamp(now())-as_timestamp(states.script.sove_lyd.last_updated)) > 3600*1 }}'
+  action:
+   - service: media_player.turn_off
+     entity_id: media_player.soverom    
 
 - alias: "Lys soverom lyd 0"
   trigger:
@@ -157,6 +174,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0xdb153a)', 'entity_id': 'switch.movement_soverom'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
   condition:
    - condition: template
      value_template: '{{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.last_updated)) > 3600*4 }}'
@@ -197,6 +217,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0xdb153a)', 'entity_id': 'switch.movement_soverom'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
   condition:
    - condition: template
      value_template: '{{(as_timestamp(now())-as_timestamp(states.script.vekke_lys.last_updated)) > 3600*4 }}'

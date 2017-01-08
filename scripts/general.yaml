@@ -1,6 +1,6 @@
 away_48:
   sequence:
-    - delay:
+  - delay:
         hours: 48
 alert:
   sequence:
@@ -20,7 +20,7 @@ all_devices_off:
   sequence:
     - service: homeassistant.turn_off
       entity_id: group.all_lights
-    - service: medida_player.turn_off
+    - service: media_player.turn_off
     - delay: '00:00:10'
     - service: homeassistant.turn_off
       entity_id: group.all_lights

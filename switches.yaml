@@ -12,7 +12,16 @@
       fire_event: True
     09130000db153a012670:
       name: Movement_soverom
-      fire_event: True      
+      fire_event: True
+    091300c7d5d97a012b70:
+      name: Movement_stue
+      fire_event: True  
+    0913009c94597a013670:
+      name: Movement_soverom_seng
+      fire_event: True
+    091300c8fafd7a012d70:
+      name: Movement_kjokken
+      fire_event: True
     0b1100e003af16aa10000060:
       name: Door
       fire_event: True
@@ -49,19 +58,11 @@
       fire_event: True
     0b110002012c299a0a000070:
       name: lux
-#    0b11000689bc0cfe05010f70:
-#      name: mobillader
     091300381cd55001f670:
       name: vann_kjokken
       fire_event: True
     0913001587a768022e60:
-      name: news_stue
-      fire_event: True
-#    0913001587a768022e60:
-#      name: news_soverom
-#      fire_event: True
-    09130003cc0d68023c70:
-      name: news_bad
+      name: news_soverom
       fire_event: True
 
 

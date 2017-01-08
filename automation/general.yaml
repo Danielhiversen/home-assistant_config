@@ -43,6 +43,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'group on', 'entity_id': 'switch.leggetid_stue'}
+  condition:
+    - condition: template
+      value_template: '{% if states.automation.leggetid.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.leggetid.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
   action:
     - service: script.turn_off
       data: 
@@ -57,10 +60,16 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
+  condition:
+    - condition: template
+      value_template: '{% if states.automation.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.leggetid_soverom.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
   action:
     - service: script.turn_off
       data: 
          entity_id: script.leggetid_soverom
+    - service: script.turn_off
+      data: 
+         entity_id: script.leggetid_soverom_temp
     - delay: '00:00:01'
     - service: script.turn_on
       data:
@@ -207,21 +216,6 @@
       data:
         entity_id: 
           - script.timed_movement_soverom_1min_off
-
-- alias: "light"
-  trigger:
-    - platform: state
-      entity_id: light.Lys_stue
-      state: 'off'
-    - platform: state
-      entity_id: light.Lys_TV
-      state: 'off'
-  action:
-    - service: homeassistant.turn_off
-      entity_id: script.light_turned_off_5min
-    - delay: '00:00:01'
-    - service: homeassistant.turn_on
-      entity_id: script.light_turned_off_5min
 
 - alias: "Close dor"
   trigger:
@@ -405,6 +399,10 @@
      state: 'off'
      for:
        minutes: 20
+  condition:
+    - condition: state
+      entity_id: switch.stovsuger
+      state: 'on'
   action:
    - service: homeassistant.turn_off
      entity_id: switch.stovsuger
@@ -415,6 +413,8 @@
      event_type: button_pressed
      event_data: {'entity_id': 'switch.stovsuger_running', 'state': 'unknown command (0xd55555)'}
   condition:
+   - condition: template
+     value_template: '{% if states.automation.stop_stovsuger.attributes.last_triggered %} {{(as_timestamp(now())-as_timestamp(states.automation.stop_stovsuger.attributes.last_triggered)) > 30}} {% else %}true{% endif %}'
    - condition: or
      conditions:
      - condition: state
@@ -424,9 +424,6 @@
        entity_id: script.timed_movement
        state: 'on'
   action:
-    - service: homeassistant.turn_off
-      entity_id: switch.stovsuger
-    - delay: '00:00:05'
     - service: homeassistant.turn_off
       entity_id: switch.stovsuger
 

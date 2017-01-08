@@ -287,7 +287,7 @@
     - service: homeassistant.turn_on
       entity_id: script.all_devices_off
 
-- alias: "All light off"
+- alias: "All devices off"
   trigger:
     - platform: event
       event_type: button_pressed
@@ -380,6 +380,8 @@
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door'}
   condition:
+   - condition: template
+     value_template: '{% if states.automation.lys_yttergang.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_yttergang.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
    - condition: state
      entity_id: script.stovsuger_running
      state: 'off'
@@ -425,3 +427,17 @@
      service: scene.turn_on
      entity_id: scene.Normal_lys
 
+- alias: "light"
+  trigger:
+    - platform: state
+      entity_id: light.Lys_stue
+      state: 'off'
+    - platform: state
+      entity_id: light.Lys_TV
+      state: 'off'
+  action:
+    - service: homeassistant.turn_off
+      entity_id: script.light_turned_off_5min
+    - delay: '00:00:01'
+    - service: homeassistant.turn_on
+      entity_id: script.light_turned_off_5min

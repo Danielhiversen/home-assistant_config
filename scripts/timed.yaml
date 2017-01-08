@@ -94,7 +94,7 @@ timed_movement:
   sequence:
     - delay:
         hours: 2
-       
+
 timed_lys_yttergang:
   alias: "Turn off yttergang lights after 3 min"
   sequence:

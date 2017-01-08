@@ -33,6 +33,8 @@
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
   condition:
+   - condition: template
+     value_template: '{% if states.automation.lys_gang_dag.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_gang_dag.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
    - condition: state
      entity_id: script.stovsuger_running
      state: 'off'
@@ -62,6 +64,8 @@
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
   condition:
+   - condition: template
+     value_template: '{% if states.automation.lys_gang_natt.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_gang_natt.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
    - condition: state
      entity_id: script.stovsuger_running
      state: 'off'
@@ -116,6 +120,8 @@
      event_type: button_pressed
      event_data: {'entity_id': 'switch.movement3', 'state': 'unknown command (0x9da2da)'}
   condition:
+   - condition: template
+     value_template: '{% if states.automation.lys_do_dag.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_do_dag.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
    - condition: state
      entity_id: light.do
      state: 'off'
@@ -143,6 +149,8 @@
      event_type: button_pressed
      event_data: {'entity_id': 'switch.movement3', 'state': 'unknown command (0x9da2da)'}
   condition:
+   - condition: template
+     value_template: '{% if states.automation.lys_do_natt.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_do_natt.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
    - condition: state
      entity_id: light.do
      state: 'off'

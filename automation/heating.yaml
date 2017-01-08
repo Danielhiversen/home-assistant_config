@@ -2,7 +2,7 @@
   trigger:
     - platform: state
       entity_id: group.tracker
-      to: 'home'
+      state: 'home'
     - platform: state
       entity_id: script.vekke_lys, switch.movement2, switch.movement2, switch.movement_do, binary_sensor.door_soverom, binary_sensor.door_do, switch.door
       state: 'on'
@@ -63,12 +63,14 @@
   trigger:
     - platform: state
       entity_id: group.tracker
-      from: 'home'
+      state: 'not_home'
+      for:
+        minutes: 4
     - platform: state
       entity_id: script.timed_movement
-      to: 'off'
+      state: 'off'
       for:
-        minutes: 2
+        minutes: 4
   condition:
     - condition: state
       entity_id: input_boolean.auto_heat
@@ -82,7 +84,7 @@
         entity_id: group.tracker
         state: 'not_home'
     - condition: template
-      value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 180 }}'
+      value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 900 }}'
     - condition: template
       value_template: '{{float(states.input_slider.auto_temp_low.state) < float(states.climate.termostat_stue.attributes.temperature)}}'
   action:

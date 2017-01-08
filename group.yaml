@@ -31,6 +31,7 @@ stue:
   - sensor.ute_veranda_temperature
   - scene.dempet_lys
   - scene.normal_lys
+  - scene.mye_lys
   - script.stovsuger
   - sun.sun
   - sensor.yr_symbol
@@ -47,11 +48,13 @@ Soverom:
   - light.soverom2
   - group.soverom_heater
   - sensor.soverom_temperature
-  - script.leggetid_soverom
   - binary_sensor.door_soverom
   - automation.nattlys
   - group.media_soverom
   - script.sove_lyd
+  - script.leggetid_soverom
+  - script.news_soverom
+
 
 Bad:
   view: yes
@@ -77,6 +80,7 @@ tracker:
  - device_tracker.daniel_2
  - device_tracker.tine
  - device_tracker.nokia_130
+ - device_tracker.eli
 
 alarmclock:
   name: Wake Me Up

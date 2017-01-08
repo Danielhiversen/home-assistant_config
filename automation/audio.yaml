@@ -34,6 +34,8 @@
       data:
         message_type: "0"
         entity_id: media_player.chromecast1877
+    - service: homeassistant.turn_on
+      entity_id: automation.turn_off_tv_after_news
 
 - alias: "Nyheter stua"
   trigger:
@@ -47,11 +49,21 @@
      data:
        entity_id: media_player.chromecast1877
 
-#- alias: "Nyheter soverom"
-#  trigger:
-#   - platform: event
-#     event_type: button_pressed
-#     event_data: {'entity_id': 'switch.news_soverom', 'state': 'unknown command (0x87a768)'}
+- alias: "Turn off tv after news"
+  initial_state: False
+  trigger:
+   - platform: state
+     entity_id: media_player.chromecast1877
+     state: 'idle'
+     for:
+       seconds: 1
+  action:
+   - service: homeassistant.turn_off
+     entity_id: switch.tv
+   - service: homeassistant.turn_off
+     entity_id: automation.turn_off_tv_after_news
+
+
 
 
 - alias: "Radio bad av"
@@ -64,7 +76,7 @@
      entity_id: media_player.bad
 
 # https://www.nrk.no/mp3aac/
-- alias: 'Radio stue'
+- alias: 'Radio bad'
   trigger:
     platform: state
     entity_id: input_select.radio_bad
@@ -75,11 +87,11 @@
      entity_id: media_player.bad
      data_template:
        media_content_id: >-
-           {% if is_state('input_select.radio_stue', 'Alltid Nyheter') %}
+           {% if is_state('input_select.radio_bad', 'Alltid Nyheter') %}
                http://lyd.nrk.no/nrk_radio_alltid_nyheter_mp3_h
-           {% elif is_state('input_select.radio_stue', 'P1') %}
+           {% elif is_state('input_select.radio_bad', 'P1') %}
                http://lyd.nrk.no/nrk_radio_p1_trondelag_mp3_h
-           {% elif is_state('input_select.radio_stue', 'P3') %}
+           {% elif is_state('input_select.radio_bad', 'P3') %}
                http://nrk-mms-live.online.no/nrk_radio_p3_mp3_h
            {% endif %}
        media_content_type: audio/mp3
@@ -110,15 +122,19 @@
   trigger:
    - platform: state
      entity_id: media_player.bad
-     from: 'playing'
+     state: 'idle'
+     for:
+       seconds: 1
   action:
     - service: homeassistant.turn_off
       data: 
         entity_id: automation.auto_radio_bad
     - service: input_select.select_option
-      entity_id: input_select.radio_stue
+      entity_id: input_select.radio_bad
       data:
         option: "P3"
+    - service: automation.trigger
+      entity_id: automation.radio_bad
 
 - alias: "Nyheter bad stop"
   trigger:
@@ -130,12 +146,11 @@
      entity_id: media_player.bad
      state: 'playing'
   action:
-    - service: news.read_news
-      data:
-        entity_id: media_player.bad
     - service: homeassistant.turn_off
       data: 
         entity_id: automation.auto_radio_bad
+
+
 
 - alias: "Radio stue av"
   trigger:
@@ -169,6 +184,8 @@
            {% endif %}
        media_content_type: audio/mp3
 
+
+
 - alias: "Radio soverom av"
   trigger:
    - platform: state
@@ -188,14 +205,52 @@
      entity_id: media_player.soverom
      data_template:
        media_content_id: >-
-           {% if is_state('input_select.radio_stue', 'Alltid Nyheter') %}
+           {% if is_state('input_select.radio_soverom', 'Alltid Nyheter') %}
                http://lyd.nrk.no/nrk_radio_alltid_nyheter_mp3_h
-           {% elif is_state('input_select.radio_stue', 'P1') %}
+           {% elif is_state('input_select.radio_soverom', 'P1') %}
                http://lyd.nrk.no/nrk_radio_p1_trondelag_mp3_h
-           {% elif is_state('input_select.radio_stue', 'P3') %}
+           {% elif is_state('input_select.radio_soverom', 'P3') %}
                http://nrk-mms-live.online.no/nrk_radio_p3_mp3_h
            {% endif %}
        media_content_type: audio/mp3
+
+- alias: "Nyheter soverom"
+  trigger:
+   - platform: event
+     event_type: button_pressed
+     event_data: {'entity_id': 'switch.news_soverom', 'state': 'unknown command (0x87a768)'}
+  condition:
+    - condition: template
+      value_template: >
+        {% if is_state('media_player.soverom', 'playing') %}
+          false
+        {% else %}
+          true
+        {% endif %}
+  action:
+    - service: homeassistant.turn_on
+      entity_id: script.news_soverom
+    - service: homeassistant.turn_on
+      entity_id: automation.auto_radio_soverom
+
+- alias: "Nyheter soverom stop"
+  trigger:
+   - platform: event
+     event_type: button_pressed
+     event_data: {'entity_id': 'switch.news_soverom', 'state': 'unknown command (0x87a768)'}
+  condition:
+   - condition: state
+     entity_id: media_player.soverom
+     state: 'playing'
+  action:
+    - service: homeassistant.turn_off
+      data: 
+        entity_id: automation.auto_radio_soverom
+
+
+
+
+
 
 - alias: "Radio av"
   trigger:

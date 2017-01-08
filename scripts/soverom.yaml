@@ -1,6 +1,10 @@
-
 leggetid:
+  alias: "Leggetid"
   sequence:
+  - service: tts.google_say
+    entity_id: media_player.floor
+    data:
+      message: 'Sov godt.'
   - service: input_select.select_option
     entity_id: input_select.radio_stue
     data:
@@ -26,7 +30,7 @@ leggetid:
      - light.Lys_stue
 
 leggetid_soverom:
-  alias: Leggetid soverom
+  alias: "Leggetid soverom"
   sequence:
   - service: homeassistant.turn_on
     entity_id:
@@ -116,20 +120,21 @@ sove_lyd:
       data:
         entity_id: media_player.soverom
         media_content_type: audio/mp3
-        media_content_id: >- {{states.sensor.brainfm_relax.state}}
+        media_content_id: "http://192.168.1.140:8123/local/sleep.mp3"
 
 news_soverom:
   sequence:
     - service: media_player.volume_set
       data:
         entity_id: media_player.soverom
-        volume_level: 0.4
+        volume_level: 0.3
+    - service: news.read_news
+      data:
+        entity_id: media_player.soverom
+    - delay: '00:00:05'
     - service: homeassistant.turn_on
       data: 
         entity_id: automation.auto_radio_soverom
-    - service: news.read_news
-      data:
-        entity_id: media_player.bad
 
 vekke_lys:
   sequence:

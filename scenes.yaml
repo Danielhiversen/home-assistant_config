@@ -16,3 +16,11 @@
       state: on
       brightness: 170
 
+- name: Mye lys
+  entities:
+    light.Lys_stue:
+      state: on
+      brightness: 220
+    light.Lys_TV:
+      state: on
+      brightness: 180

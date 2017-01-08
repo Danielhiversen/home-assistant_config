@@ -72,8 +72,8 @@ def setup(hass, config):
                 data = {ATTR_ENTITY_ID: state.entity_id,
                         climate.ATTR_TEMPERATURE: state.attributes.get('temperature')}
                 service = climate.SERVICE_SET_TEMPERATURE
-            elif (state.domain in [input_boolean.DOMAIN, automation.DOMAIN]
-                  or state.attributes.get('assumed_state')):
+            elif (state.domain in [input_boolean.DOMAIN, automation.DOMAIN]):
+                  #or state.attributes.get('assumed_state')):
                 data = {ATTR_ENTITY_ID: state.entity_id}
                 if state.state == STATE_OFF:
                     service = SERVICE_TURN_OFF

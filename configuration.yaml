@@ -37,6 +37,8 @@ logger:
   default: warning
   logs:
     homeassistant.components.switch.broadlink: info
+    homeassistant.components.automation: info
+    homeassistant.components.script: info
 #    homeassistant.components.device_tracker: info
 #    homeassistant.components.http: info
     homeassistant.components.rfxtrx: info
@@ -56,11 +58,12 @@ history:
 
 sun:
 
-script: !include_dir_merge_list scripts
-
-scene: !include scenes.yaml
+script: !include_dir_merge_named scripts
+#script: !include scripts.yaml
 
 automation: !include_dir_merge_list automation
+
+scene: !include scenes.yaml
 
 light: !include lights.yaml
 
@@ -94,11 +97,14 @@ device_tracker:
 - platform: nmap_tracker
   hosts: 192.168.1.1-255
   track_new_devices: no
-  consider_home: 900
+  consider_home: 1800
   interval_seconds: 10
   home_interval: 5
   scan_options: " --privileged -sP "
   # sudo setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap 
+
+- platform: gpslogger
+  # http://:8123/api/gpslogger?api_password=XXX&latitude=%LAT&longitude=%LON&battery=%BATT&device=daniel&accuracy=%ACC
 
 #- platform: luci
 #  host: 192.168.1.1
@@ -109,10 +115,6 @@ device_tracker:
 #  interval_seconds: 10
 
 #- platform: bluetooth_tracker
-
-- platform: gpslogger
-  consider_home: 1800
-  # http://:8123/api/gpslogger?api_password=XXX&latitude=%LAT&longitude=%LON&battery=%BATT&device=daniel&accuracy=%ACC
 
 media_player:
 - platform: cast
@@ -218,3 +220,9 @@ tts:
 
 news:
  token: !secret endomondo
+
+
+#camera:
+#  - platform: ffmpeg
+#    name: Cam
+#    input: -rtsp_transport tcp -i rtsp://192.168.1.210/1
