@@ -1,17 +1,3 @@
-alarmhour:
-  name: Hour
-  icon: mdi:timer
-  initial: 7
-  min: 4
-  max: 11
-  step: 1
-alarmminutes:
-  name: Minutes
-  icon: mdi:timer
-  initial: 30
-  min: 0
-  max: 55
-  step: 5
 auto_temp:
   name: Auto heat high
   min: 16
@@ -42,7 +28,38 @@ temp_control_stue_temp:
   initial: 20
   step: 1
   icon: mdi:fire
+  unit_of_measurement: '°C'
+temp_control_stue_morgen_hour:
+  name: Hour+30min
+  icon: mdi:timer
+  initial: 6
+  min: 5
+  max: 9
+  step: 1
+temp_control_stue_morgen_temp:
+  name: Temp
+  min: 16
+  max: 22
+  initial: 21
+  step: 1
+  icon: mdi:fire
   unit_of_measurement: '°C'  
+temp_control_stue_kveld_hour:
+  name: Hour
+  icon: mdi:timer
+  initial: 23
+  min: 19
+  max: 23
+  step: 1
+temp_control_stue_kveld_temp:
+  name: Temp
+  min: 16
+  max: 22
+  initial: 18
+  step: 1
+  icon: mdi:fire
+  unit_of_measurement: '°C'
+
 temp_control_soverom_morgen_hour:
   name: Hour
   icon: mdi:timer
@@ -72,7 +89,9 @@ temp_control_soverom_kveld_temp:
   initial: 17
   step: 1
   icon: mdi:fire
-  unit_of_measurement: '°C'  
+  unit_of_measurement: '°C'
+  
+  
 temp_steketermometer:
   name: Temp steketermometer
   min: 40

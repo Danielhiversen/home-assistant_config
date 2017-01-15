@@ -1,17 +1,17 @@
 leggetid:
   alias: "Leggetid"
   sequence:
+  - service: scene.turn_on
+    data:
+      entity_id: scene.Dempet_lys
   - service: tts.google_say
-    entity_id: media_player.floor
     data:
       message: 'Sov godt.'
+      cache: false
   - service: input_select.select_option
     entity_id: input_select.radio_stue
     data:
       option: "Av"
-  - service: scene.turn_on
-    data:
-      entity_id: scene.Dempet_lys
   - service: homeassistant.turn_off
     entity_id:
      - light.lys_bokhylle
@@ -111,6 +111,7 @@ vekke_lyd:
       entity_id: script.news_soverom
 
 sove_lyd:
+  alias: "Sove lyd"
   sequence:
     - service: media_player.volume_set
       data:
@@ -123,6 +124,7 @@ sove_lyd:
         media_content_id: "http://192.168.1.140:8123/local/sleep.mp3"
 
 news_soverom:
+  alias: "Nyheter"
   sequence:
     - service: media_player.volume_set
       data:

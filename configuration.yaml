@@ -10,6 +10,7 @@ homeassistant:
   # Name of the location where Home Assistant is running
   name: _
   customize: !include customize.yaml
+  packages: !include_dir_named packages
 
 frontend:
 
@@ -210,10 +211,6 @@ sensor miflora3:
    - conductivity
    - battery
 
-#camera:
-#  - platform: generic
-#    still_image_url: http://raspberrypi:8082/index.html
-
 tts:
   - platform: google
     language: 'no'
@@ -226,3 +223,8 @@ news:
 #  - platform: ffmpeg
 #    name: Cam
 #    input: -rtsp_transport tcp -i rtsp://192.168.1.210/1
+
+#camera:
+#  - platform: generic
+#    still_image_url: http://raspberrypi:8082/index.html
+

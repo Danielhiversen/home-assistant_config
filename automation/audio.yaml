@@ -96,11 +96,48 @@
            {% endif %}
        media_content_type: audio/mp3
 
+- alias: "Auto radio bad"
+  initial_state: False
+  trigger:
+   - platform: state
+     entity_id: media_player.bad
+     state: 'idle'
+     for:
+       seconds: 5
+  action:
+    - service: homeassistant.turn_off
+      data: 
+        entity_id: automation.auto_radio_bad
+    - service: input_select.select_option
+      entity_id: input_select.radio_bad
+      data:
+        option: "P3"
+    - service: automation.trigger
+      entity_id: automation.radio_bad
+
+- alias: "Endre radiokanal baderom"
+  trigger:
+  - platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d000xxxxxc2
+      action_type: flip90
+  - platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d000xxxxxc2
+      action_type: flip180
+  action:
+  - service: input_select.select_next
+    entity_id: input_select.radio_bad
+
 - alias: "Nyheter bad"
   trigger:
    - platform: event
-     event_type: button_pressed
-     event_data: {'entity_id': 'switch.news_bad', 'state': 'unknown command (0x87a768)'}
+     event_type: cube_action
+     event_data:
+       entity_id: binary_sensor.cube_158d000xxxxxc2
+       action_type: shake_air
   condition:
     - condition: template
       value_template: >
@@ -117,30 +154,13 @@
       data: 
         entity_id: automation.auto_radio_bad
 
-- alias: "Auto radio bad"
-  initial_state: False
-  trigger:
-   - platform: state
-     entity_id: media_player.bad
-     state: 'idle'
-     for:
-       seconds: 1
-  action:
-    - service: homeassistant.turn_off
-      data: 
-        entity_id: automation.auto_radio_bad
-    - service: input_select.select_option
-      entity_id: input_select.radio_bad
-      data:
-        option: "P3"
-    - service: automation.trigger
-      entity_id: automation.radio_bad
-
 - alias: "Nyheter bad stop"
   trigger:
    - platform: event
-     event_type: button_pressed
-     event_data: {'entity_id': 'switch.news_bad', 'state': 'unknown command (0x87a768)'}
+     event_type: cube_action
+     event_data:
+       entity_id: binary_sensor.cube_158d000xxxxxc2
+       action_type: shake_air
   condition:
    - condition: state
      entity_id: media_player.bad
@@ -149,6 +169,20 @@
     - service: homeassistant.turn_off
       data: 
         entity_id: automation.auto_radio_bad
+
+- alias: "Cube i fritt fall"
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d000xxxxxc2
+      action_type: free_fall
+  action:
+  - service: tts.google_say
+    entity_id: media_player.bad
+    data_template:
+      message: 'Au, au. Vær litt forsiktig da.'
+      cache: false
 
 
 

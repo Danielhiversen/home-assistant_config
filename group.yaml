@@ -113,6 +113,8 @@ stue_heater:
   name: Thermotstat stue
   entities: 
    - climate.termostat_stue
+   - group.temp_control_stue_morgen
+   - group.temp_control_stue_kveld
    - group.temp_control_stue
    - group.auto_heat_stue
 auto_heat_stue:
@@ -127,6 +129,18 @@ temp_control_stue:
      - automation.temp_control_stue
      - input_slider.temp_control_stue_hour
      - input_slider.temp_control_stue_temp
+temp_control_stue_morgen:
+    name: Temp control stue morgen
+    entities: 
+     - automation.temp_control_stue_morgen
+     - input_slider.temp_control_stue_morgen_hour
+     - input_slider.temp_control_stue_morgen_temp
+temp_control_stue_kveld:
+    name: Temp control stue kveld
+    entities: 
+     - automation.temp_control_stue_kveld
+     - input_slider.temp_control_stue_kveld_hour
+     - input_slider.temp_control_stue_kveld_temp
 
 stovsuger:
   name: Støvsuger

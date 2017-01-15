@@ -20,8 +20,8 @@ all_devices_off:
   sequence:
     - service: homeassistant.turn_off
       entity_id: group.all_lights
-    - service: media_player.turn_off
     - delay: '00:00:10'
+    - service: media_player.turn_off
     - service: homeassistant.turn_off
       entity_id: group.all_lights
     - delay: '00:00:10'
@@ -29,6 +29,7 @@ all_devices_off:
       entity_id: group.all_lights
 
 borte:
+  alias: "Skru av alt"
   sequence:
     - service: climate.set_temperature
       data_template:
@@ -39,5 +40,5 @@ borte:
 
 stovsuger_running:
   sequence:
-   - delay: 00:00:30
+   - delay: 00:01:30
 

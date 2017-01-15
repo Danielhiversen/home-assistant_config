@@ -42,7 +42,7 @@ sensors:
     sensor_class: light
   stovsuger:
     friendly_name: Støvsuging
-    value_template: "{{ states.script.stovsuger_running.state == 'on' or (as_timestamp(now()) - as_timestamp(states.script.stovsuger_running.last_updated) < 120)  }}"
+    value_template: "{{ states.script.stovsuger_running.state == 'on' or (as_timestamp(now()) - as_timestamp(states.script.stovsuger_running.last_updated) < 2)  }}"
     entity_id: 
        - sensor.time
        - script.stovsuger_running

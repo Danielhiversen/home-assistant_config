@@ -1,0 +1,52 @@
+automation:
+  - alias: 'Wake Me Up'
+    initial_state: False
+    trigger:
+     - platform: time
+       minutes: '/5'
+       seconds: 2
+    condition:
+     - condition: template
+       value_template: '{{ now().hour == (states.input_slider.alarmhour.state  | round(0))  and  now().minute == (states.input_slider.alarmminutes.state  | round(0) )  }}'
+    action:
+      - service: script.turn_on
+        entity_id: script.vekke_lys
+      - service: script.turn_on
+        entity_id: script.vekke_lyd
+      - service: homeassistant.turn_off
+        entity_id: automation.wake_me_up
+  - alias: "alarm enabled"
+    trigger:
+      platform: state
+      entity_id: input_slider.alarmhour, input_slider.alarmminutes
+    action:
+    - service: homeassistant.turn_on
+      data: 
+        entity_id:
+         - automation.wake_me_up
+
+input_slider:
+  alarmhour:
+    name: Hour
+    icon: mdi:timer
+    initial: 7
+    min: 4
+    max: 11
+    step: 1
+  alarmminutes:
+    name: Minutes
+    icon: mdi:timer
+    initial: 30
+    min: 0
+    max: 55
+    step: 5
+
+sensor:
+  - platform: template
+    sensors:
+      alarm_time:
+        friendly_name: 'Alarm'
+        value_template: '{% if states.input_slider.alarmhour.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_slider.alarmhour.state|round(0)|string }}:{% if states.input_slider.alarmminutes.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_slider.alarmminutes.state|round(0)|string }}'
+        entity_id: 
+         - input_slider.alarmminutes
+         - input_slider.alarmhour

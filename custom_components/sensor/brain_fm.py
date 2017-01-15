@@ -46,17 +46,24 @@ class BrainfmSensor(Entity):
         self._client = client
         self._state = None
         self._channel_name = None
+        self._web_adress = None
 
-        def _update(now):
+        def _update(now=None):
             stations = client.get_stations()
             shuffle(stations)
             for station in stations:
+                print(station)
                 if self._sensor_type in station["canonical_name"]:
                     station_id = station["station_id"]
+                    print(client.get_station(station_id=station_id))
                     while client.get_station(station_id=station_id)['playable'] == 0:
-                        sub_statoions = client.get_stations_by_id(parent_id=station_id)
-                        shuffle(sub_statoions)
-                        station_id = sub_statoions[0]['station_id']
+                        sub_stations = client.get_stations_by_id(parent_id=station_id)
+                        shuffle(sub_stations)
+                        station_id = sub_stations[0]['station_id']
+                        for sub_station in sub_stations:
+                            if '8hours' in station["canonical_name"]:
+                                station_id = sub_station['station_id']
+                                break
                     try:
                         token_data = client.get_token(station_id=station_id)
                         self._web_adress = "https://stream.brain.fm/?tkn=" + token_data["session_token"]
@@ -67,7 +74,8 @@ class BrainfmSensor(Entity):
                         break
                     except:
                         continue
-        track_time_change(self._hass, _update, hour=9, minute=14, second=36)
+        _update(now=None)
+        track_time_change(hass, _update, hour=9, minute=14, second=36)
         
     @property
     def name(self):

@@ -1,5 +1,5 @@
 - platform: rfxtrx
-  automatic_add: True
+  automatic_add: False
   devices:
     0a52080601010038480349:
       name: Kjoleskap
@@ -44,12 +44,6 @@
 
 - platform: template
   sensors:
-    alarm_time:
-      friendly_name: 'Alarm'
-      value_template: '{% if states.input_slider.alarmhour.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_slider.alarmhour.state|round(0)|string }}:{% if states.input_slider.alarmminutes.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_slider.alarmminutes.state|round(0)|string }}'
-      entity_id: 
-       - input_slider.alarmminutes
-       - input_slider.alarmhour
     relative_alarm_time:
       value_template: '{{ states.input_slider.alarmhour.state|float|multiply(60) + states.input_slider.alarmminutes.state|float - (now().hour|float|multiply(60) + now().minute)}}'
       unit_of_measurement: "min"
@@ -99,7 +93,7 @@
                               {% set num = num + 1|float %}
                           {%- endif %}
                           {%- if loop.last %}
-                              {%- if   as_timestamp(now()) - as_timestamp(states.sensor.stue_temperature.last_updated) < 180 -%}
+                              {%- if   as_timestamp(now()) - as_timestamp(states.sensor.stue_temperature.last_updated) < 240 -%}
                                {{   states.sensor.stue_temperature.state }}
                               {%- elif  num > 0  -%}
                               {{ (sum/num) | round(1) }}
@@ -154,9 +148,9 @@
   name: External IP
   value_template: '{{ value_json.ip }}'
 
-#- platform: brain_fm
-#  email: !secret email
-#  password: !secret brain_fm_password
+- platform: brain_fm
+  email: !secret email
+  password: !secret brain_fm_password
 
 # platform: tellstick
 # 11: Kjoleskap

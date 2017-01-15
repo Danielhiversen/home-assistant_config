@@ -6,6 +6,22 @@
       service: homeassistant.turn_on
       entity_id: script.away_48
 
+- alias: "All devices off"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'group on', 'entity_id': 'switch.main'}
+  condition:
+    - condition: template
+      value_template: '{% if states.automation.all_devices_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.all_devices_off.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
+  action:
+  - service: tts.google_say
+    data_template:
+      message: 'Ha det bra.'
+      cache: false
+  - service: homeassistant.turn_on
+    entity_id: script.all_devices_off
+
 - alias: "Kjoleskap for varmt"
   trigger:
     platform: state

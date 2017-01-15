@@ -180,14 +180,12 @@ def setup(hass, config):
         except (ExpatError, IndexError) as err:
             track_point_in_utc_time(hass, _workout_text, now + timedelta(minutes=2))       
             return
-        print(nowcast_precipitation)
         track_point_in_utc_time(hass, _workout_text, nextrun + timedelta(seconds=2))
 
     def _workout_text(now=None):
         nonlocal workout_text
         nonlocal last_workout_time
         last_workout = endomondo.get_workouts()[0]
-        print(last_workout)
         if not now:
             now = dt_util.utcnow()
         now = dt_util.as_local(now)
@@ -208,5 +206,6 @@ def setup(hass, config):
 
     hass.services.register(DOMAIN, "read_news", _read_news)
     print(_get_text())
+    workout_text = None
 
     return True

@@ -27,6 +27,63 @@
         entity_id: automation.temp_control_stue
 
 
+- alias: "temp_control_stue_kveld_hour enabled"
+  trigger:
+    platform: state
+    entity_id: input_slider.temp_control_stue_kveld_temp, input_slider.temp_control_stue_kveld_hour
+  action:
+  - service: homeassistant.turn_on
+    data: 
+      entity_id:
+       - automation.temp_control_stue_kveld
+
+- alias: 'temp_control_stue_kveld'
+  initial_state: False
+  trigger:
+   - platform: time
+     minutes: 0
+     seconds: 29
+  condition:
+   - condition: template
+     value_template: '{{ now().hour == (states.input_slider.temp_control_stue_kveld_hour.state  | round(0))  }}'
+  action:
+    - service: climate.set_temperature
+      data_template:
+        entity_id: "climate.termostat_stue"
+        temperature: '{{ float(states.input_slider.temp_control_stue_kveld_temp.state) }}'
+
+
+- alias: "temp_control_stue_morgen_hour enabled"
+  trigger:
+    platform: state
+    entity_id: input_slider.temp_control_stue_morgen_temp, input_slider.temp_control_stue_morgen_hour
+  action:
+  - service: homeassistant.turn_on
+    data: 
+      entity_id:
+       - automation.temp_control_stue_morgen
+
+- alias: 'temp_control_stue_morgen'
+  initial_state: False
+  trigger:
+   - platform: time
+     minutes: 31
+     seconds: 21
+  condition:
+   - condition: template
+     value_template: '{{ now().hour == (states.input_slider.temp_control_stue_morgen_hour.state  | round(0))  }}'
+  action:
+    - service: climate.set_temperature
+      data_template:
+        entity_id: "climate.termostat_stue"
+        temperature: '{{ float(states.input_slider.temp_control_stue_morgen_temp.state) }}'
+
+
+
+
+
+
+
 - alias: "temp_control_soverom_kveld_hour enabled"
   trigger:
     platform: state

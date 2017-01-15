@@ -16,7 +16,7 @@ steketermometer:
    - " "
   initial: " "
   icon: mdi:fish
-  
+
 radio_bad:
   name: Radio
   options:
