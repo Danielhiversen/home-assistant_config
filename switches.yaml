@@ -1,5 +1,5 @@
 - platform: rfxtrx
-  automatic_add: False
+  automatic_add: True
   signal_repetitions: 2
   devices:
     0b1100cd0213c7f210010f70:
@@ -58,6 +58,9 @@
       fire_event: True
     0b110002012c299a0a000070:
       name: lux
+    09130051aebf8a013640:
+      name: vann_bad
+      fire_event: True    
     091300381cd55001f670:
       name: vann_kjokken
       fire_event: True

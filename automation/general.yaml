@@ -6,6 +6,35 @@
       service: homeassistant.turn_on
       entity_id: script.away_48
 
+- alias: "Turn off all devices"
+  trigger:
+    - platform: time
+      after: '00:30:00'
+    - platform: time
+      after: '01:30:00'
+    - platform: state
+      entity_id: script.timed_movement
+      to: 'off'
+      for:
+        minutes: 1
+  condition:
+    - condition: state
+      entity_id: script.timed_movement
+      state: 'off'
+      for:
+        minutes: 1
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: group.tracker
+        state: 'not_home'
+      - condition: time
+        after: '23:00:00'
+        before: '07:00:00'
+  action:
+    - service: homeassistant.turn_on
+      entity_id: script.all_devices_off
+
 - alias: "All devices off"
   trigger:
     - platform: event
@@ -16,9 +45,9 @@
       value_template: '{% if states.automation.all_devices_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.all_devices_off.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
   action:
   - service: tts.google_say
-    data_template:
+    data:
       message: 'Ha det bra.'
-      cache: false
+      cache: true
   - service: homeassistant.turn_on
     entity_id: script.all_devices_off
 
@@ -114,6 +143,15 @@
     - platform: state
       entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.movement1,  binary_sensor.movement2, binary_sensor.movement3, binary_sensor.movement_do
       state: 'on'
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0xdb153a)', 'entity_id': 'switch.movement_soverom'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
   condition:
     - condition: state
       entity_id: script.stovsuger_running
@@ -126,7 +164,6 @@
          entity_id: 
           - script.timed_movement
     # Set new timer
-    - delay: '00:00:01'
     - service: script.turn_on
       data:
         entity_id: 
@@ -466,9 +503,9 @@
       title: "Offline device"
       target: "device/daniel_telefon"
       message: >
-        Device is offline:       
+        Device is offline: 
         {% for state in states.device_tracker if state.entity_id in states.group.hw_devices.attributes.entity_id  %}
-        {%- if state.state == 'not_home'-%} {{ state.name | lower }} {% endif -%}
+        {%- if state.state == 'not_home'-%} {{ state.name | lower }}, {% endif -%}
         {% endfor %}
 
 - alias: "Ny ip"

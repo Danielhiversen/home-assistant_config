@@ -29,9 +29,6 @@ stue:
   - sensor.stue_vindu_temperature
   - sensor.ute_soverom_temperature
   - sensor.ute_veranda_temperature
-  - scene.dempet_lys
-  - scene.normal_lys
-  - scene.mye_lys
   - script.stovsuger
   - sun.sun
   - sensor.yr_symbol
@@ -39,6 +36,7 @@ stue:
   - group.stue_heater
   - switch.tv
   - group.media_stue
+  - group.stue_scene
 
 Soverom:
   view: yes
@@ -72,6 +70,7 @@ Kjokken:
   entities:
   - sensor.kjoleskap_temperature
   - light.veranda
+  - group.kjokken_timer
 #  - group.steketermometer
 
 tracker:
@@ -184,3 +183,25 @@ steketermometer:
    - input_select.steketermometer
    - input_slider.temp_steketermometer
    - input_boolean.steketermometer_notify_daniel
+
+
+stue_scene:
+  name: Presets
+  entities: 
+  - scene.dempet_lys
+  - scene.normal_lys
+  - scene.mye_lys
+
+stue_lys:
+  entities: 
+  - light.Lys_stue
+  - light.Lys_TV
+  - light.lys_bokhylle
+  - light.lys_bilder
+
+kjokken_timer:
+  name: Timer
+  entities: 
+  - sensor.timer_minutes
+  - input_slider.timer_minutes
+  

@@ -61,6 +61,7 @@ class BrainfmSensor(Entity):
                         shuffle(sub_stations)
                         station_id = sub_stations[0]['station_id']
                         for sub_station in sub_stations:
+                            print(station)
                             if '8hours' in station["canonical_name"]:
                                 station_id = sub_station['station_id']
                                 break
@@ -71,10 +72,10 @@ class BrainfmSensor(Entity):
                         with open('/home/dahoiv/.homeassistant/www/sleep.mp3','wb') as output:
                             output.write(mp3file.read())
                         self._state = token_data["name"]
+                        print(token_data)
                         break
                     except:
                         continue
-        _update(now=None)
         track_time_change(hass, _update, hour=9, minute=14, second=36)
         
     @property

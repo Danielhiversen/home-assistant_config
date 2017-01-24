@@ -124,8 +124,8 @@
   initial_state: False
   trigger:
    - platform: time
-     minutes: 0
-     seconds: 21
+     minutes: 29
+     seconds: 2
   condition:
    - condition: template
      value_template: '{{ now().hour == (states.input_slider.temp_control_soverom_morgen_hour.state  | round(0))  }}'

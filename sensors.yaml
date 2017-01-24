@@ -3,7 +3,7 @@
   devices:
     0a52080601010038480349:
       name: Kjoleskap
-    0a520805020200cb1e0249:
+    0a520805020200cb1e0249: # 02
       name: Stue_Vindu
     0a52080103010012260259:
       name: Ute_soverom
@@ -126,6 +126,7 @@
 #                  {%- endif %}
 #          {%- endfor-%}
 
+
 - platform: time_date
   display_options:
     - 'time'
@@ -163,3 +164,39 @@
 # only_named: 1
 # temperature_scale: °C
 # datatype_mask: 127
+
+- platform: miflora
+  mac: C4:7C:8D:61:7E:3B 
+  name: Blomst tv
+  force_update: false
+  median: 3
+  monitored_conditions:
+   - moisture
+   - light
+   - temperature
+   - conductivity
+   - battery
+
+- platform: miflora
+  mac: C4:7C:8D:61:7F:EC 
+  name: Blomst sofa
+  force_update: false
+  median: 3
+  monitored_conditions:
+   - moisture
+   - light
+   - temperature
+   - conductivity
+   - battery
+
+- platform: miflora
+  mac: C4:7C:8D:61:7E:5D 
+  name: Blomst bokhylle
+  force_update: false
+  median: 3
+  monitored_conditions:
+   - moisture
+   - light
+   - temperature
+   - conductivity
+   - battery

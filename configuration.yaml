@@ -44,15 +44,19 @@ logger:
 #    homeassistant.components.http: info
     homeassistant.components.rfxtrx: info
 #    homeassistant.components.sensor.miflora: debug
+    custom_components.xiaomi: debug
+    custom_components.sensor.xiaomi: debug
+    custom_components.switch.xiaomi: debug
+    custom_components.binary_sensor: debug
+    custom_components.light.xiaomi: debug
+#    homeassistant.core: info
+
 
 history: 
   exclude:
     entities:
       - sensor.no_updates
     domains:
-      - device_tracker
-      - script
-      - automation
       - proximity
 
 #updater:
@@ -98,7 +102,7 @@ device_tracker:
 - platform: nmap_tracker
   hosts: 192.168.1.1-255
   track_new_devices: no
-  consider_home: 1800
+  consider_home: 600
   interval_seconds: 10
   home_interval: 5
   scan_options: " --privileged -sP "
@@ -165,51 +169,16 @@ input_boolean:
     initial: off
   movement_soverom:
     initial: off
+  movement_kjokken:
+    initial: off
+  movement_stue:
+    initial: off
   auto_heat:
     name: Auto heat
     initial: off
   steketermometer_notify_daniel:
     name: Notify Daniel
-    initial: off  
-
-sensor miflora1:
-  platform: miflora
-  mac: C4:7C:8D:61:7E:3B 
-  name: Blomst tv
-  force_update: false
-  median: 3
-  monitored_conditions:
-   - moisture
-   - light
-   - temperature
-   - conductivity
-   - battery
-
-sensor miflora2:
-  platform: miflora
-  mac: C4:7C:8D:61:7F:EC 
-  name: Blomst sofa
-  force_update: false
-  median: 3
-  monitored_conditions:
-   - moisture
-   - light
-   - temperature
-   - conductivity
-   - battery
-
-sensor miflora3:
-  platform: miflora
-  mac: C4:7C:8D:61:7E:5D 
-  name: Blomst bokhylle
-  force_update: false
-  median: 3
-  monitored_conditions:
-   - moisture
-   - light
-   - temperature
-   - conductivity
-   - battery
+    initial: off
 
 tts:
   - platform: google
@@ -228,3 +197,7 @@ news:
 #  - platform: generic
 #    still_image_url: http://raspberrypi:8082/index.html
 
+xiaomi:
+ gateways:
+   - sid:
+     key: !secret xiaomi

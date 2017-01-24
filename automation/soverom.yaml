@@ -71,8 +71,10 @@
       entity_id: script.vekke_lys
       state: 'off'
     - condition: template
-      value_template: '{{(as_timestamp(now())-as_timestamp(states.script.sove_lyd.last_triggered)) > 3600*1 }}'
+      value_template: '{% if states.script.sove_lyd.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.sove_lyd.attributes.last_triggered)) > 3600 }}  {% else %}  true {% endif %}'
   action:
+   - service: homeassistant.turn_off
+     entity_id: automation.auto_radio_soverom
    - service: media_player.turn_off
      entity_id: media_player.soverom    
 
@@ -173,14 +175,16 @@
       event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
   condition:
    - condition: template
-     value_template: '{{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.last_triggered)) > 3600*4 }}'
+     value_template: '{% if states.script.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.attributes.last_triggered)) > 3600*4 }}  {% else %}  true {% endif %}'
+
    - condition: or
      conditions:
      - condition: template
-       value_template: '{{(as_timestamp(now())-as_timestamp(states.script.vekke_lys.last_triggered)) < 3600*4 }}'
+       value_template: '{% if states.script.vekke_lys.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.vekke_lys.attributes.last_triggered)) < 3600*4 }}  {% else %}  true {% endif %}'
      - condition: time
        after: '11:00:00'
        before: '23:00:00'
+
    - condition: state
      entity_id: light.soverom1
      state: 'off'
@@ -209,14 +213,16 @@
       event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
   condition:
    - condition: template
-     value_template: '{{(as_timestamp(now())-as_timestamp(states.script.vekke_lys.last_triggered)) > 3600*4 }}'
+     value_template: '{% if states.script.vekke_lys.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.vekke_lys.attributes.last_triggered)) > 3600*4 }}  {% else %}  true {% endif %}'
+
    - condition: or
      conditions:
      - condition: template
-       value_template: '{{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.last_triggered)) < 3600*4 }}'
+       value_template: '{% if states.script.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.attributes.last_triggered)) < 3600*4 }}  {% else %}  true {% endif %}'
      - condition: time
        before: '11:00:00'
        after: '23:00:00'
+
    - condition: state
      entity_id: light.soverom1
      state: 'off'
@@ -262,3 +268,4 @@
        - light.soverom
      data:
        transition: 10
+

@@ -8,7 +8,7 @@
      entity_id: sensor.bad_humidity
      above: 30
    - condition: template
-     value_template: '{% if states.automation.baderom_fuktighet.attributes.last_triggered %} {{(as_timestamp(now())-as_timestamp(states.automation.baderom_fuktighet.attributes.last_triggered)) > 90 }}  {% else %}  true {% endif %}'
+     value_template: '{% if states.automation.baderom_fuktighet.attributes.last_triggered %} {{(as_timestamp(now())-as_timestamp(states.automation.baderom_fuktighet.attributes.last_triggered)) > 90*60 }}  {% else %}  true {% endif %}'
   action:
   - service: tts.google_say
     entity_id: media_player.bad

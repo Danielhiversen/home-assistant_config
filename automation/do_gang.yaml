@@ -47,11 +47,17 @@
      after: '07:00:00'
      before: '22:00:00'     
   action:
+   - service: homeassistant.turn_off
+     entity_id: automation.lys_gang_dag
    - service: homeassistant.turn_on
      data:
        entity_id: light.gang
        brightness: 80
-       
+   - delay: '00:02:00'
+   - service: homeassistant.turn_on
+     entity_id: automation.lys_gang_dag
+
+
 - alias: "Lys gang natt"
   trigger:
    - platform: event
@@ -78,11 +84,15 @@
      before: '07:00:00'
      after: '22:00:00'     
   action:
+   - service: homeassistant.turn_off
+     entity_id: automation.lys_gang_dag
    - service: homeassistant.turn_on
      data:
        entity_id: light.gang
        rgb_color: [140,7,0]
-
+   - delay: '00:02:00'
+   - service: homeassistant.turn_on
+     entity_id: automation.lys_gang_dag
 
 
 - alias: "Lys do timer"
@@ -116,9 +126,6 @@
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
-   - platform: event
-     event_type: button_pressed
-     event_data: {'entity_id': 'switch.movement3', 'state': 'unknown command (0x9da2da)'}
   condition:
    - condition: template
      value_template: '{% if states.automation.lys_do_dag.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_do_dag.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'

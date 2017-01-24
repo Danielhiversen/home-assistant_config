@@ -4,11 +4,11 @@
       entity_id: group.tracker
       state: 'home'
     - platform: state
-      entity_id: switch.movement2, switch.movement2, switch.movement_do, binary_sensor.door_soverom, binary_sensor.door_do, switch.door
+      entity_id: script.timed_movement
       state: 'on'
     - platform: numeric_state
       entity_id: sensor.relative_alarm_time
-      above: -20
+      above: -30
     - platform: numeric_state
       entity_id: proximity.home
       below: 1300
@@ -19,9 +19,6 @@
     - condition: state
       entity_id: input_boolean.auto_heat
       state: 'on'
-    - condition: time
-      after: '07:00:00'
-      before: '22:00:00'
     - condition: template
       value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 900}}'
     - condition: template
@@ -34,6 +31,14 @@
       - condition: state
         entity_id: automation.wake_me_up
         state: 'on'
+
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id == sensor.relative_alarm_time}}'
+      - condition: time
+        after: '07:00:00'
+        before: '22:00:00'
 
     - condition: or
       conditions:
@@ -95,6 +100,8 @@
         value_template: '{{trigger.platform != state}}'
       - condition: and
         conditions:
+        - condition: template
+          value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 900}}'
         - condition: or
           conditions:
           - condition: time
@@ -103,8 +110,6 @@
           - condition: state
             entity_id: group.tracker
             state: 'not_home'
-        - condition: template
-          value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 900}}'
   action:
     - service: climate.set_temperature
       data_template:

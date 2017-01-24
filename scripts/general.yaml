@@ -29,8 +29,12 @@ all_devices_off:
       entity_id: group.all_lights
 
 borte:
-  alias: "Skru av alt"
+  alias: "Drar bort"
   sequence:
+    - service: tts.google_say
+      data:
+        message: 'Ha det bra.'
+        cache: true
     - service: climate.set_temperature
       data_template:
         entity_id: "climate.termostat_stue"

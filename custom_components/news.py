@@ -46,11 +46,18 @@ def strip_tags(html):
     s.feed(html)
     return s.get_data()
 
+def num2str(num):
+  num = float(num)
+  if (num - int(num)) == 0:
+      num = int(num)
+  return str(round(num, 1)).replace("."," komma ")
+
+
 def setup(hass, config):
     """Setup example component."""
 
     yr_precipitation = []
-    nowcast_precipitation = []
+    nowcast_precipitation = None
     news_rss = []
     workout_text = None
     last_workout_time = None
@@ -94,13 +101,13 @@ def setup(hass, config):
             return news
 
         if yr_precipitation:
-            precipitation = str(sum(yr_precipitation)).replace("."," komma ")
+            precipitation = num2str(sum(yr_precipitation))
             news = news + "De siste 3 timene har det kommet " + precipitation + " mm nedbør "
         temp = hass.states.get('sensor.ute_veranda_temperature')
         if temp and temp.state != "unknown":
-            news = news + "og temperaturen er nå " + str(round(float(temp.state), 1)).replace("."," komma ") + " grader ute. "
+            news = news + "og temperaturen er nå " + num2str(temp.state) + " grader ute. "
         if nowcast_precipitation:
-            precipitation = str(round(sum(nowcast_precipitation),1)).replace("."," komma ")
+            precipitation = num2str(nowcast_precipitation)
             news = news + "Den neste timen er det ventet " + precipitation + " mm nedbør. "
 
         news = news + "Her kommer siste nytt:  "
@@ -117,6 +124,7 @@ def setup(hass, config):
         if service and service.data.get(ATTR_ENTITY_ID):
             data[ATTR_ENTITY_ID] = service.data.get(ATTR_ENTITY_ID)
         data['message'] = news
+        data['cache'] = False
         print(data)
         hass.services.call('tts', 'google_say', data)
 
@@ -171,12 +179,9 @@ def setup(hass, config):
             if '@nextrun' not in model:
                 model = model[0]
             nextrun = dt_util.parse_datetime(model['@nextrun'])
-            precipitation = []
             for time_entry in data['product']['time']:
                 loc_data = time_entry['location']
-                nowcast_precipitation.append(float(loc_data['precipitation']['@value']))
-                if len(precipitation) > 7:
-                    break
+                nowcast_precipitation = float(loc_data['precipitation']['@value'])
         except (ExpatError, IndexError) as err:
             track_point_in_utc_time(hass, _workout_text, now + timedelta(minutes=2))       
             return
@@ -189,10 +194,14 @@ def setup(hass, config):
         if not now:
             now = dt_util.utcnow()
         now = dt_util.as_local(now)
-        if last_workout_time == last_workout.start_time or (now - dt_util.as_local(last_workout.start_time)).total_seconds() > 3600*24:
+        if last_workout_time == last_workout.start_time:
             return
+        if (now - dt_util.as_local(last_workout.start_time)).total_seconds() > 3600*24:
+            workout_text = None
+            return
+
         last_workout_time = last_workout.start_time
-        workout_text = "Bra jobbet Daniel! I dag har du trent i " + str(int(last_workout.duration/3600)) + " timer og "  + str(int((last_workout.duration - int(last_workout.duration/3600)*3600)/60)) + " minutter. Distanse " + str(round(last_workout.distance,1)) + " kilometer. Du har forbrent " + str(round(last_workout.burgers_burned, 1)) + " burgere. \n"
+        workout_text = "Bra jobbet Daniel! I dag har du trent i " + str(int(last_workout.duration/3600)) + " timer og "  + str(int((last_workout.duration - int(last_workout.duration/3600)*3600)/60)) + " minutter. Distanse " + num2str(last_workout.distance) + " kilometer. Du har forbrent " + num2str(last_workout.burgers_burned) + " burgere. \n"
         if last_workout.live:
             track_point_in_utc_time(hass, _workout_text, now + timedelta(seconds=30))
 

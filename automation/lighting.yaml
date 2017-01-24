@@ -1,4 +1,4 @@
-- alias: "Dark"
+- alias: "Home and dark"
   trigger:
     - platform: numeric_state
       entity_id: sun.sun
@@ -9,28 +9,13 @@
       to: 'off'
       for:
         minutes: 15
-  condition:
-    - condition: state
-      entity_id: group.tracker
-      state: 'home'
-    - condition: time
-      after: '14:00:00'
-      before: '23:00:00'
-    - condition: state
-      entity_id: script.light_turned_off_5min
-      state: 'off'
-  action:
-     service: scene.turn_on
-     entity_id: scene.Normal_lys
 
-- alias: "Home"
-  trigger:
     - platform: state
       entity_id: group.tracker
       from: 'not_home'
       to: 'home'
     - platform: state
-      entity_id: switch.movement1, switch.movement2, switch.movement2, switch.movement_do, binary_sensor.door_soverom, binary_sensor.door_do, switch.door
+      entity_id: script.timed_movement
       state: 'on'
   condition:
     - condition: or
@@ -38,21 +23,35 @@
       - condition: numeric_state
         entity_id: sun.sun
         value_template: '{{ state.attributes.elevation }}'
-        below: 8
+        below: 5
       - condition: state
         entity_id: binary_sensor.stue_lux
         state: 'off'
         for:
-          minutes: 15
-    - condition: state
-      entity_id: light.Lys_stue
-      state: 'off'
-    - condition: state
-      entity_id: light.Lys_TV
-      state: 'off'
-    - condition: time
+          minutes: 5
+
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: light.Lys_stue
+        state: 'off'
+      - condition: template
+        value_template: '{{states.light.Lys_stue.attributes.brightness <= 135}}'
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: light.Lys_TV
+        state: 'off'
+      - condition: template
+        value_template: '{{states.light.Lys_TV.attributes.brightness <= 101}}'
+
+
+    - condition: template
+      value_template: '{% if states.script.leggetid.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid.attributes.last_triggered)) > 3600*3 }}  {% else %}  true {% endif %}'
+    - condition: time      
       after: '07:00:00'
       before: '23:00:00'
+
     - condition: state
       entity_id: script.light_turned_off_5min
       state: 'off'
@@ -78,7 +77,7 @@
 - alias: "Night"
   trigger:
     - platform: state
-      entity_id: switch.movement1, switch.movement2, switch.movement2, switch.movement_do, binary_sensor.door_soverom, binary_sensor.door_do, switch.door
+      entity_id: script.timed_movement
       state: 'on'
     - platform: event
       event_type: button_pressed
@@ -86,6 +85,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0xdb153a)', 'entity_id': 'switch.movement_soverom'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
   condition:
     - condition: numeric_state
       entity_id: sun.sun
@@ -111,7 +113,7 @@
     - condition: or
       conditions:
       - condition: template
-        value_template: '{{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.last_triggered)) < 60*60*2 }}'
+        value_template: '{% if states.script.leggetid.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid.attributes.last_triggered)) < 3600*3 }}  {% else %}  true {% endif %}'
       - condition: time
         after: '23:00:00'
         before: '07:00:00'
@@ -165,7 +167,7 @@
 - alias: "lys bokhylle og bilder av"
   trigger:
     platform: time
-    after: '23:30:00'
+    after: '22:03:00'
   action:
       service: homeassistant.turn_off
       entity_id: 
@@ -173,58 +175,21 @@
       - light.lys_bilder
       - light.vindu
 
-- alias: "Turn off light"
+- alias: "Turn off light stue"
   trigger:
-    - platform: state
-      entity_id: group.tracker
-      from: 'home'
-      to: 'not_home'
     - platform: state
       entity_id: binary_sensor.stue_lux
       to: 'on'
       for:
-        minutes: 15
-    - platform: state
-      entity_id: script.timed_movement
-      to: 'off'
-      for:
-        minutes: 1
-  condition:
-    - condition: state
-      entity_id: group.tracker
-      state: 'not_home'
-    - condition: state
-      entity_id: binary_sensor.stue_lux
-      state: 'on'
-    - condition: state
-      entity_id: script.timed_movement
-      state: 'off'
+        minutes: 3
   action:
-    - service: script.turn_off
-      data: 
-         entity_id: script.vekke_lys
-    - service: homeassistant.turn_on
-      entity_id: script.all_devices_off
-
-- alias: "Turn off light night"
-  trigger:
-    - platform: time
-      after: '01:00:00'
-    - platform: state
-      entity_id: script.timed_movement
-      to: 'off'
-      for:
-        minutes: 1
-  condition:
-    - condition: state
-      entity_id: script.timed_movement
-      state: 'off'
-    - condition: time
-      after: '00:00:00'
-      before: '07:00:00'
-  action:
-    - service: homeassistant.turn_on
-      entity_id: script.all_devices_off
+      service: homeassistant.turn_off
+      entity_id: 
+      - light.Lys_TV
+      - light.Lys_stue
+      - light.lys_bokhylle
+      - light.lys_bilder
+      - light.vindu
 
 - alias: "Away lights"
   trigger:
@@ -318,28 +283,16 @@
      entity_id: light.yttergang
      state: 'off'
   action:
+   - service: homeassistant.turn_off
+     entity_id: automation.lys_yttergang
    - service: homeassistant.turn_on
      data:
        entity_id: light.yttergang
        transition: 0
        brightness: 90
-
-- alias: 'Wake Me Up, lys stue'
-  trigger:
-   - platform: numeric_state
-     entity_id: sensor.relative_alarm_time
-     above: 0
-  condition:
-   - condition: state
-     entity_id: automation.wake_me_up
-     state: 'on'
-   - condition: numeric_state
-     entity_id: sun.sun
-     value_template: '{{ state.attributes.elevation }}'
-     below: 8
-  action:
-     service: scene.turn_on
-     entity_id: scene.Normal_lys
+   - delay: '00:02:00'
+   - service: homeassistant.turn_on
+     entity_id: automation.lys_yttergang
 
 - alias: "light"
   trigger:

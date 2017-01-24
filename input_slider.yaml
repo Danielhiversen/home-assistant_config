@@ -61,9 +61,9 @@ temp_control_stue_kveld_temp:
   unit_of_measurement: '°C'
 
 temp_control_soverom_morgen_hour:
-  name: Hour
+  name: Hour+30min
   icon: mdi:timer
-  initial: 7
+  initial: 6
   min: 5
   max: 15
   step: 1
@@ -100,3 +100,4 @@ temp_steketermometer:
   step: 5
   icon: mdi:food-fork-drink
   unit_of_measurement: '°C' 
+
