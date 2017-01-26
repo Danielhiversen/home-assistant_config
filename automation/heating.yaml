@@ -8,7 +8,7 @@
       state: 'on'
     - platform: numeric_state
       entity_id: sensor.relative_alarm_time
-      above: -30
+      below: 30
     - platform: numeric_state
       entity_id: proximity.home
       below: 1300
@@ -16,18 +16,18 @@
       entity_id: proximity.home
       below: 100
   condition:
-    - condition: state
-      entity_id: input_boolean.auto_heat
-      state: 'on'
     - condition: template
       value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 900}}'
     - condition: template
       value_template: '{{float(states.input_slider.auto_temp.state) > float(states.climate.termostat_stue.attributes.temperature)}}'
+    - condition: state
+      entity_id: input_boolean.auto_heat
+      state: 'on'
 
     - condition: or
       conditions:
       - condition: template
-        value_template: '{{ trigger.entity_id !=  sensor.relative_alarm_time}}'
+        value_template: '{{ trigger.entity_id !=  states.sensor.relative_alarm_time}}'
       - condition: state
         entity_id: automation.wake_me_up
         state: 'on'
@@ -35,7 +35,7 @@
     - condition: or
       conditions:
       - condition: template
-        value_template: '{{ trigger.entity_id == sensor.relative_alarm_time}}'
+        value_template: '{{ trigger.entity_id == states.sensor.relative_alarm_time}}'
       - condition: time
         after: '07:00:00'
         before: '22:00:00'
@@ -43,7 +43,7 @@
     - condition: or
       conditions:
       - condition: template
-        value_template: '{{trigger.entity_id !=  proximity.home}}'
+        value_template: '{{trigger.entity_id !=  states.proximity.home}}'
       - condition: and
         conditions:
         - condition: template
@@ -88,11 +88,11 @@
       event_type: button_pressed
       event_data: {'state': 'group on', 'entity_id': 'switch.leggetid_stue'}
   condition:
+    - condition: template
+      value_template: '{{float(states.input_slider.auto_temp_low.state) < float(states.climate.termostat_stue.attributes.temperature)}}'
     - condition: state
       entity_id: input_boolean.auto_heat
       state: 'on'
-    - condition: template
-      value_template: '{{float(states.input_slider.auto_temp_low.state) < float(states.climate.termostat_stue.attributes.temperature)}}'
 
     - condition: or
       conditions:
@@ -105,7 +105,7 @@
         - condition: or
           conditions:
           - condition: time
-            after: '21:00:00'
+            after: '21:30:00'
             before: '07:00:00'
           - condition: state
             entity_id: group.tracker

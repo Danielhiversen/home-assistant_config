@@ -11,9 +11,9 @@
     0b11000100e6ce7609010f70:
       name: lys_bilder
     0b11000466bc0cfe05010f70:
-      name: Vindu
+      name: IKKE_I_BRUK
     0b11000689bc0cfe05010f70:
-      name: mobillader
+      name: Vindu
 
 - platform: hue
   host: 192.168.1.170

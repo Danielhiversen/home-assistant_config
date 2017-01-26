@@ -16,14 +16,20 @@
       entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.movement1,  binary_sensor.movement2, binary_sensor.movement3, binary_sensor.movement_do
       state: 'on'
   condition:
-    - condition: template
-      value_template: '{% if states.automation.nyheter_hjemkomst_start.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.nyheter_hjemkomst_start.attributes.last_triggered)) > 1800 }}  {% else %}  true {% endif %}'
+
   action:
-    - service: media_player.turn_off
-      entity_id: media_player.chromecast1877
     - service: homeassistant.turn_off
       data: 
         entity_id: automation.nyheter_hjemkomst_start
+    - condition: and
+      conditions:
+      - condition: template
+        value_template: '{% if states.automation.nyheter_hjemkomst_start.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.nyheter_hjemkomst_start.attributes.last_triggered)) > 1800 }}  {% else %}  true {% endif %}'
+      - condition: template
+        value_template: '{% if states.automation.nyheter_hjemkomst.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.nyheter_hjemkomst.attributes.last_triggered)) < 900 }}  {% else %}  false {% endif %}'
+      
+    - service: media_player.turn_off
+      entity_id: media_player.chromecast1877
     - service: homeassistant.turn_off
       entity_id: switch.tv
     - delay: '00:00:03'

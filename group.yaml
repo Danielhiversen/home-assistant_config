@@ -23,6 +23,7 @@ stue:
   - binary_sensor.door
   - binary_sensor.movement1
   - binary_sensor.movement2
+  - binary_sensor.movement_stue
   - sensor.stue_temperature
   - sensor.mean_stue_temp
   - sensor.stue_humidity
@@ -47,6 +48,7 @@ Soverom:
   - group.soverom_heater
   - sensor.soverom_temperature
   - binary_sensor.door_soverom
+  - binary_sensor.movement_soverom
   - automation.nattlys
   - group.media_soverom
   - script.sove_lyd
@@ -68,6 +70,7 @@ Bad:
 Kjokken:
   view: yes
   entities:
+  - binary_sensor.movement_kjokken
   - sensor.kjoleskap_temperature
   - light.veranda
   - group.kjokken_timer

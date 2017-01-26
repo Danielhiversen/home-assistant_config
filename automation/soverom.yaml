@@ -9,6 +9,10 @@
   action:
     - service: homeassistant.turn_off
       entity_id: automation.auto_radio_soverom
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.soverom
+        volume_level: 0.4
     - service: input_select.select_option
       entity_id: input_select.radio_soverom
       data:
@@ -157,6 +161,7 @@
     - service: script.turn_off
       data: 
         entity_id: script.timed_lys_soverom
+    - delay: 00:00:05
     # Set new timer 
     - service: script.turn_on
       data:
@@ -180,7 +185,7 @@
    - condition: or
      conditions:
      - condition: template
-       value_template: '{% if states.script.vekke_lys.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.vekke_lys.attributes.last_triggered)) < 3600*4 }}  {% else %}  true {% endif %}'
+       value_template: '{% if states.script.vekke_lys.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.vekke_lys.attributes.last_triggered)) < 3600*4 }}  {% else %}  false {% endif %}'
      - condition: time
        after: '11:00:00'
        before: '23:00:00'
@@ -196,8 +201,7 @@
       entity_id:
         - light.soverom
       data:
-        brightness: 216
-        xy_color: [0.5458, 0.4159]
+        xy_color: [0.5458,0.4159]
 
 
 - alias: "Nattlys"
@@ -218,7 +222,7 @@
    - condition: or
      conditions:
      - condition: template
-       value_template: '{% if states.script.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.attributes.last_triggered)) < 3600*4 }}  {% else %}  true {% endif %}'
+       value_template: '{% if states.script.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.attributes.last_triggered)) < 3600*4 }}  {% else %}  false {% endif %}'
      - condition: time
        before: '11:00:00'
        after: '23:00:00'
@@ -240,9 +244,6 @@
 
 - alias: "Lys soverom door trigger off"
   trigger:
-    - platform: state
-      entity_id: binary_sensor.door_soverom
-      state: 'off'
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'off', 'entity_id': 'switch.door_bedroom'}
@@ -255,6 +256,9 @@
      state: 'on'
    - condition: state
      entity_id: script.leggetid_soverom
+     state: 'off'
+   - condition: state
+     entity_id: script.vekke_lys
      state: 'off'
   action:
    - delay:

@@ -47,7 +47,7 @@
 
 
     - condition: template
-      value_template: '{% if states.script.leggetid.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid.attributes.last_triggered)) > 3600*3 }}  {% else %}  true {% endif %}'
+      value_template: '{% if states.script.leggetid.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid.attributes.last_triggered)) > 3600*3 }}  {% else %}  false {% endif %}'
     - condition: time      
       after: '07:00:00'
       before: '23:00:00'
@@ -113,7 +113,7 @@
     - condition: or
       conditions:
       - condition: template
-        value_template: '{% if states.script.leggetid.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid.attributes.last_triggered)) < 3600*3 }}  {% else %}  true {% endif %}'
+        value_template: '{% if states.script.leggetid.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid.attributes.last_triggered)) < 3600*3 }}  {% else %}  false {% endif %}'
       - condition: time
         after: '23:00:00'
         before: '07:00:00'
@@ -122,6 +122,7 @@
     - service: script.turn_off
       data: 
          entity_id: script.timed_lights_5min_off
+    - delay: 00:00:02
     - service: script.turn_on
       data:
         entity_id: script.timed_lights_5min_off
@@ -158,11 +159,15 @@
       after: '14:00:00'
       before: '23:00:00'
   action:
-      service: homeassistant.turn_on
+    - service: homeassistant.turn_on
       entity_id: 
       - light.lys_bokhylle
       - light.lys_bilder
+    - service: homeassistant.turn_on
+      entity_id:
       - light.vindu
+      data:
+        brightness: 65
 
 - alias: "lys bokhylle og bilder av"
   trigger:

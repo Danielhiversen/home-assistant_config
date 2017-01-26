@@ -97,9 +97,6 @@ def setup(hass, config):
             news = news + workout_text
             workout_text = None
 
-        if message_type == "0":
-            return news
-
         if yr_precipitation:
             precipitation = num2str(sum(yr_precipitation))
             news = news + "De siste 3 timene har det kommet " + precipitation + " mm nedbør "

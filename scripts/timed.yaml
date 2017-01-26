@@ -96,6 +96,30 @@ timed_movement_soverom_1min_off:
       data: 
          entity_id: input_boolean.movement_soverom
 
+timed_movement_kjokken_1min_off:
+  alias: "Turn off movement kjokken after 1min"
+  sequence:
+    - service: homeassistant.turn_on
+      data: 
+         entity_id: input_boolean.movement_kjokken
+    - delay:
+        seconds: 60
+    - service: homeassistant.turn_off
+      data: 
+         entity_id: input_boolean.movement_kjokken
+
+timed_movement_stue_1min_off:
+  alias: "Turn off movement stue after 1min"
+  sequence:
+    - service: homeassistant.turn_on
+      data: 
+         entity_id: input_boolean.movement_stue
+    - delay:
+        seconds: 60
+    - service: homeassistant.turn_off
+      data: 
+         entity_id: input_boolean.movement_stue
+
 timed_movement:
   sequence:
     - delay:

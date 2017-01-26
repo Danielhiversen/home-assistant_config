@@ -133,7 +133,7 @@
       data: 
          entity_id: script.away_48
     # Set new timer  
-    - delay: '00:00:01'
+    - delay: '00:00:05'
     - service: script.turn_on
       data:
          entity_id: script.away_48
@@ -157,12 +157,13 @@
       entity_id: script.stovsuger_running
       state: 'off'
       for:
-        minutes: 10
+        minutes: 2
   action:
     - service: script.turn_off
       data: 
          entity_id: 
           - script.timed_movement
+    - delay: 00:00:03
     # Set new timer
     - service: script.turn_on
       data:
@@ -248,7 +249,6 @@
       data: 
          entity_id: script.timed_movement3_1min_off
     # Set new timer 
-    - delay: '00:00:01'
     - service: script.turn_on
       data:
         entity_id: 
@@ -259,16 +259,48 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0xdb153a)', 'entity_id': 'switch.movement_soverom'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
   action:
     - service: script.turn_off
       data: 
          entity_id: script.timed_movement_soverom_1min_off
     # Set new timer 
-    - delay: '00:00:01'
     - service: script.turn_on
       data:
         entity_id: 
           - script.timed_movement_soverom_1min_off
+
+- alias: "Movement kjokken"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0x55997a)', 'entity_id': 'switch.movement_kjokken'}
+  action:
+    - service: script.turn_off
+      data: 
+         entity_id: script.timed_movement_kjokken_1min_off
+    # Set new timer 
+    - service: script.turn_on
+      data:
+        entity_id: 
+          - script.timed_movement_kjokken_1min_off
+
+- alias: "Movement stue"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'unknown command (0x2ebf8a)', 'entity_id': 'switch.movement_stue'}
+  action:
+    - service: script.turn_off
+      data: 
+         entity_id: script.timed_movement_stue_1min_off
+    # Set new timer 
+    - service: script.turn_on
+      data:
+        entity_id: 
+          - script.timed_movement_stue_1min_off
 
 - alias: "Close dor"
   trigger:

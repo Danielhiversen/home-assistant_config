@@ -8,10 +8,6 @@ leggetid:
     data:
       message: 'Sov godt.'
       cache: false
-  - service: input_select.select_option
-    entity_id: input_select.radio_stue
-    data:
-      option: "Av"
   - service: homeassistant.turn_off
     entity_id:
      - light.lys_bokhylle
@@ -24,6 +20,10 @@ leggetid:
      - light.lys_bilder
      - light.vindu
   - delay: '00:10:00'
+  - service: input_select.select_option
+    entity_id: input_select.radio_stue
+    data:
+      option: "Av"
   - service: homeassistant.turn_off
     entity_id:
      - light.Lys_TV

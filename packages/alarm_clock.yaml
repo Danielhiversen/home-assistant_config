@@ -67,6 +67,16 @@ script:
       - delay: 00:12:00
       - service: homeassistant.turn_on
         entity_id: script.news_soverom
+      - delay: 00:02:00
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.soverom
+          volume_level: 0.6
+      - delay: 00:02:00
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.soverom
+          volume_level: 0.8
 
   vekke_lys:
     sequence:

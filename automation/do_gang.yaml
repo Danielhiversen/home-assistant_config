@@ -99,7 +99,7 @@
   trigger:
    - platform: event
      event_type: button_pressed
-     event_data: {'state': 'on', 'entity_id': 'binary_sensor.movement_do'}
+     event_data: {'state': 'on', 'entity_id': 'sensor.movement_do'}
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
@@ -122,7 +122,7 @@
   trigger:
    - platform: event
      event_type: button_pressed
-     event_data: {'state': 'on', 'entity_id': 'binary_sensor.movement_do'}
+     event_data: {'state': 'on', 'entity_id': 'switch.movement_do'}
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
@@ -145,7 +145,7 @@
   trigger:
    - platform: event
      event_type: button_pressed
-     event_data: {'state': 'on', 'entity_id': 'binary_sensor.movement_do'}
+     event_data: {'state': 'on', 'entity_id': 'switch.movement_do'}
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}

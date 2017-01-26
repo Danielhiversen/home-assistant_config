@@ -13,14 +13,14 @@
     09130000db153a012670:
       name: Movement_soverom
       fire_event: True
-    091300c7d5d97a012b70:
-      name: Movement_stue
-      fire_event: True  
     0913009c94597a013670:
       name: Movement_soverom_seng
       fire_event: True
-    091300c8fafd7a012d70:
+    0913002355997a013d60:
       name: Movement_kjokken
+      fire_event: True
+    091300122ebf8a013670:
+      name: Movement_stue
       fire_event: True
     0b1100e003af16aa10000060:
       name: Door
@@ -67,7 +67,9 @@
     0913001587a768022e60:
       name: news_soverom
       fire_event: True
-
+    09130033154c02011d70:
+      name: knapp
+      fire_event: True
 
 #- platform: command_line
 #  switches:
