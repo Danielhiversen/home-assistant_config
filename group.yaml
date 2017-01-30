@@ -57,10 +57,8 @@ Soverom:
 Bad:
   view: yes
   entities:
-  - sensor.bad_temperature
-  - sensor.bad_humidity
-  - sensor.temperature_158d000159f1af
-  - sensor.humidity_158d000159f1af
+  - sensor.mean_bad_temp
+  - sensor.mean_bad_fuktighet
   - light.do
   - light.gang
   - binary_sensor.door_do

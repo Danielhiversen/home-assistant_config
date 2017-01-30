@@ -1,0 +1,33 @@
+camera:
+  - platform: generic
+    name: cam1
+    password: !secret cam_password_1
+    username: !secret cam_username_1
+    still_image_url: http://192.168.1.106/tmpfs/auto.jpg
+
+switch:
+  platform: command_line
+  switches:
+    left_right:
+      command_off: !secret left_1
+      command_on: !secret right_1
+    down_up:
+      command_off: !secret down_1
+      command_on: !secret up_1
+    stop_start:
+      command_off: !secret stop_1
+      command_on: !secret swipe_1
+    preset:
+      command_off: !secret preset1_1
+      command_on: !secret preset2_1
+
+
+group:
+  camera1:
+    name: Kamera1
+    entities:
+    - camera.cam1
+    - switch.left_right
+    - switch.down_up
+    - switch.stop_start
+    - switch.preset
