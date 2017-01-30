@@ -29,13 +29,17 @@ sensors:
     sensor_class: motion
     entity_id: input_boolean.movement3
   door:
-    value_template: "{{ states.switch.door.state == 'on' }}" 
+    value_template: "{{ states.input_boolean.door.state == 'on' }}" 
     sensor_class: opening
-    entity_id: switch.door
+    entity_id: input_boolean.door
   door_soverom:
-    value_template: "{{ states.switch.door_bedroom.state == 'on' }}" 
+    value_template: "{{ states.input_boolean.door_soverom.state == 'on' }}" 
     sensor_class: opening
-    entity_id: switch.door_bedroom
+    entity_id: input_boolean.door_soverom
+  door_bad:
+    value_template: "{{ states.input_boolean.door_bad.state == 'on' }}" 
+    sensor_class: opening
+    entity_id: input_boolean.door_bad
   door_do:
     value_template: "{{ states.switch.door_do.state == 'on' }}" 
     entity_id: switch.door_do
@@ -55,3 +59,12 @@ sensors:
        - sensor.time
        - script.stovsuger_running
     sensor_class: moving
+  state_mediaplayer_stue:
+    value_template:  >
+        {% if is_state('media_player.stue', 'playing') %}
+          True
+        {% else %}
+          False
+        {% endif %}
+    entity_id: 
+       - media_player.stue

@@ -107,6 +107,9 @@ def setup(hass, config):
             precipitation = num2str(nowcast_precipitation)
             news = news + "Den neste timen er det ventet " + precipitation + " mm nedbør. "
 
+        if message_type == "1":
+            return news
+
         news = news + "Her kommer siste nytt:  "
         for case in news_rss:
             news = news + case + " "

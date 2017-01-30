@@ -129,6 +129,18 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'on', 'entity_id': 'switch.soverom_switch1'}
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d0001165868
+        click_type: double
+  condition:
+   - condition: state
+     entity_id: light.soverom1
+     state: 'off'
+   - condition: state
+     entity_id: light.soverom2
+     state: 'off'
   action:
   - service: homeassistant.turn_on
     entity_id:
@@ -202,7 +214,7 @@
         - light.soverom
       data:
         xy_color: [0.5458,0.4159]
-
+        brightness: 255
 
 - alias: "Nattlys"
   trigger:
@@ -215,6 +227,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
+    - platform: state
+      entity_id: binary_sensor.door_soverom
+      state: 'on'
   condition:
    - condition: template
      value_template: '{% if states.script.vekke_lys.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.vekke_lys.attributes.last_triggered)) > 3600*4 }}  {% else %}  true {% endif %}'
@@ -247,6 +262,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'off', 'entity_id': 'switch.door_bedroom'}
+    - platform: state
+      entity_id: binary_sensor.door_soverom
+      state: 'off'
   condition:
    - condition: state
      entity_id: light.soverom1
@@ -263,13 +281,53 @@
   action:
    - delay:
         seconds: 5
-   # Cancel ev. old timers 
    - service: script.turn_off
-     data: 
-       entity_id: script.timed_lys_soverom
+     entity_id: script.timed_lys_soverom
    - service: homeassistant.turn_off
-     entity_id:
-       - light.soverom
+     entity_id: light.soverom
      data:
        transition: 10
+
+
+
+
+- alias: "Lys av pA soverom, knapp"
+  trigger:
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'on', 'entity_id': 'switch.soverom_switch1'}
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d0001165868
+        click_type: double
+  condition:
+   - condition: state
+     entity_id: light.soverom1
+     state: 'on'
+   - condition: state
+     entity_id: light.soverom2
+     state: 'on'
+  action:
+  - service: homeassistant.turn_off
+    entity_id:
+      - light.soverom
+
+- alias: "Klokke soverom"
+  trigger:
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d0001165868
+        click_type: single
+  action:
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.soverom
+        volume_level: 0.4
+    - service: tts.google_say
+      entity_id: media_player.soverom
+      data_template:
+        message: 'Klokken er {{ now().hour}}  {{ now().minute}}'
+        cache: false
 

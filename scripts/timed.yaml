@@ -18,11 +18,12 @@ timed_lights_5min_off:
       entity_id:
        - light.Lys_TV
        - light.Lys_stue
-    - delay:
-        seconds: 1
     - service: homeassistant.turn_off
-      entity_id:      
-       - script.light_turned_off_5min
+      entity_id: script.light_turned_off_5min
+    - delay:
+        seconds: 3
+    - service: homeassistant.turn_off
+      entity_id: script.light_turned_off_5min
  
 timed_lights_20min_off:
   alias: "Turn off lights after 20min"
@@ -36,8 +37,7 @@ timed_lights_20min_off:
    - delay:
        seconds: 1
    - service: homeassistant.turn_off
-     entity_id:      
-      - script.light_turned_off_5min
+     entity_id: script.light_turned_off_5min
  
 light_turned_off_5min:
   alias: "Light turned off during last 5 min"
@@ -51,8 +51,7 @@ timed_movement1_1min_off:
     - delay:
         minutes: 1
     - service: homeassistant.turn_off
-      data:
-        entity_id: switch.movement1
+      entity_id: switch.movement1
 
 timed_movement2_1min_off:
   alias: "Turn off movement after 1min"
@@ -60,8 +59,7 @@ timed_movement2_1min_off:
     - delay:
         minutes: 1
     - service: homeassistant.turn_off
-      data:
-        entity_id: switch.movement2
+      entity_id: switch.movement2
 
 timed_movement_do_1min_off:
   alias: "Turn off movement after 1min"
@@ -69,61 +67,52 @@ timed_movement_do_1min_off:
     - delay:
         minutes: 1
     - service: homeassistant.turn_off
-      data:
-        entity_id: switch.movement_do
+      entity_id: switch.movement_do
 
 timed_movement3_1min_off:
   alias: "Turn off movement after 1min"
   sequence:
     - service: homeassistant.turn_on
-      data: 
-         entity_id: input_boolean.movement3
+      entity_id: input_boolean.movement3
     - delay:
         seconds: 15
     - service: homeassistant.turn_off
-      data: 
-         entity_id: input_boolean.movement3
+      entity_id: input_boolean.movement3
 
 timed_movement_soverom_1min_off:
   alias: "Turn off movement soverom after 1min"
   sequence:
     - service: homeassistant.turn_on
-      data: 
-         entity_id: input_boolean.movement_soverom
+      entity_id: input_boolean.movement_soverom
     - delay:
         seconds: 60
     - service: homeassistant.turn_off
-      data: 
-         entity_id: input_boolean.movement_soverom
+      entity_id: input_boolean.movement_soverom
 
 timed_movement_kjokken_1min_off:
   alias: "Turn off movement kjokken after 1min"
   sequence:
     - service: homeassistant.turn_on
-      data: 
-         entity_id: input_boolean.movement_kjokken
+      entity_id: input_boolean.movement_kjokken
     - delay:
         seconds: 60
     - service: homeassistant.turn_off
-      data: 
-         entity_id: input_boolean.movement_kjokken
+      entity_id: input_boolean.movement_kjokken
 
 timed_movement_stue_1min_off:
   alias: "Turn off movement stue after 1min"
   sequence:
     - service: homeassistant.turn_on
-      data: 
-         entity_id: input_boolean.movement_stue
+      entity_id: input_boolean.movement_stue
     - delay:
         seconds: 60
     - service: homeassistant.turn_off
-      data: 
-         entity_id: input_boolean.movement_stue
+      entity_id: input_boolean.movement_stue
 
 timed_movement:
   sequence:
     - delay:
-        hours: 2
+        hours: 1
 
 timed_lys_yttergang:
   alias: "Turn off yttergang lights after 3 min"
@@ -141,8 +130,7 @@ timed_lys_soverom:
     - delay:
         minutes: 5
     - service: homeassistant.turn_off
-      entity_id:
-        - light.soverom
+      entity_id: light.soverom
       data:
         transition: 10
 
@@ -152,8 +140,7 @@ timed_lys_gang:
     - delay:
         minutes: 4
     - service: homeassistant.turn_off
-      data:
-        entity_id: light.gang
+      entity_id: light.gang
 
 timed_lys_do:
   alias: "Turn off do lights after 15 min"
@@ -161,5 +148,4 @@ timed_lys_do:
     - delay:
         minutes: 15
     - service: homeassistant.turn_off
-      data:
-        entity_id: light.do
+      entity_id: light.do

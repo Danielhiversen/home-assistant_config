@@ -6,24 +6,37 @@ leggetid:
       entity_id: scene.Dempet_lys
   - service: tts.google_say
     data:
+      entity_id: media_player.hele_huset
       message: 'Sov godt.'
-      cache: false
+      cache: true
   - service: homeassistant.turn_off
     entity_id:
      - light.lys_bokhylle
      - light.lys_bilder
      - light.vindu
-  - delay: '00:00:05'
+  - delay: '00:00:07'
+  - service: input_select.select_option
+    entity_id: input_select.radio_stue
+    data:
+      option: "Av"
+  - service: input_select.select_option
+    entity_id: input_select.radio_bad
+    data:
+      option: "Av"
+  - service: homeassistant.turn_off
+    entity_id:
+     - media_player.stue
+     - media_player.chromecast1877
+     - media_player.bad
+  - service: homeassistant.turn_off
+    entity_id:
+     - switch.tv
   - service: homeassistant.turn_off
     entity_id:
      - light.lys_bokhylle
      - light.lys_bilder
      - light.vindu
   - delay: '00:10:00'
-  - service: input_select.select_option
-    entity_id: input_select.radio_stue
-    data:
-      option: "Av"
   - service: homeassistant.turn_off
     entity_id:
      - light.Lys_TV
@@ -112,6 +125,7 @@ news_soverom:
   sequence:
     - service: media_player.volume_set
       data:
+        message_type: "1"
         entity_id: media_player.soverom
         volume_level: 0.3
     - service: news.read_news

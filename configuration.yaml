@@ -28,11 +28,10 @@ http:
 recorder:
   purge_days: 2
   db_url: !secret db_url
-#  db_url: sqlite:///home/dahoiv/hass.db
-
-logbook:
 
 restore_states:
+
+logbook:
 
 logger:
   default: warning
@@ -123,16 +122,10 @@ device_tracker:
 
 media_player:
 - platform: cast
-  host: 192.168.1.160
 
 #- platform: vlc
+#  arguments: 'front:CARD=SB,DEV=0'
 #  name: Stue
-
-- platform: cast
-  host: 192.168.1.218
-
-- platform: cast
-  host: 192.168.1.144
 
 rfxtrx:
   device: /dev/serial/by-id/usb-RFXCOM_RFXtrx433_A1Y0NJGR-if00-port0
@@ -164,7 +157,14 @@ climate:
 # target_sensor : sensor.temperature_rubicson_61951
 # max_temp : 100
 
-input_boolean: 
+input_boolean:
+  door:
+    initial: off
+  door_soverom:
+    initial: off
+  door_bad:
+    initial: off
+
   movement3:
     initial: off
   movement_soverom:

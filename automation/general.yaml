@@ -40,16 +40,18 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'group on', 'entity_id': 'switch.main'}
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d00012ac03c
+        click_type: single
+
   condition:
     - condition: template
       value_template: '{% if states.automation.all_devices_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.all_devices_off.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
   action:
-  - service: tts.google_say
-    data:
-      message: 'Ha det bra.'
-      cache: true
   - service: homeassistant.turn_on
-    entity_id: script.all_devices_off
+    entity_id: script.borte
 
 - alias: "Kjoleskap for varmt"
   trigger:
@@ -83,6 +85,16 @@
 - alias: "Leggetid"
   trigger:
     - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d00013ed144
+        click_type: double
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d00013ed144
+        click_type: single
+    - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
     - platform: event
@@ -103,6 +115,11 @@
 - alias: "Leggetid soverom"
   trigger:
     - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d00013ed144
+        click_type: double
+    - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
   condition:
@@ -110,30 +127,29 @@
       value_template: '{% if states.automation.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.leggetid_soverom.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
   action:
     - service: script.turn_off
-      data: 
-         entity_id: script.leggetid_soverom
+      entity_id: script.leggetid_soverom
     - service: script.turn_off
-      data: 
-         entity_id: script.leggetid_soverom_temp
+      entity_id: script.leggetid_soverom_temp
     - delay: '00:00:01'
     - service: script.turn_on
-      data:
-        entity_id: script.leggetid_soverom
+      entity_id: script.leggetid_soverom
+    - delay: '00:01:00'
+    - service: script.turn_on
+      entity_id: script.sove_lyd
 
 - alias: "Away 48"
   trigger:
     - platform: state
       entity_id: group.tracker
-      to: 'home'
+      to: 'not_home'
     - platform: state
       entity_id: script.timed_movement
-      state: 'on'
+      state: 'off'
   action:
     - service: script.turn_off
       data: 
          entity_id: script.away_48
     # Set new timer  
-    - delay: '00:00:05'
     - service: script.turn_on
       data:
          entity_id: script.away_48
@@ -141,7 +157,7 @@
 - alias: "movement"
   trigger:
     - platform: state
-      entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.movement1,  binary_sensor.movement2, binary_sensor.movement3, binary_sensor.movement_do
+      entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.door_bad, binary_sensor.movement1,  binary_sensor.movement2, binary_sensor.movement3, binary_sensor.movement_do, binary_sensor.motion_sensor_158d00010ab2d0, binary_sensor.movement_kjokken, binary_sensor.movement_stue, binary_sensor.movement_soverom
       state: 'on'
     - platform: event
       event_type: button_pressed
@@ -160,15 +176,9 @@
         minutes: 2
   action:
     - service: script.turn_off
-      data: 
-         entity_id: 
-          - script.timed_movement
-    - delay: 00:00:03
-    # Set new timer
+      entity_id: script.timed_movement
     - service: script.turn_on
-      data:
-        entity_id: 
-          - script.timed_movement
+      entity_id: script.timed_movement
 
 - alias: "movement alert"
   trigger:
@@ -176,6 +186,9 @@
      entity_id: script.timed_movement
      state: 'on'
   condition:
+   - condition: state
+     entity_id: group.tracker
+     state: 'not_home'
    - condition: state
      entity_id: script.alert
      state: 'off'
@@ -192,15 +205,9 @@
       state: 'on'
   action:
     - service: script.turn_off
-      data: 
-         entity_id: 
-          - script.timed_movement1_1min_off
-    # Set new timer
-    - delay: '00:00:01'
+      entity_id: script.timed_movement1_1min_off
     - service: script.turn_on
-      data:
-        entity_id: 
-          - script.timed_movement1_1min_off
+      entity_id: script.timed_movement1_1min_off
 
 - alias: "movement2"
   trigger:
@@ -209,15 +216,9 @@
       state: 'on'
   action:
     - service: script.turn_off
-      data: 
-         entity_id: 
-          - script.timed_movement2_1min_off
-    # Set new timer 
-    - delay: '00:00:01'
+      entity_id: script.timed_movement2_1min_off
     - service: script.turn_on
-      data:
-        entity_id: 
-          - script.timed_movement2_1min_off
+      entity_id: script.timed_movement2_1min_off
 
 - alias: "movement do"
   trigger:
@@ -226,15 +227,9 @@
       state: 'on'
   action:
     - service: script.turn_off
-      data: 
-         entity_id: 
-          - script.timed_movement_do_1min_off
-    # Set new timer 
-    - delay: '00:00:01'
+      entity_id: script.timed_movement_do_1min_off
     - service: script.turn_on
-      data:
-        entity_id: 
-          - script.timed_movement_do_1min_off
+      entity_id: script.timed_movement_do_1min_off
 
 - alias: "Movement3"
   trigger:
@@ -246,13 +241,9 @@
       state: 'on'
   action:
     - service: script.turn_off
-      data: 
-         entity_id: script.timed_movement3_1min_off
-    # Set new timer 
+      entity_id: script.timed_movement3_1min_off
     - service: script.turn_on
-      data:
-        entity_id: 
-          - script.timed_movement3_1min_off
+      entity_id: script.timed_movement3_1min_off
 
 - alias: "Movement soverom"
   trigger:
@@ -264,13 +255,9 @@
       event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
   action:
     - service: script.turn_off
-      data: 
-         entity_id: script.timed_movement_soverom_1min_off
-    # Set new timer 
+      entity_id: script.timed_movement_soverom_1min_off
     - service: script.turn_on
-      data:
-        entity_id: 
-          - script.timed_movement_soverom_1min_off
+      entity_id: script.timed_movement_soverom_1min_off
 
 - alias: "Movement kjokken"
   trigger:
@@ -279,13 +266,9 @@
       event_data: {'state': 'unknown command (0x55997a)', 'entity_id': 'switch.movement_kjokken'}
   action:
     - service: script.turn_off
-      data: 
-         entity_id: script.timed_movement_kjokken_1min_off
-    # Set new timer 
+      entity_id: script.timed_movement_kjokken_1min_off
     - service: script.turn_on
-      data:
-        entity_id: 
-          - script.timed_movement_kjokken_1min_off
+      entity_id: script.timed_movement_kjokken_1min_off
 
 - alias: "Movement stue"
   trigger:
@@ -294,24 +277,83 @@
       event_data: {'state': 'unknown command (0x2ebf8a)', 'entity_id': 'switch.movement_stue'}
   action:
     - service: script.turn_off
-      data: 
-         entity_id: script.timed_movement_stue_1min_off
-    # Set new timer 
+      entity_id: script.timed_movement_stue_1min_off
     - service: script.turn_on
-      data:
-        entity_id: 
-          - script.timed_movement_stue_1min_off
+      entity_id: script.timed_movement_stue_1min_off
 
-- alias: "Close dor"
+
+- alias: "dor on"
   trigger:
-    platform: state
-    entity_id: switch.door
-    to: 'on'
-    for:
-      minutes: 5
+   - platform: state
+     entity_id: switch.door
+     to: 'on'
+   - platform: state
+     entity_id: binary_sensor.door_window_sensor_158d000110ab73
+     to: 'on'
   action:
-      service: homeassistant.turn_off
-      entity_id: switch.door
+   - service: homeassistant.turn_on
+     entity_id: input_boolean.door
+
+- alias: "dor off"
+  trigger:
+   - platform: state
+     entity_id: switch.door
+     to: 'off'
+   - platform: state
+     entity_id: binary_sensor.door_window_sensor_158d000110ab73
+     to: 'off'
+  action:
+   - service: homeassistant.turn_off
+     entity_id: input_boolean.door
+
+- alias: "dor bad on"
+  trigger:
+   - platform: state
+     entity_id: switch.door_bad
+     to: 'on'
+   - platform: state
+     entity_id: binary_sensor.door_window_sensor_158d000110ab92
+     to: 'on'
+  action:
+   - service: homeassistant.turn_on
+     entity_id: input_boolean.door_bad
+
+- alias: "dor bad off"
+  trigger:
+   - platform: state
+     entity_id: switch.door_bad
+     to: 'off'
+   - platform: state
+     entity_id: binary_sensor.door_window_sensor_158d000110ab92
+     to: 'off'
+  action:
+   - service: homeassistant.turn_off
+     entity_id: input_boolean.door_bad
+
+- alias: "dor soverom on"
+  trigger:
+   - platform: state
+     entity_id: switch.door_bedroom
+     to: 'on'
+   - platform: state
+     entity_id: binary_sensor.door_window_sensor_158d00010dc700
+     to: 'on'
+  action:
+   - service: homeassistant.turn_on
+     entity_id: input_boolean.door_soverom
+
+- alias: "dor soverom off"
+  trigger:
+   - platform: state
+     entity_id: switch.door_bedroom
+     to: 'off'
+   - platform: state
+     entity_id: binary_sensor.door_window_sensor_158d00010dc700
+     to: 'off'
+  action:
+   - service: homeassistant.turn_off
+     entity_id: input_boolean.door_soverom
+
 
 - alias: "Close do dor"
   trigger:
@@ -319,23 +361,11 @@
     entity_id: switch.door_do
     to: 'on'
     for:
-      minutes: 5
+      minutes: 50
   action:
       service: homeassistant.turn_off
       entity_id: 
       - switch.door_do
-
-- alias: "Close soverom dor"
-  trigger:
-    platform: state
-    entity_id: switch.door_bedroom
-    to: 'on'
-    for:
-      minutes: 30
-  action:
-      service: homeassistant.turn_off
-      entity_id: 
-      - switch.door_bedroom
 
 - alias: "Tine home"
   trigger:
@@ -430,13 +460,9 @@
     event_data: {'entity_id': 'switch.stovsuger_running', 'state': 'unknown command (0xd55555)'}
   action:
     - service: script.turn_off
-      data: 
-         entity_id: script.stovsuger_running
-    # Set new timer
-    - delay: '00:00:01'
+      entity_id: script.stovsuger_running
     - service: script.turn_on
-      data:
-        entity_id: script.stovsuger_running
+      entity_id: script.stovsuger_running
 
 - alias: "Start Stovsuger"
   trigger:
@@ -471,9 +497,6 @@
     - condition: template
       value_template: '{% if states.automation.stovsuger.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.stovsuger.attributes.last_triggered)) > 3600*12 }}  {% else %}true{% endif %}'
   action:
-    - service: homeassistant.turn_on
-      entity_id: switch.stovsuger
-    - delay: '00:00:25'
     - service: homeassistant.turn_on
       entity_id: switch.stovsuger
 

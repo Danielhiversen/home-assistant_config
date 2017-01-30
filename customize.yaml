@@ -23,3 +23,32 @@
   sensor.yr_symbol:
     friendly_name: _
 
+  binary_sensor.door_window_sensor_158d00010dc700:
+    friendly_name: "Soveromsdør"
+  binary_sensor.door_window_sensor_158d000110ab73:
+    friendly_name: "Ytterdør"
+  binary_sensor.door_window_sensor_158d000110ab92:
+    friendly_name: "Baderomsdør"
+
+  binary_sensor.switch_158d0001165868:
+    friendly_name: "Knapp Soverom"
+  binary_sensor.switch_158d00012ac03c:
+    friendly_name: "Knapp Yttergang"
+  binary_sensor.switch_158d00013ed144:
+    friendly_name: "Knapp Gang"
+
+  binary_sensor.cube_158d0001118a8a:
+    friendly_name: "Kube Stue"
+  binary_sensor.cube_158d0001182e4f:
+    friendly_name: "Kube bad"
+
+  binary_sensor.motion_sensor_158d00010ab2d0:
+    friendly_name: "Bevegelse Stue"
+
+  sensor.temperature_158d000159c9d0:
+    friendly_name: "Temperatur Stue"
+  sensor.temperature_158d000159f1af:
+    friendly_name: "Temperatur Bad"
+  sensor.humidity_158d000159f1af:
+    friendly_name: "Fuktighet Bad"
+

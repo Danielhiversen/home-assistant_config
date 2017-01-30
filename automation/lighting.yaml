@@ -47,7 +47,7 @@
 
 
     - condition: template
-      value_template: '{% if states.script.leggetid.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid.attributes.last_triggered)) > 3600*3 }}  {% else %}  false {% endif %}'
+      value_template: '{% if states.script.leggetid.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid.attributes.last_triggered)) > 3600*3 }}  {% else %}  true {% endif %}'
     - condition: time      
       after: '07:00:00'
       before: '23:00:00'
@@ -55,11 +55,10 @@
     - condition: state
       entity_id: script.light_turned_off_5min
       state: 'off'
+
     - condition: state
-      entity_id: script.leggetid
-      state: 'off'
-      for:
-        hours: 2
+      entity_id: script.timed_movement
+      state: 'on'
     - condition: or
       conditions:
       - condition: state
@@ -79,15 +78,6 @@
     - platform: state
       entity_id: script.timed_movement
       state: 'on'
-    - platform: event
-      event_type: button_pressed
-      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
-    - platform: event
-      event_type: button_pressed
-      event_data: {'state': 'unknown command (0xdb153a)', 'entity_id': 'switch.movement_soverom'}
-    - platform: event
-      event_type: button_pressed
-      event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
   condition:
     - condition: numeric_state
       entity_id: sun.sun
@@ -172,7 +162,7 @@
 - alias: "lys bokhylle og bilder av"
   trigger:
     platform: time
-    after: '22:03:00'
+    after: '23:03:00'
   action:
       service: homeassistant.turn_off
       entity_id: 
@@ -310,6 +300,5 @@
   action:
     - service: homeassistant.turn_off
       entity_id: script.light_turned_off_5min
-    - delay: '00:00:01'
     - service: homeassistant.turn_on
       entity_id: script.light_turned_off_5min

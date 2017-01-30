@@ -1,8 +1,8 @@
 - alias: "Baderom fuktighet"
   trigger:
-    - platform: event
-      event_type: button_pressed
-      event_data: {'state': 'on', 'entity_id': 'switch.door_bad'}
+    - platform: state
+      entity_id: binary_sensor.door_bad
+      state: 'on'
   condition:
    - condition: numeric_state
      entity_id: sensor.bad_humidity

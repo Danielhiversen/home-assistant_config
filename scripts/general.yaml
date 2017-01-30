@@ -1,7 +1,7 @@
 away_48:
   sequence:
   - delay:
-        hours: 48
+        hours: 47
 alert:
   sequence:
    - delay: 00:02:00
@@ -19,8 +19,10 @@ alert:
 all_devices_off:
   sequence:
     - service: homeassistant.turn_off
-      entity_id: group.all_lights
-    - delay: '00:00:10'
+      entity_id:
+       - group.stue_lys
+       - light.gang
+    - delay: '00:00:50'
     - service: media_player.turn_off
     - service: homeassistant.turn_off
       entity_id: group.all_lights
@@ -31,7 +33,11 @@ all_devices_off:
 borte:
   alias: "Drar bort"
   sequence:
+    - service: media_player.turn_on
+      entity_id: media_player.stue
+    - delay: '00:00:02'
     - service: tts.google_say
+      entity_id: media_player.stue
       data:
         message: 'Ha det bra.'
         cache: true

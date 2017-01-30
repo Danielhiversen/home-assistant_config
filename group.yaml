@@ -9,21 +9,18 @@ div:
   - script.borte
   - group.stovsuger
   - input_select.radio
+  - media_player.hele_huset
 
 stue:
   name: Stue 
   view: yes
   entities:
-  - light.Lys_stue
-  - light.Lys_TV
-  - light.lys_bokhylle
-  - light.lys_bilder
-  - light.yttergang
-  - light.vindu
+  - group.yttergang
   - binary_sensor.door
   - binary_sensor.movement1
   - binary_sensor.movement2
   - binary_sensor.movement_stue
+  - binary_sensor.motion_sensor_158d00010ab2d0
   - sensor.stue_temperature
   - sensor.mean_stue_temp
   - sensor.stue_humidity
@@ -35,6 +32,7 @@ stue:
   - sensor.yr_symbol
   - sensor.yr_condition
   - group.stue_heater
+  - group.stue_lys
   - switch.tv
   - group.media_stue
   - group.stue_scene
@@ -61,9 +59,12 @@ Bad:
   entities:
   - sensor.bad_temperature
   - sensor.bad_humidity
+  - sensor.temperature_158d000159f1af
+  - sensor.humidity_158d000159f1af
   - light.do
   - light.gang
   - binary_sensor.door_do
+  - binary_sensor.door_bad
   - binary_sensor.movement3
   - group.media_bad
 
@@ -165,6 +166,7 @@ media_bad:
 media_stue:
   name: Media
   entities:
+   - media_player.stue
    - media_player.chromecast1877
    - input_select.radio_stue
 
@@ -175,6 +177,7 @@ hw_devices:
    - device_tracker.chromecast
    - device_tracker.chromecast_soverom
    - device_tracker.chromecast_bad
+   - device_tracker.chromecast_stue
    - device_tracker.lys_do
    - device_tracker.lys_veranda
    - device_tracker.lys_yttergang
@@ -196,11 +199,13 @@ stue_scene:
   - scene.mye_lys
 
 stue_lys:
+  name: Lys
   entities: 
   - light.Lys_stue
   - light.Lys_TV
   - light.lys_bokhylle
   - light.lys_bilder
+  - light.vindu
 
 kjokken_timer:
   name: Timer
@@ -208,3 +213,7 @@ kjokken_timer:
   - sensor.timer_minutes
   - input_slider.timer_minutes
   
+yttergang:
+  name: _
+  entities:
+  - light.yttergang
