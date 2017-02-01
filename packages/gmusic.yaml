@@ -2,11 +2,11 @@ input_select:
   music:
     name: Musikk
     options:
-     - " "
+     - " "   # Should be empty
     icon: mdi:music-note
   media_player:
     name: Media player
-    options:
+    options: # entity_ids of your media players
      - "stue"
      - "bad"
      - "hele_huset"
