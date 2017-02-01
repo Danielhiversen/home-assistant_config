@@ -1,0 +1,32 @@
+input_select:
+  music:
+    name: Musikk
+    options:
+     - " "
+    icon: mdi:music-note
+  media_player:
+    name: Media player
+    options:
+     - "stue"
+     - "bad"
+     - "hele_huset"
+    icon: mdi:music-note
+
+switch:
+ - platform: gmusic
+   user: !secret gmusic_user
+   password: !secret gmusic_pass
+   device_id: !secret gmusic_device_id #http://unofficial-google-music-api.readthedocs.io/en/latest/reference/mobileclient.html#gmusicapi.clients.Mobileclient.login
+   input_select: music
+   media_player: media_player
+
+group:
+  google_music:
+    name: Google Music 
+
+    entities:
+    - input_select.music
+    - input_select.media_player
+    - switch.google_music
+
+
