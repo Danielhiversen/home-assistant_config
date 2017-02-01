@@ -16,8 +16,7 @@ switch:
  - platform: gmusic
    user: !secret gmusic_user
    password: !secret gmusic_pass
-   device_id: !secret gmusic_device_id #http://unofficial-google-music-api.readthedocs.io/en/latest/reference/mobileclient.html#gmusicapi.clients.Mobileclient.login
-   input_select: music
+   device_id: !secret gmusic_device_id # http://unofficial-google-music-api.readthedocs.io/en/latest/reference/mobileclient.html#gmusicapi.clients.Mobileclient.login
    media_player: media_player
 
 group:
