@@ -28,10 +28,6 @@ DEPENDENCIES = ['group', ]
 # Shortcut for the logger
 _LOGGER = logging.getLogger(__name__)
 
-def setup(hass, config):
-    """Setup example component."""
-
-
 def setup_platform(hass, config, add_devices, discovery_info=None):
     """Setup the Gmusic switch."""
     add_devices([GmusicComponent(hass, config)])
