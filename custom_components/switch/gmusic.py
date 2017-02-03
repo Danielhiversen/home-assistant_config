@@ -44,7 +44,7 @@ class GmusicComponent(SwitchDevice):
         if not logged_in:
             _LOGGER.error("Failed to log in, check http://unofficial-google-music-api.readthedocs.io/en/latest/reference/mobileclient.html#gmusicapi.clients.Mobileclient.login")	
             return False
-        self._input_select_entity = "input_select." + config.get("input_select","")
+        self._playlist = "input_select." + config.get("playlist","")
         self._media_player = "input_select." + config.get("media_player","")
         self._entity_ids = []
         self._playing = False
@@ -84,8 +84,8 @@ class GmusicComponent(SwitchDevice):
         self._turn_off_media_player()
 
     def _update_playlist(self, now=None):
-        if self.hass.states.get(self._input_select_entity) is None:
-            _LOGGER.error("%s is not a valid input_select entity.", self._input_select_entity)
+        if self.hass.states.get(self._playlist) is None:
+            _LOGGER.error("%s is not a valid input_select entity.", self._playlist)
             return        
         self._playlists = self._api.get_all_user_playlist_contents()
         self._playlist_to_index = {}
@@ -96,7 +96,7 @@ class GmusicComponent(SwitchDevice):
             if len(name) < 1:
                 continue
             self._playlist_to_index[name] = idx
-        data = {"options": list(self._playlist_to_index.keys()), "entity_id": self._input_select_entity}
+        data = {"options": list(self._playlist_to_index.keys()), "entity_id": self._playlist}
         self.hass.services.call(input_select.DOMAIN, input_select.SERVICE_SET_OPTIONS, data)
 
     def _turn_off_media_player(self):
@@ -114,10 +114,9 @@ class GmusicComponent(SwitchDevice):
         if media_player is None:
             _LOGGER.error("%s is not a valid input_select entity.", self._media_player)
             return False
-        new_state = media_player.state
-        _entity_ids = "media_player." + new_state
+        _entity_ids = "media_player." + media_player.state
         if self.hass.states.get(_entity_ids) is None:
-            _LOGGER.error("%s is not a valid media player.", new_state)
+            _LOGGER.error("%s is not a valid media player.", media_player.state)
             return False
         self._entity_ids = _entity_ids 
         return True
@@ -150,9 +149,9 @@ class GmusicComponent(SwitchDevice):
         self.hass.bus.listen_once(EVENT_HOMEASSISTANT_START, self._next_track)
 
     def _play(self):
-        option = self.hass.states.get(self._input_select_entity).state
         if not self._update_entity_ids():
             return
+        option = self.hass.states.get(self._playlist).state
         idx = self._playlist_to_index.get(option)
         if idx is None:
             self._turn_off_media_player()
