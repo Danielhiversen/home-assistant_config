@@ -17,7 +17,8 @@ switch:
    user: !secret gmusic_user
    password: !secret gmusic_pass
    device_id: !secret gmusic_device_id # http://unofficial-google-music-api.readthedocs.io/en/latest/reference/mobileclient.html#gmusicapi.clients.Mobileclient.login
-   media_player: media_player
+   media_player: media_player # entity id of the input select used for mediaplayer
+   playlist: music # entity id of the input select used for playlist
 
 group:
   google_music:
