@@ -20,6 +20,9 @@ switch:
    media_player: media_player # entity id of the input select used for mediaplayer
    playlist: music # entity id of the input select used for playlist
 
+
+
+# OPTIONAL
 group:
   google_music:
     name: Google Music 
