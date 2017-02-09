@@ -27,7 +27,7 @@
     - condition: or
       conditions:
       - condition: template
-        value_template: '{{ trigger.entity_id !=  states.sensor.relative_alarm_time}}'
+        value_template: '{{ trigger.entity_id !=  states.sensor.relative_alarm_time.entity_id}}'
       - condition: state
         entity_id: automation.wake_me_up
         state: 'on'
@@ -35,7 +35,7 @@
     - condition: or
       conditions:
       - condition: template
-        value_template: '{{ trigger.entity_id == states.sensor.relative_alarm_time}}'
+        value_template: '{{ trigger.entity_id == states.sensor.relative_alarm_time.entity_id}}'
       - condition: time
         after: '07:00:00'
         before: '22:00:00'
@@ -43,7 +43,7 @@
     - condition: or
       conditions:
       - condition: template
-        value_template: '{{trigger.entity_id !=  states.proximity.home}}'
+        value_template: '{{trigger.entity_id !=  states.proximity.home.entity_id}}'
       - condition: and
         conditions:
         - condition: template
@@ -78,6 +78,9 @@
       state: 'off'
       for:
         minutes: 60
+    - platform: state
+      entity_id: script.borte
+      state: 'on'
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
@@ -87,6 +90,21 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'group on', 'entity_id': 'switch.leggetid_stue'}
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d00013ed144
+        click_type: double
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d00013ed144
+        click_type: single
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d00012ac03c
+        click_type: single
   condition:
     - condition: template
       value_template: '{{float(states.input_slider.auto_temp_low.state) < float(states.climate.termostat_stue.attributes.temperature)}}'
@@ -97,7 +115,7 @@
     - condition: or
       conditions:
       - condition: template
-        value_template: '{{trigger.platform != state}}'
+        value_template: '{{trigger.platform != "state"}}'
       - condition: and
         conditions:
         - condition: template

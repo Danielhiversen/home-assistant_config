@@ -1,5 +1,6 @@
 """
 """
+import asyncio
 import logging
 import time
 import feedparser
@@ -7,6 +8,7 @@ from html.parser import HTMLParser
 from endomondo import MobileApi
 # pip install git+https://github.com/Danielhiversen/sports-tracker-liberator
 from bs4 import BeautifulSoup
+from xml.parsers.expat import ExpatError
 import requests
 import xmltodict
 from datetime import timedelta
@@ -56,7 +58,7 @@ def num2str(num):
 def setup(hass, config):
     """Setup example component."""
 
-    yr_precipitation = []
+    yr_precipitation = {}
     nowcast_precipitation = None
     news_rss = []
     workout_text = None
@@ -67,7 +69,11 @@ def setup(hass, config):
     def _get_text(message_type=None):
         news = ""
         now = dt_util.now()
-        if now.hour < 10:
+        if message_type == 2:
+            news = news + "Sov godt "
+        elif now.hour < 4:
+            news = news + "God natt "
+        elif now.hour < 10:
             news = news + "God morgen "
         elif now.hour < 18:
             news = news + "Hei "
@@ -89,7 +95,7 @@ def setup(hass, config):
             persons.insert(-1,"og")
         news = news + ' '.join(persons) + '. '
 
-        if message_type == "0":
+        if message_type == 0:
             news = news + "Velkommen hjem. "
 
         nonlocal workout_text
@@ -98,35 +104,65 @@ def setup(hass, config):
             workout_text = None
 
         if yr_precipitation:
-            precipitation = num2str(sum(yr_precipitation))
+            res = 0
+            for time, value in yr_precipitation.items():
+#                print(time, value)
+                if time < now and time > now - timedelta(hours=3):
+                    res += value
+            precipitation = num2str(res)
             news = news + "De siste 3 timene har det kommet " + precipitation + " mm nedbør "
+
         temp = hass.states.get('sensor.ute_veranda_temperature')
         if temp and temp.state != "unknown":
             news = news + "og temperaturen er nå " + num2str(temp.state) + " grader ute. "
-        if nowcast_precipitation:
-            precipitation = num2str(nowcast_precipitation)
-            news = news + "Den neste timen er det ventet " + precipitation + " mm nedbør. "
+        if nowcast_precipitation > 0:
+            news = news + "Den neste timen er det ventet " + num2str(nowcast_precipitation) + " mm nedbør. "
 
-        if message_type == "1":
+        if message_type == 2:
+            alarm_state = hass.states.get('automation.wake_me_up')
+            if alarm_state and alarm_state.state == "on":
+                time_to_alarm = float(hass.states.get('sensor.relative_alarm_time').state)
+                alarm_time_hour = int(time_to_alarm / 60)
+                alarm_time_min = int(time_to_alarm - alarm_time_hour*60)
+                news = news + "Vekkerklokken ringer om " + str(alarm_time_hour) + " timer og " + str(alarm_time_min) + " minutter."
+
+        if message_type in [1, 2]:
             return news
 
         news = news + "Her kommer siste nytt:  "
-        for case in news_rss:
+        if False:
+            _news_rss = news_rss
+        else:
+            _news_rss = news_rss[:2]
+        for case in _news_rss:
             news = news + case + " "
         return news
             
-    def _read_news(service=None):
-        message_type = None
-        if service:
-            message_type = service.data.get("message_type")
+    @asyncio.coroutine
+    def _read_news(service):
+        message_type = int(service.data.get("message_type", -1))
         news = _get_text(message_type)
+
         data = {}
         if service and service.data.get(ATTR_ENTITY_ID):
             data[ATTR_ENTITY_ID] = service.data.get(ATTR_ENTITY_ID)
         data['message'] = news
         data['cache'] = False
-        print(data)
-        hass.services.call('tts', 'google_say', data)
+
+        autoradio = True if service.data.get("entity_id_radio") else False
+        yield from hass.services.async_call('tts', 'google_say', data, blocking=autoradio)
+        return
+        if not autoradio:
+            return
+        # if vekking:
+
+        data = {}
+        data[ATTR_ENTITY_ID] = service.data.get("entity_id_radio")
+        if service.data.get("radio_option"):
+            data['option'] = service.data.get("radio_option")
+        else:
+            data['option'] = "P3"
+        hass.services.call('input_select', 'select_option', data)
 
     def _rss_news(time=None):
         nonlocal news_rss
@@ -152,40 +188,53 @@ def setup(hass, config):
         news_rss.append("Værvarsel " + strip_tags(_feed.feed.summary).replace("<strong>","").replace("</strong>",""))
 
     def _yr_precipitation(now=None):
-        state = hass.states.get('sensor.yr_precipitation').state
-        nonlocal yr_precipitation
-        yr_precipitation.append(float(state))
-        if len(yr_precipitation) > 3:
-            yr_precipitation.pop(0)
-
-    def _yr_precipitation2(now=None):
         url = "http://api.met.no/weatherapi/nowcast/0.9/"
         urlparams = {'lat': str(hass.config.latitude),
                     'lon': str(hass.config.longitude)}
+
+        if not now:
+            now = dt_util.utcnow()
 
         try:
             with requests.Session() as sess:
                 response = sess.get(url, params=urlparams)
         except requests.RequestException:
+            track_point_in_utc_time(hass, _yr_precipitation, now + timedelta(minutes=2))
             return
         if response.status_code != 200:
+            track_point_in_utc_time(hass, _yr_precipitation, now + timedelta(minutes=2))
             return
         text = response.text
 
         nonlocal nowcast_precipitation
+        nonlocal yr_precipitation
+        nowcast_precipitation = 0
         try:
             data = xmltodict.parse(text)['weatherdata']
             model = data['meta']['model']
             if '@nextrun' not in model:
                 model = model[0]
             nextrun = dt_util.parse_datetime(model['@nextrun'])
+            nextrun = nextrun if (nextrun > now) else now + timedelta(minutes=2)
             for time_entry in data['product']['time']:
                 loc_data = time_entry['location']
-                nowcast_precipitation = float(loc_data['precipitation']['@value'])
+                time = dt_util.parse_datetime(time_entry['@to'])
+                #print(loc_data['precipitation']['@value'])
+                #print(dt_util.as_local(time))
+
+                value = float(loc_data['precipitation']['@value'])
+                if time > now and time < now + timedelta(hours=1):
+                    nowcast_precipitation += value
+                yr_precipitation[time] = value
+
+            for time in yr_precipitation.copy().keys():
+                if time < now - timedelta(hours=3):
+                    del yr_precipitation[time]
+
         except (ExpatError, IndexError) as err:
-            track_point_in_utc_time(hass, _workout_text, now + timedelta(minutes=2))       
+            track_point_in_utc_time(hass, _yr_precipitation, now + timedelta(minutes=2))       
             return
-        track_point_in_utc_time(hass, _workout_text, nextrun + timedelta(seconds=2))
+        track_point_in_utc_time(hass, _yr_precipitation, nextrun + timedelta(seconds=2))
 
     def _workout_text(now=None):
         nonlocal workout_text
@@ -194,8 +243,7 @@ def setup(hass, config):
         if not now:
             now = dt_util.utcnow()
         now = dt_util.as_local(now)
-        if last_workout_time == last_workout.start_time:
-            return
+
         if (now - dt_util.as_local(last_workout.start_time)).total_seconds() > 3600*24:
             workout_text = None
             return
@@ -208,7 +256,6 @@ def setup(hass, config):
     _rss_news()
     _workout_text()
     _yr_precipitation()
-    _yr_precipitation2()
     track_time_change(hass, _yr_precipitation, minute=[31], second=0)
     track_time_change(hass, _rss_news, minute=[10, 26, 41, 56], second=0)
     track_time_change(hass, _workout_text, minute=[11, 26, 41, 56], second=0)

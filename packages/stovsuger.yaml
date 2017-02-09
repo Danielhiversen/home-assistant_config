@@ -1,0 +1,136 @@
+binary_sensor:
+- platform: ml
+  name: Stovsuger_ml
+  knn_path: "/ml_script/knn.pkl"
+  pca_path: "/ml_script/pca.pkl"
+
+script:
+  stovsuger_checker:
+    sequence:
+    - service: homeassistant.turn_on
+      entity_id: switch.infrared_1
+    - service: homeassistant.turn_on
+      entity_id: switch.preset1_1
+    - delay: '00:00:05'
+    - service: ml.check_state
+    - delay: '00:00:05'
+    - service: homeassistant.turn_off
+      entity_id: switch.preset1_1
+    - service: homeassistant.turn_off
+      entity_id: switch.infrared_1
+
+  stovsuger_checker_main:
+    sequence:
+    - service: homeassistant.turn_on
+      entity_id: switch.infrared_1
+    - service: homeassistant.turn_on
+      entity_id: switch.preset1_1
+    - delay: '00:00:05'
+    - service: ml.check_state
+    - delay: '00:00:05'
+    - service: homeassistant.turn_off
+      entity_id: switch.preset1_1
+    - service: homeassistant.turn_off
+      entity_id: switch.infrared_1
+
+    - delay: '00:15:00'
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.stovsuger_ml
+        state: 'off'
+    - service: homeassistant.turn_on
+      entity_id: switch.infrared_1
+    - service: homeassistant.turn_on
+      entity_id: switch.preset1_1
+    - delay: '00:00:05'
+    - service: ml.check_state
+    - delay: '00:00:05'
+    - service: homeassistant.turn_off
+      entity_id: switch.preset1_1
+    - service: homeassistant.turn_off
+      entity_id: switch.infrared_1
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.stovsuger_ml
+        state: 'off'
+    - service: homeassistant.turn_on
+      entity_id: automation.stovsuger_checker_mising
+
+
+automation:
+  - alias: "HA started, stovsuger ml"
+    trigger:
+        platform: event
+        event_type: homeassistant_start
+    action:
+     - service: homeassistant.turn_on
+       entity_id: script.stovsuger_checker
+
+  - alias: "stovsuger checker 1"
+    trigger:
+      platform: state
+      entity_id: binary_sensor.stovsuger
+      to: "off"
+      for:
+        seconds: 15
+    action:
+     - service: homeassistant.turn_on
+       entity_id: script.stovsuger_checker_main
+
+
+  - alias: "stovsuger checker misisng"
+    initial_state: False
+    trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d00010ab2d0,  binary_sensor.movement_stue
+      state: 'on'
+    condition:
+     - condition: state
+       entity_id: binary_sensor.stovsuger_ml
+       state: 'off'
+    action:
+    - service: homeassistant.turn_off
+      entity_id: automation.stovsuger_checker_mising
+    - service: media_player.turn_on
+      entity_id: media_player.stue
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.stue
+        volume_level: 0.65
+    - delay: '00:00:15'
+    - service: tts.google_say
+      entity_id: media_player.stue
+      data_template:
+        message: '. . . . Hei. Støvsugeren har satt seg fast. Kan du vvære så snill å sette den tilbake på plass?'
+        cache: true
+    - service: homeassistant.turn_on
+      entity_id: automation.stovsuger_checker_back
+
+  - alias: "stovsuger checker back"
+    initial_state: False
+    trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d00010ab2d0,  binary_sensor.movement_stue
+      state: 'on'
+    condition:
+     - condition: state
+       entity_id: binary_sensor.stovsuger_ml
+       state: 'on'
+    action:
+    - service: homeassistant.turn_off
+      entity_id: automation.stovsuger_checker_back
+    - service: media_player.turn_on
+      entity_id: media_player.stue
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.stue
+        volume_level: 0.65
+    - delay: '00:00:15'
+    - service: tts.google_say
+      entity_id: media_player.stue
+      data_template:
+        message: '. . . . Hei. Tusen takk for hjelpa med støvsugeren.'
+        cache: true
+

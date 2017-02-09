@@ -56,6 +56,10 @@
       entity_id: script.light_turned_off_5min
       state: 'off'
 
+    - condition: template
+      value_template: '{% if states.automation.all_devices_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.all_devices_off.attributes.last_triggered)) > 60*5 }}  {% else %}  true {% endif %}'
+
+
     - condition: state
       entity_id: script.timed_movement
       state: 'on'
@@ -177,6 +181,15 @@
       to: 'on'
       for:
         minutes: 3
+    - platform: state
+      entity_id: binary_sensor.stue_lux
+      to: 'on'
+      for:
+        minutes: 60
+    - platform: numeric_state
+      entity_id: sun.sun
+      value_template: '{{ state.attributes.elevation }}'
+      above: 5
   action:
       service: homeassistant.turn_off
       entity_id: 
@@ -266,6 +279,9 @@
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door'}
+   - platform: state
+     entity_id: binary_sensor.door
+     state: 'on'
   condition:
    - condition: template
      value_template: '{% if states.automation.lys_yttergang.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_yttergang.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'

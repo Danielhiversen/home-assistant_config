@@ -1,0 +1,66 @@
+binary_sensor:
+  - platform: template
+    sensors:
+      dark:
+        value_template: "{{ states.input_boolean.dark.state == 'on' }}" 
+        sensor_class: light
+        entity_id: input_boolean.dark
+        friendly_name: "Dark"
+
+input_boolean:
+  dark:
+    initial: off
+
+automation:
+  - alias: "dark"
+    trigger:
+    - platform: numeric_state
+      entity_id: sun.sun
+      value_template: '{{ state.attributes.elevation }}'
+      below: 2
+    - platform: state
+      entity_id: binary_sensor.stue_lux
+      to: 'off'
+      for:
+        minutes: 15
+    condition:
+    - condition: template
+      value_template: '{% if states.automation.dark.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.dark.attributes.last_triggered)) > 2*60 }}  {% else %}  true {% endif %}'
+    - condition: template
+      value_template: '{% if states.automation.light.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.light.attributes.last_triggered)) > 2*60 }}  {% else %}  true {% endif %}'
+    action:
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.dark
+
+  - alias: "light"
+    trigger:
+    - platform: numeric_state
+      entity_id: sun.sun
+      value_template: '{{ state.attributes.elevation }}'
+      above: 5
+    - platform: state
+      entity_id: binary_sensor.stue_lux
+      to: 'on'
+      for:
+        minutes: 15
+    condition:
+    - condition: template
+      value_template: '{% if states.automation.dark.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.dark.attributes.last_triggered)) > 2*60 }}  {% else %}  true {% endif %}'
+    - condition: template
+      value_template: '{% if states.automation.light.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.light.attributes.last_triggered)) > 2*60 }}  {% else %}  true {% endif %}'
+    action:
+    - service: homeassistant.turn_off
+      entity_id: input_boolean.dark
+
+  - alias: "HA started dark"
+    trigger:
+    - platform: event
+      event_type: homeassistant_start
+    condition:
+    - condition: numeric_state
+      entity_id: sun.sun
+      value_template: '{{ state.attributes.elevation }}'
+      below: 5
+    action:
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.dark

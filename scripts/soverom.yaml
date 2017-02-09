@@ -4,17 +4,29 @@ leggetid:
   - service: scene.turn_on
     data:
       entity_id: scene.Dempet_lys
-  - service: tts.google_say
+  - service: homeassistant.turn_off
+    entity_id:
+     - media_player.stue
+     - media_player.tv
+     - switch.tv
+     - light.lys_bokhylle
+     - light.lys_bilder
+     - light.vindu
+  - service: media_player.volume_set
     data:
-      entity_id: media_player.hele_huset
-      message: 'Sov godt.'
-      cache: true
+      entity_id: media_player.bad
+      volume_level: 0.5
+  - delay: '00:00:03'
+  - service: news.read_news
+    data:
+      message_type: "2"
+      entity_id: media_player.bad
   - service: homeassistant.turn_off
     entity_id:
      - light.lys_bokhylle
      - light.lys_bilder
      - light.vindu
-  - delay: '00:00:07'
+  - delay: '00:01:07'
   - service: input_select.select_option
     entity_id: input_select.radio_stue
     data:
@@ -25,17 +37,7 @@ leggetid:
       option: "Av"
   - service: homeassistant.turn_off
     entity_id:
-     - media_player.stue
-     - media_player.chromecast1877
      - media_player.bad
-  - service: homeassistant.turn_off
-    entity_id:
-     - switch.tv
-  - service: homeassistant.turn_off
-    entity_id:
-     - light.lys_bokhylle
-     - light.lys_bilder
-     - light.vindu
   - delay: '00:10:00'
   - service: homeassistant.turn_off
     entity_id:
@@ -91,11 +93,11 @@ leggetid_soverom_temp:
 sove_tid:
   sequence:
   - service: script.turn_off
-    data: 
-       entity_id: script.leggetid_soverom
+    entity_id: script.leggetid_soverom
   - service: script.turn_off
-    data: 
-       entity_id: script.vekke_lys
+    entity_id: script.leggetid_soverom_temp
+  - service: script.turn_off
+    entity_id: script.vekke_lys
   - service: homeassistant.turn_on
     entity_id:
       - light.soverom
@@ -106,6 +108,15 @@ sove_tid:
   - service: homeassistant.turn_off
     entity_id:
       - light.soverom
+  - condition: and
+    conditions:
+     - condition: template
+       value_template: '{% if states.script.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.attributes.last_triggered)) < 3600*4 }}  {% else %}  false {% endif %}'
+     - condition: state
+       entity_id: input_boolean.sovelyd
+       state: 'on'
+  - service: script.turn_on
+    entity_id: script.sove_lyd
 
 sove_lyd:
   alias: "Sove lyd"

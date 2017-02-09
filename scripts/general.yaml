@@ -23,6 +23,8 @@ all_devices_off:
        - group.stue_lys
        - light.gang
     - delay: '00:00:50'
+    - service: homeassistant.turn_off
+      entity_id: switch.tv
     - service: media_player.turn_off
     - service: homeassistant.turn_off
       entity_id: group.all_lights
@@ -33,20 +35,20 @@ all_devices_off:
 borte:
   alias: "Drar bort"
   sequence:
-    - service: media_player.turn_on
+    - service: homeassistant.turn_on
+      entity_id: script.all_devices_off
+    - service: homeassistant.turn_on
       entity_id: media_player.stue
-    - delay: '00:00:02'
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.stue
+        volume_level: 0.5
+    - delay: '00:00:04'
     - service: tts.google_say
       entity_id: media_player.stue
       data:
         message: 'Ha det bra.'
         cache: true
-    - service: climate.set_temperature
-      data_template:
-        entity_id: "climate.termostat_stue"
-        temperature: '{{ float(states.input_slider.auto_temp_low.state) }}'
-    - service: homeassistant.turn_on
-      entity_id: script.all_devices_off
 
 stovsuger_running:
   sequence:

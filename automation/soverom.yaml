@@ -149,12 +149,13 @@
       transition: 0
       brightness: 1
       xy_color: [0.5458, 0.4159]
+  - delay: 00:00:01
   - service: homeassistant.turn_on
     entity_id:
       - light.soverom
     data:
       transition: 15
-      brightness: 216
+      brightness: 255
       xy_color: [0.5458, 0.4159]
  
 - alias: "Lys soverom door timer"
@@ -168,16 +169,19 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
+  condition:
+   - condition: state
+     entity_id: script.leggetid_soverom
+     state: 'off'
+   - condition: state
+     entity_id: script.vekke_lys
+     state: 'off'
   action:
     # Cancel ev. old timers 
     - service: script.turn_off
-      data: 
-        entity_id: script.timed_lys_soverom
-    - delay: 00:00:05
-    # Set new timer 
+      entity_id: script.timed_lys_soverom
     - service: script.turn_on
-      data:
-        entity_id: script.timed_lys_soverom
+      entity_id: script.timed_lys_soverom
 
 - alias: "Lys soverom door trigger dag"
   trigger:
@@ -209,12 +213,17 @@
      entity_id: light.soverom2
      state: 'off'
   action:
+    - service: homeassistant.turn_off
+      entity_id: automation.lys_soverom_door_trigger_dag
     - service: homeassistant.turn_on
       entity_id:
         - light.soverom
       data:
         xy_color: [0.5458,0.4159]
         brightness: 255
+    - delay: 00:00:30
+    - service: homeassistant.turn_on
+      entity_id: automation.lys_soverom_door_trigger_dag
 
 - alias: "Nattlys"
   trigger:
@@ -231,8 +240,16 @@
       entity_id: binary_sensor.door_soverom
       state: 'on'
   condition:
+   - condition: state
+     entity_id: input_boolean.nattlys
+     state: 'on'
+  
    - condition: template
      value_template: '{% if states.script.vekke_lys.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.vekke_lys.attributes.last_triggered)) > 3600*4 }}  {% else %}  true {% endif %}'
+   - condition: template
+     value_template: '{% if states.script.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.attributes.last_triggered)) > 60*2}}  {% else %}  true {% endif %}'
+   - condition: template
+     value_template: '{% if states.automation.lys_soverom_door_timer.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_soverom_door_timer.attributes.last_triggered)) > 20}}  {% else %}  true {% endif %}'
 
    - condition: or
      conditions:
@@ -249,12 +266,17 @@
      entity_id: light.soverom2
      state: 'off'
   action:
+    - service: homeassistant.turn_off
+      entity_id: automation.nattlys
     - service: homeassistant.turn_on
       entity_id:
         - light.soverom
       data:
         brightness: 10
         xy_color: [0.675,0.322]
+    - delay: 00:00:30
+    - service: homeassistant.turn_on
+      entity_id: automation.nattlys
 
 
 - alias: "Lys soverom door trigger off"
@@ -288,7 +310,24 @@
      data:
        transition: 10
 
-
+- alias: "Temporarly disable night light"
+  trigger:
+   - platform: state
+     entity_id: light.soverom1
+     state: 'off'
+   - platform: state
+     entity_id: light.soverom2
+     state: 'off'
+  condition:
+   - condition: state
+     entity_id: automation.nattlys
+     state: 'off'
+  action:
+   - service: homeassistant.turn_off
+     entity_id: automation.nattlys
+   - delay: 00:01:00
+   - service: homeassistant.turn_on
+     entity_id: automation.nattlys
 
 
 - alias: "Lys av pA soverom, knapp"
@@ -321,13 +360,15 @@
         entity_id: binary_sensor.switch_158d0001165868
         click_type: single
   action:
+    - service: media_player.turn_on
+      entity_id: media_player.soverom
     - service: media_player.volume_set
       data:
         entity_id: media_player.soverom
-        volume_level: 0.4
+        volume_level: 0.55
     - service: tts.google_say
       entity_id: media_player.soverom
       data_template:
-        message: 'Klokken er {{ now().hour}}  {{ now().minute}}'
+        message: 'Klokken er {{ now().hour}}  {{ "%0.02d" | format(now().strftime("%-M") | int) }}'
         cache: false
 

@@ -10,12 +10,15 @@ div:
   - group.stovsuger
   - input_select.radio
   - media_player.hele_huset
+  - group.blomster
+  - group.google_music
 
 stue:
   name: Stue 
   view: yes
   entities:
-  - group.yttergang
+  - light.yttergang
+  - light.gateway_light_f0b429b41020
   - binary_sensor.door
   - binary_sensor.movement1
   - binary_sensor.movement2
@@ -33,7 +36,6 @@ stue:
   - sensor.yr_condition
   - group.stue_heater
   - group.stue_lys
-  - switch.tv
   - group.media_stue
   - group.stue_scene
 
@@ -47,7 +49,8 @@ Soverom:
   - sensor.soverom_temperature
   - binary_sensor.door_soverom
   - binary_sensor.movement_soverom
-  - automation.nattlys
+  - input_boolean.nattlys
+  - input_boolean.sovelyd
   - group.media_soverom
   - script.sove_lyd
   - script.leggetid_soverom
@@ -70,10 +73,20 @@ Kjokken:
   view: yes
   entities:
   - binary_sensor.movement_kjokken
+  - binary_sensor.door_window_sensor_158d0001102226
   - sensor.kjoleskap_temperature
   - light.veranda
   - group.kjokken_timer
 #  - group.steketermometer
+
+Test:
+  view: yes
+  entities:
+  - binary_sensor.dark
+  - group.camera_1
+  - group.camera_2
+  - binary_sensor.stue_lux
+  - binary_sensor.stovsuger_ml
 
 tracker:
  - device_tracker.daniel
@@ -93,18 +106,21 @@ alarmclock:
 
 soverom_heater:
   name: Thermotstat soverom
+  control: hidden
   entities: 
    - climate.soverom
    - group.temp_control_soverom_morgen
    - group.temp_control_soverom_kveld
 temp_control_soverom_morgen:
     name: Temp control soverom morgen
+    control: hidden
     entities: 
      - automation.temp_control_soverom_morgen
      - input_slider.temp_control_soverom_morgen_hour
      - input_slider.temp_control_soverom_morgen_temp
 temp_control_soverom_kveld:
     name: Temp control soverom kveld
+    control: hidden
     entities: 
      - automation.temp_control_soverom_kveld
      - input_slider.temp_control_soverom_kveld_hour
@@ -112,6 +128,7 @@ temp_control_soverom_kveld:
 
 stue_heater:
   name: Thermotstat stue
+  control: hidden
   entities: 
    - climate.termostat_stue
    - group.temp_control_stue_morgen
@@ -120,24 +137,28 @@ stue_heater:
    - group.auto_heat_stue
 auto_heat_stue:
   name: Auto heat
+  control: hidden
   entities: 
    - input_boolean.auto_heat
    - input_slider.auto_temp
    - input_slider.auto_temp_low
 temp_control_stue:
     name: Temp control stue
+    control: hidden
     entities: 
      - automation.temp_control_stue
      - input_slider.temp_control_stue_hour
      - input_slider.temp_control_stue_temp
 temp_control_stue_morgen:
     name: Temp control stue morgen
+    control: hidden
     entities: 
      - automation.temp_control_stue_morgen
      - input_slider.temp_control_stue_morgen_hour
      - input_slider.temp_control_stue_morgen_temp
 temp_control_stue_kveld:
     name: Temp control stue kveld
+    control: hidden
     entities: 
      - automation.temp_control_stue_kveld
      - input_slider.temp_control_stue_kveld_hour
@@ -148,6 +169,8 @@ stovsuger:
   entities: 
    - switch.stovsuger
    - binary_sensor.stovsuger
+   - binary_sensor.stovsuger_ml
+   - script.stovsuger_checker
 
 media_soverom:
   name: Media
@@ -163,10 +186,13 @@ media_bad:
 
 media_stue:
   name: Media
+  control: hidden
   entities:
    - media_player.stue
-   - media_player.chromecast1877
+   - media_player.tv
    - input_select.radio_stue
+   - switch.tv
+   - switch.lydplanke
 
 hw_devices:
   entities:
@@ -180,6 +206,9 @@ hw_devices:
    - device_tracker.lys_veranda
    - device_tracker.lys_yttergang
    - device_tracker.philipshue
+   - device_tracker.cam1
+   - device_tracker.cam2
+   - device_tracker.xiaomi
 
 steketermometer:
   name: Steketermometer
@@ -210,8 +239,10 @@ kjokken_timer:
   entities: 
   - sensor.timer_minutes
   - input_slider.timer_minutes
-  
-yttergang:
-  name: _
-  entities:
-  - light.yttergang
+
+blomster:
+  name: Blomster
+  entities: 
+  - sensor.blomst_bokhylle_moisture
+  - sensor.blomst_sofa_moisture
+  - sensor.blomst_tv_moisture

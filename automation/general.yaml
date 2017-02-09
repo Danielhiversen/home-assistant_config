@@ -3,8 +3,11 @@
       platform: event
       event_type: homeassistant_start
   action:
-      service: homeassistant.turn_on
-      entity_id: script.away_48
+   - service: homeassistant.turn_on
+     entity_id: script.away_48
+   - delay: '00:03:01'
+   - service: homeassistant.turn_on
+     entity_id: automation.start_media_stue
 
 - alias: "Turn off all devices"
   trigger:
@@ -127,15 +130,14 @@
       value_template: '{% if states.automation.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.leggetid_soverom.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
   action:
     - service: script.turn_off
+      entity_id: script.timed_lys_soverom
+    - service: script.turn_off
       entity_id: script.leggetid_soverom
     - service: script.turn_off
       entity_id: script.leggetid_soverom_temp
     - delay: '00:00:01'
     - service: script.turn_on
       entity_id: script.leggetid_soverom
-    - delay: '00:01:00'
-    - service: script.turn_on
-      entity_id: script.sove_lyd
 
 - alias: "Away 48"
   trigger:
@@ -157,17 +159,19 @@
 - alias: "movement"
   trigger:
     - platform: state
-      entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.door_bad, binary_sensor.movement1,  binary_sensor.movement2, binary_sensor.movement3, binary_sensor.movement_do, binary_sensor.motion_sensor_158d00010ab2d0, binary_sensor.movement_kjokken, binary_sensor.movement_stue, binary_sensor.movement_soverom
+      entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.door_bad, binary_sensor.movement1,  binary_sensor.movement2, binary_sensor.movement3, binary_sensor.movement_do, binary_sensor.motion_sensor_158d00010ab2d0, binary_sensor.movement_kjokken, binary_sensor.movement_stue
       state: 'on'
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
     - platform: event
       event_type: button_pressed
-      event_data: {'state': 'unknown command (0xdb153a)', 'entity_id': 'switch.movement_soverom'}
+      event_data: {'state': 'on', 'entity_id': 'switch.door'}
     - platform: event
       event_type: button_pressed
-      event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
+      event_data: {'state': 'on', 'entity_id': 'switch.movement1'}
+
+
   condition:
     - condition: state
       entity_id: script.stovsuger_running
@@ -330,6 +334,32 @@
    - service: homeassistant.turn_off
      entity_id: input_boolean.door_bad
 
+
+- alias: "dor do on"
+  trigger:
+   - platform: state
+     entity_id: switch.door_do
+     to: 'on'
+   - platform: state
+     entity_id: binary_sensor.door_window_sensor_158d00012d8d86
+     to: 'on'
+  action:
+   - service: homeassistant.turn_on
+     entity_id: input_boolean.door_do
+
+- alias: "dor do off"
+  trigger:
+   - platform: state
+     entity_id: switch.door_do
+     to: 'off'
+   - platform: state
+     entity_id: binary_sensor.door_window_sensor_158d00012d8d86
+     to: 'off'
+  action:
+   - service: homeassistant.turn_off
+     entity_id: input_boolean.door_do
+
+
 - alias: "dor soverom on"
   trigger:
    - platform: state
@@ -374,8 +404,7 @@
       to: 'home'
   action:
       service: homeassistant.turn_off
-      entity_id: 
-      - automation.nattlys
+      entity_id: input_boolean.nattlys
 
 #- alias: "Mobillader on"
 #  trigger:

@@ -31,17 +31,19 @@ recorder:
 
 restore_states:
 
+alarm:
+
 logbook:
 
 logger:
   default: warning
   logs:
-    homeassistant.components.switch.broadlink: info
+ #   homeassistant.components.switch.broadlink: info
     homeassistant.components.automation: info
     homeassistant.components.script: info
 #    homeassistant.components.device_tracker: info
 #    homeassistant.components.http: info
-    homeassistant.components.rfxtrx: info
+ #   homeassistant.components.rfxtrx: info
 #    homeassistant.components.sensor.miflora: debug
     custom_components.xiaomi: debug
     custom_components.sensor.xiaomi: debug
@@ -163,6 +165,12 @@ input_boolean:
   door_soverom:
     initial: off
   door_bad:
+    initial: off
+  door_do:
+    initial: off
+  nattlys:
+    initial: off
+  sovelyd:
     initial: off
 
   movement3:

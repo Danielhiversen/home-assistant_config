@@ -5,14 +5,61 @@
       state: 'on'
   condition:
    - condition: numeric_state
-     entity_id: sensor.bad_humidity
-     above: 30
+     entity_id: sensor.mean_bad_fuktighet
+     above: 60
    - condition: template
-     value_template: '{% if states.automation.baderom_fuktighet.attributes.last_triggered %} {{(as_timestamp(now())-as_timestamp(states.automation.baderom_fuktighet.attributes.last_triggered)) > 90*60 }}  {% else %}  true {% endif %}'
+     value_template: '{% if states.automation.baderom_fuktighet.attributes.last_triggered %} {{(as_timestamp(now())-as_timestamp(states.automation.baderom_fuktighet.attributes.last_triggered)) > 60*60*4 }}  {% else %}  true {% endif %}'
   action:
+  - service: media_player.turn_on
+    entity_id: media_player.bad
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.bad
+      volume_level: 0.55
   - service: tts.google_say
     entity_id: media_player.bad
     data_template:
-      message: 'Husk å skru på vifta, da luftfuktigheten er {{states.sensor.bad_humidity.state | float | round(0)}}.'
+      message: 'Husk å skru på vifta, da luftfuktigheten er {{states.sensor.mean_bad_fuktighet.state | float | round(0)}} prosent.'
       cache: false
 
+- alias: "Baderomsdor open"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.door_bad
+      state: 'on'
+      for:
+        minutes: 45
+  action:
+    - service: homeassistant.turn_on
+      entity_id: automation.baderomsdor_open_notify
+
+- alias: "Baderomsdor open notify"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.movement3
+      state: 'on'
+    - platform: state
+      entity_id: binary_sensor.movement_do
+      state: 'on'
+    - platform: state
+      entity_id: binary_sensor.door_do
+  condition:
+   - condition: state
+     entity_id: binary_sensor.door_bad
+     state: 'on'
+   - condition: template
+     value_template: '{% if states.automation.baderomsdor_open_notify.attributes.last_triggered %} {{(as_timestamp(now())-as_timestamp(states.automation.baderomsdor_open_notify.attributes.last_triggered)) > 60*60*20 }}  {% else %}  true {% endif %}'
+  action:
+    - service: homeassistant.turn_off
+      entity_id: automation.baderomsdor_open_notify
+    - service: media_player.turn_on
+      entity_id: media_player.bad
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.bad
+        volume_level: 0.4
+    - service: tts.google_say
+      entity_id: media_player.bad
+      data_template:
+        message: 'Husk å lukke baderomsdøra, da det blir kaldt her.'
+        cache: true

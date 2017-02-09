@@ -1,5 +1,5 @@
 - platform: rfxtrx
-  automatic_add: True
+  automatic_add: False
   devices:
     0a52080601010038480349:
       name: Kjoleskap
@@ -45,7 +45,13 @@
 - platform: template
   sensors:
     relative_alarm_time:
-      value_template: '{{ states.input_slider.alarmhour.state|float|multiply(60) + states.input_slider.alarmminutes.state|float - (now().hour|float|multiply(60) + now().minute)}}'
+      value_template: >
+                     {% set relative_time =  (states.input_slider.alarmhour.state|float|multiply(60) + states.input_slider.alarmminutes.state|float) - (now().hour|float|multiply(60) + now().minute) %}
+                     {%- if relative_time < 0 -%}
+                        {{24*60+relative_time}}
+                      {%- else -%}
+                        {{relative_time}}
+                     {%- endif %}
       unit_of_measurement: "min"
       entity_id: 
        - sensor.time
@@ -87,34 +93,6 @@
       value_template: >
                       {% set sum = 0 %}
                       {% set num = 0 %}
-                      {% for state in [states.sensor.blomst_tv_temperature, states.sensor.blomst_sofa_temperature, states.sensor.blomst_bokhylle_temperature, states.sensor.stue_temperature, states.sensor.stue_tvbenk_temperature] %}
-                          {%- if  as_timestamp(now()) - as_timestamp(state.last_updated) < 300  and not (state.state == "unknown")-%}
-                              {% set sum = sum + state.state|float %}
-                              {% set num = num + 1|float %}
-                          {%- endif %}
-                          {%- if loop.last %}
-                              {%- if   as_timestamp(now()) - as_timestamp(states.sensor.stue_temperature.last_updated) < 240 -%}
-                               {{   states.sensor.stue_temperature.state }}
-                              {%- elif  num > 0  -%}
-                              {{ (sum/num) | round(1) }}
-                              {%- else -%}
-                               {{   states.sensor.stue_temperature.state }}
-                              {%- endif %}
-                          {%- endif %}
-                      {%- endfor -%}
-      unit_of_measurement: "°C"
-      entity_id: 
-       - sensor.blomst_tv_temperature
-       - sensor.blomst_sofa_temperature
-       - sensor.blomst_bokhylle_temperature
-       - sensor.stue_temperature
-       - sensor.stue_tvbenk_temperature
-
-    mean_stue_temp2:
-      friendly_name: 'Avg stue temp'
-      value_template: >
-                      {% set sum = 0 %}
-                      {% set num = 0 %}
                       {% for state in [states.sensor.blomst_tv_temperature, states.sensor.blomst_sofa_temperature, states.sensor.blomst_bokhylle_temperature, states.sensor.stue_temperature, states.sensor.stue_tvbenk_temperature, states.sensor.temperature_158d000159c9d0] %}
                           {%- if  state != None and as_timestamp(now()) - as_timestamp(state.last_updated) < 300 -%}
                               {% set sum = sum + state.state|float %}
@@ -124,7 +102,7 @@
                               {%- if  states.sensor.stue_temperature != None and states.sensor.temperature_158d000159c9d0 != None and (as_timestamp(now()) - as_timestamp(states.sensor.stue_temperature.last_updated) < 180) and as_timestamp(now()) - as_timestamp(states.sensor.temperature_158d000159c9d0.last_updated) -%}
                                {{   ((states.sensor.stue_temperature.state|float + states.sensor.temperature_158d000159c9d0.state|float)/2.0) | round(1)}}
                               {%- elif   states.sensor.temperature_158d000159c9d0 != None and as_timestamp(now()) - as_timestamp(states.sensor.temperature_158d000159c9d0.last_updated) < 180 -%}
-                               {{   states.sensor.temperature_158d000159c9d0.state }}
+                               {{   states.sensor.temperature_158d000159c9d0.state  | round(1) }}
                               {%- elif   states.sensor.stue_temperature != None and  as_timestamp(now()) - as_timestamp(states.sensor.stue_temperature.last_updated) < 240 -%}
                                {{   states.sensor.stue_temperature.state }}
                               {%- elif  num > 0  -%}
@@ -144,7 +122,7 @@
        - sensor.stue_tvbenk_temperature
     test_humidity_bad:
       friendly_name: 'test humidity'
-      value_template: '{{ states.sensor.humidity_158d000159f1af.state|float/2.0 - states.sensor.bad_humidity.state|float }}'
+      value_template: '{{ states.sensor.humidity_158d000159f1af.state|float- states.sensor.bad_humidity.state|float }}'
       unit_of_measurement: " "
       entity_id: 
        - sensor.humidity_158d000159f1af
@@ -156,6 +134,34 @@
       entity_id: 
        - sensor.temperature_158d000159c9d0
        - sensor.stue_temperature
+    mean_bad_fuktighet:
+      friendly_name: 'Bad fuktighet'
+      value_template: >
+                      {%- if  states.sensor.bad_humidity != None and states.sensor.humidity_158d000159f1af != None and (as_timestamp(now()) - as_timestamp(states.sensor.bad_humidity.last_updated) < 180) and as_timestamp(now()) - as_timestamp(states.sensor.humidity_158d000159f1af.last_updated) -%}
+                                             {{   ((states.sensor.bad_humidity.state|float + states.sensor.humidity_158d000159f1af.state|float)/2.0) | round(1)}}
+                      {%- elif   states.sensor.humidity_158d000159f1af != None and as_timestamp(now()) - as_timestamp(states.sensor.humidity_158d000159f1af.last_updated) < 180 -%}
+                                             {{   states.sensor.humidity_158d000159f1af.state|float| round(1) }}
+                      {%- else -%}
+                                             {{   states.sensor.bad_humidity.state|float| round(1) }}
+                      {%- endif %}
+      unit_of_measurement: "%"
+      entity_id: 
+       - sensor.humidity_158d000159f1af
+       - sensor.bad_humidity
+    mean_bad_temp:
+      friendly_name: 'Bad temperatur'
+      value_template: >
+                      {%- if  states.sensor.bad_temperature != None and states.sensor.temperature_158d000159f1af != None and (as_timestamp(now()) - as_timestamp(states.sensor.bad_temperature.last_updated) < 180) and as_timestamp(now()) - as_timestamp(states.sensor.temperature_158d000159f1af.last_updated) -%}
+                                             {{   ((states.sensor.bad_temperature.state|float + states.sensor.temperature_158d000159f1af.state|float)/2.0) | round(1)}}
+                      {%- elif   states.sensor.temperature_158d000159f1af != None and as_timestamp(now()) - as_timestamp(states.sensor.temperature_158d000159f1af.last_updated) < 180 -%}
+                                             {{   states.sensor.temperature_158d000159f1af.state|float| round(1) }}
+                      {%- else -%}
+                                             {{   states.sensor.bad_temperature.state|float| round(1) }}
+                      {%- endif %}
+      unit_of_measurement: "°C"
+      entity_id: 
+       - sensor.temperature_158d000159f1af
+       - sensor.bad_temperature
 #    no_updates:
 #      friendly_name: 'No updates'
 #      value_template: >

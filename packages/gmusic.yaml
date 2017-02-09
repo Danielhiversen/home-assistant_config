@@ -1,0 +1,34 @@
+input_select:
+  music:
+    name: Musikk
+    options:
+     - " "   # Should be empty
+    icon: mdi:music-note
+  media_player:
+    name: Media player
+    options: # entity_ids of your media players
+     - "stue"
+     - "bad"
+     - "hele_huset"
+    icon: mdi:music-note
+
+switch:
+ - platform: gmusic
+   user: !secret gmusic_user
+   password: !secret gmusic_pass
+   device_id: !secret gmusic_device_id # http://unofficial-google-music-api.readthedocs.io/en/latest/reference/mobileclient.html#gmusicapi.clients.Mobileclient.login
+   media_player: media_player # entity id of the input select used for mediaplayer
+   playlist: music # entity id of the input select used for playlist
+
+
+
+# OPTIONAL
+group:
+  google_music:
+    name: Google Music 
+    entities:
+    - input_select.music
+    - input_select.media_player
+    - switch.google_music
+
+

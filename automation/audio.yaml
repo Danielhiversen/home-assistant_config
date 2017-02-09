@@ -7,9 +7,14 @@
      from: 'not_home'
      to: 'home'
   action:
+    - service: media_player.turn_on
+      entity_id: media_player.stue
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.stue
+        volume_level: 0.65
     - service: homeassistant.turn_on
-      data: 
-        entity_id: automation.nyheter_hjemkomst_start
+      entity_id: automation.nyheter_hjemkomst_start
 
 - alias: "Nyheter hjemkomst start"
   initial_state: False
@@ -27,7 +32,8 @@
         value_template: '{% if states.automation.nyheter_hjemkomst_start.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.nyheter_hjemkomst_start.attributes.last_triggered)) > 1800 }}  {% else %}  true {% endif %}'
       - condition: template
         value_template: '{% if states.automation.nyheter_hjemkomst.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.nyheter_hjemkomst.attributes.last_triggered)) < 900 }}  {% else %}  false {% endif %}'
-    - delay: '00:00:03'
+
+    - delay: '00:00:15'
     - service: news.read_news
       data:
         message_type: "0"
@@ -40,8 +46,7 @@
      event_data: {'entity_id': 'switch.news_stue', 'state': 'unknown command (0x87a768)'}
   action:
    - service: news.read_news
-     data:
-       entity_id: media_player.stue
+     entity_id: media_player.stue
 
 - alias: "Radio stue av"
   trigger:
@@ -105,6 +110,12 @@
           true
         {% endif %}
   action:
+    - service: media_player.turn_on
+      entity_id: media_player.stue
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.stue
+        volume_level: 0.23
     - service: input_select.select_option
       entity_id: input_select.radio_stue
       data:
@@ -147,6 +158,12 @@
           true
         {% endif %}
   action:
+    - service: media_player.turn_on
+      entity_id: media_player.stue
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.stue
+        volume_level: 0.23
     - service: news.read_news
       entity_id: media_player.stue
     - service: homeassistant.turn_on
@@ -178,6 +195,12 @@
       entity_id: binary_sensor.cube_158d0001118a8a
       action_type: free_fall
   action:
+  - service: media_player.turn_on
+    entity_id: media_player.stue
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.stue
+      volume_level: 0.23
   - service: tts.google_say
     entity_id: media_player.stue
     data_template:
@@ -209,11 +232,16 @@
    - platform: state
      entity_id: binary_sensor.state_mediaplayer_stue
      state: 'on'
+   - platform: state
+     entity_id: media_player.stue
+     from: "off"
+     to : "idle"
   action:
    - service: homeassistant.turn_off
      entity_id: automation.start_media_stue
    - service: homeassistant.turn_on
      entity_id: switch.lydplanke
+    # retry if failed
 
 - alias: "Stop media stue"
   trigger:
@@ -225,6 +253,7 @@
   action:
    - service: homeassistant.turn_on
      entity_id: automation.start_media_stue
+
 
 # BAD
 
@@ -292,6 +321,12 @@
           true
         {% endif %}
   action:
+    - service: media_player.turn_on
+      entity_id: media_player.bad
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.bad
+        volume_level: 0.4
     - service: input_select.select_option
       entity_id: input_select.radio_bad
       data:
@@ -309,6 +344,7 @@
   condition:
     - condition: template
       value_template: >
+        {% if is_state('media_player.bad', 'playing') %}
           true
         {% else %}
           false
@@ -333,12 +369,16 @@
           true
         {% endif %}
   action:
-    - service: news.read_news
+    - service: media_player.turn_on
+      entity_id: media_player.bad
+    - service: media_player.volume_set
       data:
         entity_id: media_player.bad
+        volume_level: 0.4
+    - service: news.read_news
+      entity_id: media_player.bad
     - service: homeassistant.turn_on
-      data: 
-        entity_id: automation.auto_radio_bad
+      entity_id: automation.auto_radio_bad
 
 - alias: "Nyheter bad stop"
   trigger:
@@ -353,8 +393,7 @@
      state: 'playing'
   action:
     - service: homeassistant.turn_off
-      data: 
-        entity_id: automation.auto_radio_bad
+      entity_id: automation.auto_radio_bad
     - service: media_player.turn_off
       entity_id: media_player.bad
 
@@ -366,6 +405,12 @@
       entity_id: binary_sensor.cube_158d0001182e4f
       action_type: free_fall
   action:
+  - service: media_player.turn_on
+    entity_id: media_player.bad
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.bad
+      volume_level: 0.4
   - service: tts.google_say
     entity_id: media_player.bad
     data_template:
@@ -446,7 +491,7 @@
     - service: media_player.volume_set
       data:
         entity_id: media_player.soverom
-        volume_level: 0.3
+        volume_level: 0.55
     - service: news.read_news
       data:
         message_type: "1"
@@ -469,6 +514,8 @@
   action:
     - service: homeassistant.turn_off
       entity_id: automation.auto_radio_soverom
+    - service: media_player.turn_off
+      entity_id: media_player.soverom
 
 
 
@@ -502,4 +549,7 @@
                http://nrk-mms-live.online.no/nrk_radio_p3_mp3_h
            {% endif %}
        media_content_type: audio/mp3
-
+   - service: media_player.volume_set
+     data:
+       entity_id: media_player.hele_huset
+       volume_level: 0.23

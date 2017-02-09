@@ -14,6 +14,9 @@
     friendly_name: Stue
   light.lys_tv:
     friendly_name: Tv
+  light.gateway_light_f0b429b41020:
+    friendly_name: Tak
+
   sensor.bad:
     friendly_name: Bad fuktighet
   scene.dempet_lys:
@@ -29,6 +32,10 @@
     friendly_name: "Ytterdør"
   binary_sensor.door_window_sensor_158d000110ab92:
     friendly_name: "Baderomsdør"
+  binary_sensor.door_window_sensor_158d00012d8d86:
+    friendly_name: "Dodør"
+  binary_sensor.door_window_sensor_158d0001102226:
+    friendly_name: "Verandadør"
 
   binary_sensor.switch_158d0001165868:
     friendly_name: "Knapp Soverom"
