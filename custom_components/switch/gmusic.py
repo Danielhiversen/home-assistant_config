@@ -4,18 +4,22 @@ import asyncio
 import logging
 import time
 import random
+import pickle
+import os.path
 from datetime import timedelta
+from gmusicapi import Mobileclient
 
 from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, EVENT_HOMEASSISTANT_START
 from homeassistant.util import dt as dt_util
 from homeassistant.components.switch import (
     ENTITY_ID_FORMAT, SwitchDevice, PLATFORM_SCHEMA)
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.event import track_state_change
+from homeassistant.helpers.event import track_state_change, track_time_change
 from homeassistant.components.sensor.rest import RestData
 from homeassistant.components.media_player import (
     SERVICE_PLAY_MEDIA, MEDIA_TYPE_MUSIC, ATTR_MEDIA_CONTENT_ID,
     ATTR_MEDIA_CONTENT_TYPE, DOMAIN as DOMAIN_MP)
+from homeassistant.config import get_default_config_dir
 
 import homeassistant.components.input_select as input_select
 
@@ -33,17 +37,51 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     add_devices([GmusicComponent(hass, config)])
     return True
 
+# https://github.com/simon-weber/gmusicapi/issues/424
+class GMusic(Mobileclient):
+    def login(self, username, password, device_id, authtoken=None):
+        if authtoken:
+            self.android_id               = device_id
+            self.session._authtoken       = authtoken
+            self.session.is_authenticated = True
+
+            try:
+                # Send a test request to ensure our authtoken is still valide and working
+                self.get_registered_devices()
+                return True
+            except:
+                # Faild with the test-request so we set "is_authenticated=False"
+                # and go through the login-process again to get a new "authtoken"
+                self.session.is_authenticated = False
+
+        if device_id:
+            if super(GMusic, self).login(username, password, device_id):
+                return True
+
+        # Prevent further execution in case we failed with the login-process
+        raise SystemExit
+
     
 class GmusicComponent(SwitchDevice):
     def __init__(self, hass, config):
-        from gmusicapi import Mobileclient
 
         self.hass = hass
-        self._api = Mobileclient()
-        logged_in = self._api.login(config.get('user'), config.get('password'), config.get('device_id'))
+        authtoken_path = get_default_config_dir() + "gmusic_authtoken"
+        if os.path.isfile(authtoken_path):
+            with open(authtoken_path, 'rb') as handle:
+                authtoken = pickle.load(handle)
+        else:
+            authtoken = None
+        print("aaaaaaaaaaaaaaaaaaaaaa", authtoken)
+        self._api = GMusic()
+        logged_in = self._api.login(config.get('user'), config.get('password'), config.get('device_id'), authtoken)
         if not logged_in:
             _LOGGER.error("Failed to log in, check http://unofficial-google-music-api.readthedocs.io/en/latest/reference/mobileclient.html#gmusicapi.clients.Mobileclient.login")	
             return False
+        with open(authtoken_path, 'wb') as f:
+            pickle.dump(self._api.session._authtoken, f)
+        
+
         self._playlist = "input_select." + config.get("playlist","")
         self._media_player = "input_select." + config.get("media_player","")
         self._entity_ids = []
@@ -52,8 +90,8 @@ class GmusicComponent(SwitchDevice):
         self._tracks = []
         self._next_track_no = 0
         self._playlist_to_index = {}
-        self._unsub_tracker = None
         self._name = "Google music"
+        track_time_change(hass, self._update_playlist, hour=[15, 6], minute=46, second=46)
         hass.bus.listen_once(EVENT_HOMEASSISTANT_START, self._update_playlist)
 
     @property
@@ -77,6 +115,8 @@ class GmusicComponent(SwitchDevice):
 
     def turn_on(self, **kwargs):
         """Fire the on action."""
+        if self._playing:
+            return
         self._play()
 
     def turn_off(self, **kwargs):
@@ -105,9 +145,6 @@ class GmusicComponent(SwitchDevice):
         self.hass.services.call(DOMAIN_MP, SERVICE_TURN_OFF, data, blocking=True)
         self._playing = False
         self.update_ha_state()
-        if self._unsub_tracker is not None:
-            self._unsub_tracker()
-            self._unsub_tracker = None
 
     def _update_entity_ids(self):
         media_player = self.hass.states.get(self._media_player)
@@ -132,9 +169,9 @@ class GmusicComponent(SwitchDevice):
             return
         try:
             url = self._api.get_stream_url(track['trackId'])
-        except:
-            track_no = track_no + 1
-            _LOGGER.error("Faield to get track")	
+        except Exception as err:
+            self._next_track_no = self._next_track_no + 1
+            _LOGGER.error("Failed to get track (%s)", err)	
             return _next_track()
         data = {
             ATTR_MEDIA_CONTENT_ID: url,
@@ -142,11 +179,12 @@ class GmusicComponent(SwitchDevice):
         }
 
         data[ATTR_ENTITY_ID] = self._entity_ids
-        self.hass.services.call(DOMAIN_MP, SERVICE_PLAY_MEDIA, data)
-        self._next_track_no = self._next_track_no + 1
-        self._playing = True
         self.update_ha_state()
-        self.hass.bus.listen_once(EVENT_HOMEASSISTANT_START, self._next_track)
+        self.hass.services.call(DOMAIN_MP, SERVICE_PLAY_MEDIA, data, blocking=True)
+        print("finished")
+#        yield from self.hass.services.async_call(DOMAIN_MP, SERVICE_PLAY_MEDIA, data, blocking=True)
+        self._next_track_no = self._next_track_no + 1
+        self._next_track()
 
     def _play(self):
         if not self._update_entity_ids():
@@ -161,6 +199,5 @@ class GmusicComponent(SwitchDevice):
         random.shuffle(self._tracks)
         self._next_track_no = 0
         self._playing = True
-        self._unsub_tracker = track_state_change(self.hass, self._entity_ids, self._next_track, from_state='playing', to_state='idle')
         self._next_track()
 
