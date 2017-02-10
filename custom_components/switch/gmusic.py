@@ -189,7 +189,11 @@ class GmusicComponent(SwitchDevice):
     def _play(self):
         if not self._update_entity_ids():
             return
-        option = self.hass.states.get(self._playlist).state
+        _playlist = self.hass.states.get(self._playlist)
+        if _playlist is None:
+            _LOGGER.error("%s is not a valid input_select entity.", self._playlist)
+            return   
+        option = _playlist.state
         idx = self._playlist_to_index.get(option)
         if idx is None:
             self._turn_off_media_player()
