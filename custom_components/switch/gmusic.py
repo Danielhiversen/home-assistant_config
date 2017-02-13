@@ -172,7 +172,7 @@ class GmusicComponent(SwitchDevice):
         except Exception as err:
             self._next_track_no = self._next_track_no + 1
             _LOGGER.error("Failed to get track (%s)", err)	
-            return _next_track()
+            return self._next_track()
         data = {
             ATTR_MEDIA_CONTENT_ID: url,
             ATTR_MEDIA_CONTENT_TYPE: "audio/mp3",
