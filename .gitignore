@@ -1,5 +1,3 @@
-secrets.yaml
-
 config/*
 !config/home-assistant.conf.default
 
@@ -106,5 +104,4 @@ docs/build
 
 # Windows Explorer
 desktop.ini
-0
 

@@ -85,10 +85,11 @@ script:
         entity_id: input_boolean.alarmstatus
     - service: homeassistant.turn_off
       entity_id:
-        - light.soverom
+        - light.soverom1
       data:
         brightness: 1
         xy_color: [0.675,0.322]
+    - delay: 00:00:03
 
     - service: homeassistant.turn_on
       entity_id:

@@ -19,6 +19,8 @@ alert:
 all_devices_off:
   sequence:
     - service: homeassistant.turn_off
+      entity_id: input_boolean.xiaomi_devices
+    - service: homeassistant.turn_off
       entity_id:
        - group.stue_lys
        - light.gang
@@ -31,6 +33,10 @@ all_devices_off:
     - delay: '00:00:10'
     - service: homeassistant.turn_off
       entity_id: group.all_lights
+    - service: homeassistant.turn_off
+      entity_id: switch.preset1_1
+    - service: homeassistant.turn_off
+      entity_id: switch.preset2_1
 
 borte:
   alias: "Drar bort"

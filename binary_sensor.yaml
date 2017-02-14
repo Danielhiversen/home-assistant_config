@@ -10,6 +10,11 @@
       sensor_class: motion
       entity_id: switch.movement2
       friendly_name: "Bevegelse stue"
+    movement_stue:
+      value_template: "{{ states.input_boolean.movement_stue.state == 'on' }}" 
+      sensor_class: motion
+      entity_id: input_boolean.movement_stue
+      friendly_name: "Bevegelse stue 2"
     movement_do:
       value_template: "{{ states.switch.movement_do.state == 'on' }}" 
       sensor_class: motion
@@ -25,11 +30,6 @@
       sensor_class: motion
       entity_id: input_boolean.movement_kjokken
       friendly_name: "Bevegelse kjøkken"
-    movement_stue:
-      value_template: "{{ states.input_boolean.movement_stue.state == 'on' }}" 
-      sensor_class: motion
-      entity_id: input_boolean.movement_stue
-      friendly_name: "Bevegelse stue 2"
     movement3:
       value_template: "{{ states.input_boolean.movement3.state == 'on' }}" 
       sensor_class: motion

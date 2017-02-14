@@ -5,6 +5,8 @@
   action:
    - service: homeassistant.turn_on
      entity_id: script.away_48
+   - service: homeassistant.turn_off
+     entity_id: input_boolean.xiaomi_devices
    - delay: '00:03:01'
    - service: homeassistant.turn_on
      entity_id: automation.start_media_stue
@@ -159,7 +161,7 @@
 - alias: "movement"
   trigger:
     - platform: state
-      entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.door_bad, binary_sensor.movement1,  binary_sensor.movement2, binary_sensor.movement3, binary_sensor.movement_do, binary_sensor.motion_sensor_158d00010ab2d0, binary_sensor.movement_kjokken, binary_sensor.movement_stue
+      entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.door_bad, binary_sensor.movement1,  binary_sensor.movement2, binary_sensor.movement3, binary_sensor.movement_do, binary_sensor.movement_kjokken, binary_sensor.movement_stue
       state: 'on'
     - platform: event
       event_type: button_pressed
@@ -170,8 +172,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'on', 'entity_id': 'switch.movement1'}
-
-
+    - platform: state
+      entity_id: group.tracker
+      state: 'home'
   condition:
     - condition: state
       entity_id: script.stovsuger_running
@@ -183,6 +186,8 @@
       entity_id: script.timed_movement
     - service: script.turn_on
       entity_id: script.timed_movement
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.xiaomi_devices
 
 - alias: "movement alert"
   trigger:
@@ -240,9 +245,6 @@
     - platform: event
       event_type: button_pressed
       event_data: {'entity_id': 'switch.movement3', 'state': 'unknown command (0x9da2da)'}
-    - platform: state
-      entity_id: switch.movement3
-      state: 'on'
   action:
     - service: script.turn_off
       entity_id: script.timed_movement3_1min_off
@@ -276,9 +278,20 @@
 
 - alias: "Movement stue"
   trigger:
-    - platform: event
-      event_type: button_pressed
-      event_data: {'state': 'unknown command (0x2ebf8a)', 'entity_id': 'switch.movement_stue'}
+   - platform: event
+     event_type: button_pressed
+     event_data: {'state': 'unknown command (0x2ebf8a)', 'entity_id': 'switch.movement_stue'}
+   - platform: state
+     entity_id: binary_sensor.motion_sensor_158d00010ab2d0
+     to: 'on'
+  condition:
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id !=  states.sensor.motion_sensor_158d00010ab2d0.entity_id}}'
+      - condition: state
+        entity_id: xiaomi_devices
+        state: 'on'
   action:
     - service: script.turn_off
       entity_id: script.timed_movement_stue_1min_off
@@ -294,6 +307,14 @@
    - platform: state
      entity_id: binary_sensor.door_window_sensor_158d000110ab73
      to: 'on'
+  condition:
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d000110ab73.entity_id}}'
+      - condition: state
+        entity_id: xiaomi_devices
+        state: 'on'
   action:
    - service: homeassistant.turn_on
      entity_id: input_boolean.door
@@ -306,6 +327,14 @@
    - platform: state
      entity_id: binary_sensor.door_window_sensor_158d000110ab73
      to: 'off'
+  condition:
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d000110ab73.entity_id}}'
+      - condition: state
+        entity_id: xiaomi_devices
+        state: 'on'
   action:
    - service: homeassistant.turn_off
      entity_id: input_boolean.door
@@ -318,6 +347,14 @@
    - platform: state
      entity_id: binary_sensor.door_window_sensor_158d000110ab92
      to: 'on'
+  condition:
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d000110ab92.entity_id}}'
+      - condition: state
+        entity_id: xiaomi_devices
+        state: 'on'
   action:
    - service: homeassistant.turn_on
      entity_id: input_boolean.door_bad
@@ -330,6 +367,14 @@
    - platform: state
      entity_id: binary_sensor.door_window_sensor_158d000110ab92
      to: 'off'
+  condition:
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d000110ab92.entity_id}}'
+      - condition: state
+        entity_id: xiaomi_devices
+        state: 'on'
   action:
    - service: homeassistant.turn_off
      entity_id: input_boolean.door_bad
@@ -343,6 +388,14 @@
    - platform: state
      entity_id: binary_sensor.door_window_sensor_158d00012d8d86
      to: 'on'
+  condition:
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d00012d8d86.entity_id}}'
+      - condition: state
+        entity_id: xiaomi_devices
+        state: 'on'
   action:
    - service: homeassistant.turn_on
      entity_id: input_boolean.door_do
@@ -355,6 +408,14 @@
    - platform: state
      entity_id: binary_sensor.door_window_sensor_158d00012d8d86
      to: 'off'
+  condition:
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d00012d8d86.entity_id}}'
+      - condition: state
+        entity_id: xiaomi_devices
+        state: 'on'
   action:
    - service: homeassistant.turn_off
      entity_id: input_boolean.door_do
@@ -368,6 +429,14 @@
    - platform: state
      entity_id: binary_sensor.door_window_sensor_158d00010dc700
      to: 'on'
+  condition:
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d00010dc700.entity_id}}'
+      - condition: state
+        entity_id: xiaomi_devices
+        state: 'on'
   action:
    - service: homeassistant.turn_on
      entity_id: input_boolean.door_soverom
@@ -380,6 +449,14 @@
    - platform: state
      entity_id: binary_sensor.door_window_sensor_158d00010dc700
      to: 'off'
+  condition:
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d00010dc700.entity_id}}'
+      - condition: state
+        entity_id: xiaomi_devices
+        state: 'on'
   action:
    - service: homeassistant.turn_off
      entity_id: input_boolean.door_soverom

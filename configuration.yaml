@@ -85,6 +85,8 @@ group: !include group.yaml
 
 input_select: !include input_select.yaml
 
+input_boolean: !include input_boolean.yaml
+
 # update_ip:
 
 proximity:
@@ -159,34 +161,6 @@ climate:
 # target_sensor : sensor.temperature_rubicson_61951
 # max_temp : 100
 
-input_boolean:
-  door:
-    initial: off
-  door_soverom:
-    initial: off
-  door_bad:
-    initial: off
-  door_do:
-    initial: off
-  nattlys:
-    initial: off
-  sovelyd:
-    initial: off
-
-  movement3:
-    initial: off
-  movement_soverom:
-    initial: off
-  movement_kjokken:
-    initial: off
-  movement_stue:
-    initial: off
-  auto_heat:
-    name: Auto heat
-    initial: off
-  steketermometer_notify_daniel:
-    name: Notify Daniel
-    initial: off
 
 tts:
   - platform: google
