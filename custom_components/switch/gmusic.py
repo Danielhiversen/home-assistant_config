@@ -72,7 +72,6 @@ class GmusicComponent(SwitchDevice):
                 authtoken = pickle.load(handle)
         else:
             authtoken = None
-        print("aaaaaaaaaaaaaaaaaaaaaa", authtoken)
         self._api = GMusic()
         logged_in = self._api.login(config.get('user'), config.get('password'), config.get('device_id'), authtoken)
         if not logged_in:
@@ -90,13 +89,14 @@ class GmusicComponent(SwitchDevice):
         self._tracks = []
         self._next_track_no = 0
         self._playlist_to_index = {}
+        self._unsub_tracker = None
         self._name = "Google music"
         track_time_change(hass, self._update_playlist, hour=[15, 6], minute=46, second=46)
         hass.bus.listen_once(EVENT_HOMEASSISTANT_START, self._update_playlist)
 
     @property
     def icon(self):
-        return ' mdi:music-note'
+        return 'mdi:music-note'
 
     @property
     def name(self):
@@ -140,12 +140,14 @@ class GmusicComponent(SwitchDevice):
         self.hass.services.call(input_select.DOMAIN, input_select.SERVICE_SET_OPTIONS, data)
 
     def _turn_off_media_player(self):
-        #if self._entity_ids:
+        self._playing = False
+        if self._unsub_tracker is not None:
+            self._unsub_tracker()
+            self._unsub_tracker = None
         data = {ATTR_ENTITY_ID: self._entity_ids}
         self.hass.services.call(DOMAIN_MP, SERVICE_TURN_OFF, data, blocking=True)
-        self._playing = False
         self.update_ha_state()
-
+        
     def _update_entity_ids(self):
         media_player = self.hass.states.get(self._media_player)
         if media_player is None:
@@ -158,7 +160,7 @@ class GmusicComponent(SwitchDevice):
         self._entity_ids = _entity_ids 
         return True
 
-    def _next_track(self, entity_id=None, old_state=None, new_state=None):
+    def _next_track(self, entity_id=None, old_state=None, new_state=None, retry=3):
         if not self._playing:
             return
         if self._next_track_no >= len(self._tracks):
@@ -167,12 +169,16 @@ class GmusicComponent(SwitchDevice):
         if track is None:
             self._turn_off_media_player() 
             return
+        print(track)
         try:
             url = self._api.get_stream_url(track['trackId'])
         except Exception as err:
             self._next_track_no = self._next_track_no + 1
-            _LOGGER.error("Failed to get track (%s)", err)	
-            return self._next_track()
+            _LOGGER.error("Failed to get track (%s)", err)
+            if retry < 1:
+                self._turn_off_media_player()
+                return
+            return self._next_track(retry=retry-1)
         data = {
             ATTR_MEDIA_CONTENT_ID: url,
             ATTR_MEDIA_CONTENT_TYPE: "audio/mp3",
@@ -180,11 +186,8 @@ class GmusicComponent(SwitchDevice):
 
         data[ATTR_ENTITY_ID] = self._entity_ids
         self.update_ha_state()
-        self.hass.services.call(DOMAIN_MP, SERVICE_PLAY_MEDIA, data, blocking=True)
-        print("finished")
-#        yield from self.hass.services.async_call(DOMAIN_MP, SERVICE_PLAY_MEDIA, data, blocking=True)
+        self.hass.services.call(DOMAIN_MP, SERVICE_PLAY_MEDIA, data)
         self._next_track_no = self._next_track_no + 1
-        self._next_track()
 
     def _play(self):
         if not self._update_entity_ids():
@@ -204,4 +207,4 @@ class GmusicComponent(SwitchDevice):
         self._next_track_no = 0
         self._playing = True
         self._next_track()
-
+        self._unsub_tracker = track_state_change(self.hass, self._entity_ids, self._next_track, from_state='playing', to_state='idle')

@@ -147,3 +147,19 @@ news_soverom:
       data: 
         entity_id: automation.auto_radio_soverom
 
+brightness_soverom:
+  alias: "Brightness soverom"
+  sequence:
+  - service: homeassistant.turn_on
+    entity_id: light.soverom
+    data_template:
+      transition: 1
+      brightness: '{% if states.light.soverom.attributes.brightness%}{{(states.light.soverom.attributes.brightness+25)|min(255)}}{% else %}25{% endif %}'
+  - service: script.turn_on
+    entity_id: script.brightness_soverom_temp
+
+brightness_soverom_temp:
+  sequence:
+  - delay: '00:00:01'
+  - service: script.turn_on
+    entity_id: script.brightness_soverom

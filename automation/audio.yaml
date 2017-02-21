@@ -139,6 +139,8 @@
           false
         {% endif %}
   action:
+  - service: homeassistant.turn_off
+    entity_id: switch.google_music
   - service: input_select.select_next
     entity_id: input_select.radio_stue
 
@@ -182,8 +184,9 @@
      state: 'playing'
   action:
     - service: homeassistant.turn_off
-      data: 
-        entity_id: automation.auto_radio_stue
+      entity_id: switch.google_music
+    - service: homeassistant.turn_off
+      entity_id: automation.auto_radio_stue
     - service: media_player.turn_off
       entity_id: media_player.stue
 
@@ -253,6 +256,27 @@
   action:
    - service: homeassistant.turn_on
      entity_id: automation.start_media_stue
+
+- alias: "Gmusic stue"
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001118a8a
+      action_type: tap_twice
+  action:
+   - service: homeassistant.turn_off
+     entity_id: switch.google_music
+   - service: input_select.select_option
+     entity_id: input_select.media_player
+     data:
+       option: "stue"
+   - service: input_select.select_next
+     entity_id: input_select.music
+   - service: homeassistant.turn_on
+     entity_id: switch.google_music
+
+
 
 
 # BAD
@@ -478,7 +502,7 @@
       event_type: click
       event_data:
         entity_id: binary_sensor.switch_158d0001165868
-        click_type: hold
+        click_type: double
   condition:
     - condition: template
       value_template: >
@@ -506,7 +530,7 @@
       event_type: click
       event_data:
         entity_id: binary_sensor.switch_158d0001165868
-        click_type: hold
+        click_type: double
   condition:
    - condition: state
      entity_id: media_player.soverom

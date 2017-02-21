@@ -95,7 +95,7 @@
        - automation.temp_control_soverom_kveld
 
 - alias: 'temp_control_soverom_kveld'
-  initial_state: False
+  initial_state: True
   trigger:
    - platform: time
      minutes: 0
@@ -121,7 +121,7 @@
        - automation.temp_control_soverom_morgen
 
 - alias: 'temp_control_soverom_morgen'
-  initial_state: False
+  initial_state: True
   trigger:
    - platform: time
      minutes: 29

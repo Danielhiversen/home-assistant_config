@@ -88,9 +88,6 @@
       event_type: button_pressed
       event_data: {'state': 'group on', 'entity_id': 'switch.main'}
     - platform: event
-      event_type: button_pressed
-      event_data: {'state': 'group on', 'entity_id': 'switch.leggetid_stue'}
-    - platform: event
       event_type: click
       event_data:
         entity_id: binary_sensor.switch_158d00013ed144

@@ -74,13 +74,13 @@ automation:
       entity_id: binary_sensor.stovsuger
       to: "off"
       for:
-        seconds: 15
+        seconds: 2
     action:
      - service: homeassistant.turn_on
        entity_id: script.stovsuger_checker_main
 
 
-  - alias: "stovsuger checker misisng"
+  - alias: "stovsuger checker mising"
     initial_state: False
     trigger:
     - platform: state
@@ -99,7 +99,7 @@ automation:
       data:
         entity_id: media_player.stue
         volume_level: 0.65
-    - delay: '00:00:15'
+    - delay: '00:00:12'
     - service: tts.google_say
       entity_id: media_player.stue
       data_template:
@@ -127,7 +127,7 @@ automation:
       data:
         entity_id: media_player.stue
         volume_level: 0.65
-    - delay: '00:00:15'
+    - delay: '00:00:12'
     - service: tts.google_say
       entity_id: media_player.stue
       data_template:

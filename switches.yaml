@@ -42,7 +42,7 @@
       name: leggetid
       fire_event: True
     0b11005b0154b55e01040f60:
-      name: leggetid_stue
+      name: knapp_soverom
       fire_event: True
     0913000e9da2da015270:
       name: Movement3
@@ -74,7 +74,6 @@
     09130033154c02011d70:
       name: knapp
       fire_event: True
-
 #- platform: command_line
 #  switches:
 #    stovsuger:

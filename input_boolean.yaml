@@ -7,9 +7,9 @@ door_bad:
 door_do:
   initial: off
 nattlys:
-  initial: off
+  initial: on
 sovelyd:
-  initial: off
+  initial: on
 xiaomi_devices:
   initial: off
 
@@ -23,7 +23,7 @@ movement_stue:
   initial: off
 auto_heat:
   name: Auto heat
-  initial: off
+  initial: on
 steketermometer_notify_daniel:
   name: Notify Daniel
   initial: off

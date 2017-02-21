@@ -29,7 +29,7 @@ recorder:
   purge_days: 2
   db_url: !secret db_url
 
-restore_states:
+#restore_states:
 
 alarm:
 
@@ -50,6 +50,8 @@ logger:
     custom_components.switch.xiaomi: debug
     custom_components.binary_sensor: debug
     custom_components.light.xiaomi: debug
+    miflora.miflora_poller: debug
+    homeassistant.components.sensor.miflora: debug
 #    homeassistant.core: info
 
 

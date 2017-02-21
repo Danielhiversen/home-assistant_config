@@ -11,6 +11,21 @@
    - service: homeassistant.turn_on
      entity_id: automation.start_media_stue
 
+- alias: "HA stopped"
+  trigger:
+      platform: event
+      event_type: homeassistant_stop
+  action:
+   - service: homeassistant.turn_off
+     entity_id: switch.ovn_stue
+   - service: homeassistant.turn_off
+     entity_id: switch.ovn_soverom
+   - delay: '00:00:02'
+   - service: homeassistant.turn_off
+     entity_id: switch.ovn_stue
+   - service: homeassistant.turn_off
+     entity_id: switch.ovn_soverom
+
 - alias: "Turn off all devices"
   trigger:
     - platform: time
@@ -53,7 +68,7 @@
 
   condition:
     - condition: template
-      value_template: '{% if states.automation.all_devices_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.all_devices_off.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
+      value_template: '{% if states.script.all_devices_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.all_devices_off.attributes.last_triggered)) > 5*60 }}  {% else %}  true {% endif %}'
   action:
   - service: homeassistant.turn_on
     entity_id: script.borte
@@ -102,9 +117,6 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
-    - platform: event
-      event_type: button_pressed
-      event_data: {'state': 'group on', 'entity_id': 'switch.leggetid_stue'}
   condition:
     - condition: template
       value_template: '{% if states.automation.leggetid.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.leggetid.attributes.last_triggered)) > 20 }}  {% else %}  true {% endif %}'
@@ -186,6 +198,10 @@
       entity_id: script.timed_movement
     - service: script.turn_on
       entity_id: script.timed_movement
+    - condition: and
+      conditions:
+       - condition: template
+         value_template: '{% if states.script.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.attributes.last_triggered)) < 3600*4 }}  {% else %}  false {% endif %}'
     - service: homeassistant.turn_on
       entity_id: input_boolean.xiaomi_devices
 
@@ -240,11 +256,22 @@
     - service: script.turn_on
       entity_id: script.timed_movement_do_1min_off
 
-- alias: "Movement3"
+- alias: "Movement gang"
   trigger:
     - platform: event
       event_type: button_pressed
       event_data: {'entity_id': 'switch.movement3', 'state': 'unknown command (0x9da2da)'}
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d0001137308
+      to: 'on'
+  condition:
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id !=  states.sensor.motion_sensor_158d0001137308.entity_id}}'
+      - condition: state
+        entity_id: input_boolean.xiaomi_devices
+        state: 'on'
   action:
     - service: script.turn_off
       entity_id: script.timed_movement3_1min_off
@@ -290,7 +317,7 @@
       - condition: template
         value_template: '{{ trigger.entity_id !=  states.sensor.motion_sensor_158d00010ab2d0.entity_id}}'
       - condition: state
-        entity_id: xiaomi_devices
+        entity_id: input_boolean.xiaomi_devices
         state: 'on'
   action:
     - service: script.turn_off
@@ -313,7 +340,7 @@
       - condition: template
         value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d000110ab73.entity_id}}'
       - condition: state
-        entity_id: xiaomi_devices
+        entity_id: input_boolean.xiaomi_devices
         state: 'on'
   action:
    - service: homeassistant.turn_on
@@ -333,7 +360,7 @@
       - condition: template
         value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d000110ab73.entity_id}}'
       - condition: state
-        entity_id: xiaomi_devices
+        entity_id: input_boolean.xiaomi_devices
         state: 'on'
   action:
    - service: homeassistant.turn_off
@@ -353,7 +380,7 @@
       - condition: template
         value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d000110ab92.entity_id}}'
       - condition: state
-        entity_id: xiaomi_devices
+        entity_id: input_boolean.xiaomi_devices
         state: 'on'
   action:
    - service: homeassistant.turn_on
@@ -373,7 +400,7 @@
       - condition: template
         value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d000110ab92.entity_id}}'
       - condition: state
-        entity_id: xiaomi_devices
+        entity_id: input_boolean.xiaomi_devices
         state: 'on'
   action:
    - service: homeassistant.turn_off
@@ -394,7 +421,7 @@
       - condition: template
         value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d00012d8d86.entity_id}}'
       - condition: state
-        entity_id: xiaomi_devices
+        entity_id: input_boolean.xiaomi_devices
         state: 'on'
   action:
    - service: homeassistant.turn_on
@@ -414,7 +441,7 @@
       - condition: template
         value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d00012d8d86.entity_id}}'
       - condition: state
-        entity_id: xiaomi_devices
+        entity_id: input_boolean.xiaomi_devices
         state: 'on'
   action:
    - service: homeassistant.turn_off
@@ -435,7 +462,7 @@
       - condition: template
         value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d00010dc700.entity_id}}'
       - condition: state
-        entity_id: xiaomi_devices
+        entity_id: input_boolean.xiaomi_devices
         state: 'on'
   action:
    - service: homeassistant.turn_on
@@ -455,7 +482,7 @@
       - condition: template
         value_template: '{{ trigger.entity_id !=  states.sensor.door_window_sensor_158d00010dc700.entity_id}}'
       - condition: state
-        entity_id: xiaomi_devices
+        entity_id: input_boolean.xiaomi_devices
         state: 'on'
   action:
    - service: homeassistant.turn_off
@@ -571,6 +598,7 @@
       entity_id: script.stovsuger_running
 
 - alias: "Start Stovsuger"
+  initial_state: False
   trigger:
     - platform: state
       entity_id: group.tracker

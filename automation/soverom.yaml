@@ -20,11 +20,11 @@
     - service: automation.trigger
       entity_id: automation.radio_soverom
 
-- alias: "Lys av pA soverom"
+- alias: "Sovetid pA soverom"
   trigger:
     - platform: event
       event_type: button_pressed
-      event_data: {'state': 'off', 'entity_id': 'switch.soverom_switch1'}
+      event_data: {'state': 'group on', 'entity_id': 'switch.knapp_soverom'}
     - platform: event
       event_type: button_pressed
       event_data: {'entity_id': 'switch.lyd_soverom', 'state': 'unknown command (0xd744fc)'}
@@ -53,6 +53,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'entity_id': 'switch.lyd_soverom', 'state': 'unknown command (0xd744fc)'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'group on', 'entity_id': 'switch.knapp_soverom'}
   condition:
     - condition: state
       entity_id: script.vekke_lys
@@ -70,6 +73,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'entity_id': 'switch.lyd_soverom', 'state': 'unknown command (0xd744fc)'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'group on', 'entity_id': 'switch.knapp_soverom'}
   condition:
     - condition: state
       entity_id: script.vekke_lys
@@ -87,6 +93,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'entity_id': 'switch.lyd_soverom', 'state': 'unknown command (0xd744fc)'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'group on', 'entity_id': 'switch.knapp_soverom'}
   condition:
     - condition: state
       entity_id: light.soverom1
@@ -108,6 +117,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'entity_id': 'switch.lyd_soverom', 'state': 'unknown command (0xd744fc)'}
+    - platform: event
+      event_type: button_pressed
+      event_data: {'state': 'group on', 'entity_id': 'switch.knapp_soverom'}
   condition:
     - condition: state
       entity_id: script.timed_lyd_soverom_5s
@@ -124,40 +136,7 @@
       brightness: 216
       xy_color: [0.5458, 0.4159]
   
-- alias: "Lys soverom"
-  trigger:
-    - platform: event
-      event_type: button_pressed
-      event_data: {'state': 'on', 'entity_id': 'switch.soverom_switch1'}
-    - platform: event
-      event_type: click
-      event_data:
-        entity_id: binary_sensor.switch_158d0001165868
-        click_type: double
-  condition:
-   - condition: state
-     entity_id: light.soverom1
-     state: 'off'
-   - condition: state
-     entity_id: light.soverom2
-     state: 'off'
-  action:
-  - service: homeassistant.turn_on
-    entity_id:
-      - light.soverom
-    data:
-      transition: 0
-      brightness: 1
-      xy_color: [0.5458, 0.4159]
-  - delay: 00:00:01
-  - service: homeassistant.turn_on
-    entity_id:
-      - light.soverom
-    data:
-      transition: 15
-      brightness: 255
-      xy_color: [0.5458, 0.4159]
- 
+
 - alias: "Lys soverom door timer"
   trigger:
     - platform: event
@@ -330,24 +309,61 @@
      entity_id: automation.nattlys
 
 
-- alias: "Lys av pA soverom, knapp"
+- alias: "Lysstyrke soverom, knapp"
   trigger:
-    - platform: event
-      event_type: button_pressed
-      event_data: {'state': 'on', 'entity_id': 'switch.soverom_switch1'}
     - platform: event
       event_type: click
       event_data:
         entity_id: binary_sensor.switch_158d0001165868
-        click_type: double
+        click_type: long_click_press
   condition:
    - condition: state
      entity_id: light.soverom1
-     state: 'on'
+     state: 'off'
    - condition: state
      entity_id: light.soverom2
-     state: 'on'
+     state: 'off'
   action:
+  - service: homeassistant.turn_on
+    entity_id: script.brightness_soverom
+
+- alias: "Lysstyrke soverom stopp, knapp"
+  trigger:
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d0001165868
+        click_type: hold
+  condition:
+  action:
+  - service: homeassistant.turn_off
+    entity_id: script.brightness_soverom
+  - service: homeassistant.turn_off
+    entity_id: script.brightness_soverom_temp
+
+- alias: "Lys av pA soverom, knapp"
+  trigger:
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d0001165868
+        click_type: long_click_press
+  condition:
+   - condition: or
+     conditions:
+     - condition: state
+       entity_id: light.soverom1
+       state: 'on'
+     - condition: state
+       entity_id: light.soverom2
+       state: 'on'
+  action:
+  - service: homeassistant.turn_off
+    entity_id:
+      - light.soverom
+      - script.vekke_lys
+      - script.leggetid_soverom
+      - script.leggetid_soverom_temp
   - service: homeassistant.turn_off
     entity_id:
       - light.soverom

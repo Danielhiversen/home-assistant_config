@@ -2,7 +2,7 @@ binary_sensor:
   - platform: template
     sensors:
       dark:
-        value_template: "{{ states.input_boolean.dark.state == 'on' }}" 
+        value_template: "{{ states.input_boolean.dark.state == 'off' }}" 
         sensor_class: light
         entity_id: input_boolean.dark
         friendly_name: "Dark"

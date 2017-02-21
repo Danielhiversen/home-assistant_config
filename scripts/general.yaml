@@ -24,9 +24,9 @@ all_devices_off:
       entity_id:
        - group.stue_lys
        - light.gang
-    - delay: '00:00:50'
     - service: homeassistant.turn_off
       entity_id: switch.tv
+    - delay: '00:00:50'
     - service: media_player.turn_off
     - service: homeassistant.turn_off
       entity_id: group.all_lights
@@ -36,7 +36,11 @@ all_devices_off:
     - service: homeassistant.turn_off
       entity_id: switch.preset1_1
     - service: homeassistant.turn_off
-      entity_id: switch.preset2_1
+      entity_id: switch.infrared_1
+    - service: homeassistant.turn_off
+      entity_id: switch.preset1_2
+    - service: homeassistant.turn_off
+      entity_id: switch.infrared_1
 
 borte:
   alias: "Drar bort"
@@ -49,14 +53,14 @@ borte:
       data:
         entity_id: media_player.stue
         volume_level: 0.5
-    - delay: '00:00:04'
+    - delay: '00:00:6'
     - service: tts.google_say
       entity_id: media_player.stue
       data:
-        message: 'Ha det bra.'
+        message: ' . . . .                 Ha det bra.'
         cache: true
 
 stovsuger_running:
   sequence:
-   - delay: 00:01:30
+   - delay: 00:00:15
 

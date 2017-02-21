@@ -185,7 +185,10 @@ def setup(hass, config):
             if len(news_rss) > 2:
                 break
         _feed = feedparser.parse("http://www.yr.no/sted/Norge/S%C3%B8r-Tr%C3%B8ndelag/Trondheim/Trondheim/varsel.xml")
-        news_rss.append("Værvarsel " + strip_tags(_feed.feed.summary).replace("<strong>","").replace("</strong>",""))
+        summary = _feed.feed.get("summary")
+        if summary is None:
+            return
+        news_rss.append("Værvarsel " + strip_tags(summary).replace("<strong>","").replace("</strong>",""))
 
     def _yr_precipitation(now=None):
         url = "http://api.met.no/weatherapi/nowcast/0.9/"
