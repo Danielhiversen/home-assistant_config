@@ -53,7 +53,7 @@ borte:
       data:
         entity_id: media_player.stue
         volume_level: 0.5
-    - delay: '00:00:6'
+    - delay: '00:00:06'
     - service: tts.google_say
       entity_id: media_player.stue
       data:
@@ -62,5 +62,32 @@ borte:
 
 stovsuger_running:
   sequence:
-   - delay: 00:00:15
-
+   - delay: 00:01:00
+   
+light_notify:
+  alias: "Light notify"
+  sequence:
+   - service: homeassistant.turn_on
+     data:
+       entity_id:
+        - light.yttergang
+        - light.gang
+       rgb_color: [218,23,0]
+   - service: homeassistant.turn_on
+     data:
+       entity_id:
+        - light.gateway_light_f0b429b41020
+       rgb_color: [218,23,0]
+   - delay: '00:00:05'
+   - service: homeassistant.turn_off
+     entity_id:
+      - light.yttergang
+      - light.gang
+   - delay: '00:00:05'
+   - service: homeassistant.turn_off
+     entity_id:
+      - light.gateway_light_f0b429b41020
+   - delay: '00:00:05'
+   - service: homeassistant.turn_off
+     entity_id:
+      - light.gateway_light_f0b429b41020

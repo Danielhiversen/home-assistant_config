@@ -44,7 +44,7 @@ class MlSensor(BinarySensorDevice):
         with open(get_default_config_dir() + knn_path, 'rb') as handle:
             self._knn = pickle.load(handle)
         self._name = name
-        self._state = False
+        self._state = None
         self._running = False
         self._hass = hass
         hass.services.register(DOMAIN, "check_state", self.poll_status)

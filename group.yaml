@@ -5,6 +5,7 @@ div:
 #  - switch.mobillader
   - sensor.phone_battery
   - sensor.mean_lux
+  - binary_sensor.dark
   - group.tracker
   - script.borte
   - group.stovsuger
@@ -79,14 +80,11 @@ Kjokken:
   - group.kjokken_timer
 #  - group.steketermometer
 
-Test:
+Kamera:
   view: yes
   entities:
-  - binary_sensor.dark
   - group.camera_1
   - group.camera_2
-  - binary_sensor.stue_lux
-  - binary_sensor.stovsuger_ml
 
 tracker:
  - device_tracker.daniel

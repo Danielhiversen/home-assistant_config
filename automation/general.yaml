@@ -65,13 +65,41 @@
       event_data:
         entity_id: binary_sensor.switch_158d00012ac03c
         click_type: single
-
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d00012ac03c
+        click_type: double
   condition:
     - condition: template
-      value_template: '{% if states.script.all_devices_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.all_devices_off.attributes.last_triggered)) > 5*60 }}  {% else %}  true {% endif %}'
+      value_template: '{% if states.script.all_devices_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.all_devices_off.attributes.last_triggered)) > 60 }}  {% else %}  true {% endif %}'
   action:
   - service: homeassistant.turn_on
     entity_id: script.borte
+
+
+- alias: "All devices off soverom"
+  trigger:
+    - platform: event
+      event_type: click
+      event_data:
+        entity_id: binary_sensor.switch_158d00012ac03c
+        click_type: double
+  condition:
+    - condition: template
+      value_template: '{% if states.script.all_devices_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.all_devices_off.attributes.last_triggered)) > 60 }}  {% else %}  true {% endif %}'
+  action:
+  - service: script.turn_off
+    entity_id: script.leggetid_soverom
+  - service: script.turn_off
+    entity_id: script.leggetid_soverom_temp
+  - service: script.turn_off
+    entity_id: script.vekke_lys
+  - service: homeassistant.turn_off
+    entity_id: light.soverom
+  - service: homeassistant.turn_off
+    entity_id: light.vekke_lyd
+
 
 - alias: "Kjoleskap for varmt"
   trigger:
@@ -734,4 +762,25 @@
 #        Sensor is offline: 
 #        {{states("sensor.no_updates")}}
   
-  
+- alias: "Mobillader on"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.phone_battery
+      below: 20
+  condition:
+    - condition: state
+      entity_id: device_tracker.daniel
+      state: 'home'
+  action:
+    - service: media_player.turn_on
+      entity_id: media_player.stue
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.stue
+        volume_level: 0.9
+    - delay: '00:00:15'
+    - service: tts.google_say
+      entity_id: media_player.stue
+      data_template:
+        message: 'Husk å lade telefonen Daniel, da batteriestatusen er {{states.sensor.phone_battery.state | float | round(0)}} prosent.'
+        cache: false

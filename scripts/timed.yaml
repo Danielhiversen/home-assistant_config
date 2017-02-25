@@ -125,10 +125,10 @@ timed_lys_yttergang:
         transition: 20
 
 timed_lys_soverom:
-  alias: "Turn off soverom lights after 10 min"
+  alias: "Turn off soverom lights after 3 min"
   sequence:
     - delay:
-        minutes: 5
+        minutes: 3
     - service: homeassistant.turn_off
       entity_id: light.soverom
       data:

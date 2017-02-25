@@ -43,7 +43,7 @@ logger:
     homeassistant.components.script: info
 #    homeassistant.components.device_tracker: info
 #    homeassistant.components.http: info
- #   homeassistant.components.rfxtrx: info
+    homeassistant.components.rfxtrx: info
 #    homeassistant.components.sensor.miflora: debug
     custom_components.xiaomi: debug
     custom_components.sensor.xiaomi: debug
@@ -124,7 +124,7 @@ device_tracker:
 #  consider_home: 900
 #  interval_seconds: 10
 
-#- platform: bluetooth_tracker
+- platform: bluetooth_tracker
 
 media_player:
 - platform: cast
@@ -143,7 +143,7 @@ climate:
   name :  Termostat stue
   heater :  switch.ovn_stue
   target_sensor : sensor.mean_stue_temp
-  target_temp : 18
+  target_temp : 16
   min_temp : 10
   max_temp : 25
   tolerance: 0.1
@@ -152,7 +152,7 @@ climate:
   name :  Soverom
   heater :  switch.ovn_soverom
   target_sensor : sensor.Soverom_temperature
-  target_temp : 15
+  target_temp : 12
   min_temp : 7
   max_temp : 25
   tolerance: 0.1
@@ -168,9 +168,11 @@ tts:
   - platform: google
     language: 'no'
 
+resume_mp:
+ media_player: stue
+
 news:
  token: !secret endomondo
-
 
 #camera:
 #  - platform: ffmpeg

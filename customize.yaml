@@ -54,7 +54,7 @@
   binary_sensor.motion_sensor_158d0001137308:
     friendly_name: "Bevegelse Gang"
   binary_sensor.motion_sensor_158d00010aac89:
-    friendly_name: "Bevegelse IKKE I BRUK"
+    friendly_name: "Bevegelse Soverom"
 
   sensor.temperature_158d000159c9d0:
     friendly_name: "Temperatur Stue"

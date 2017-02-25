@@ -43,13 +43,28 @@ automation:
     - service: media_player.volume_set
       data:
         entity_id: media_player.stue
-        volume_level: 0.5
+        volume_level: 0.9
     - delay: '00:00:15'
     - service: tts.google_say
       entity_id: media_player.stue
       data_template:
         message: 'Nedtelt tid har nå gått'
-        cache: false
+        cache: true
+    - service: media_player.turn_on
+      entity_id: script.light_notify
+    - delay: '00:00:01'
+    - service: media_player.turn_on
+      entity_id: script.light_notify
+    - delay: '00:00:01'
+    - service: media_player.turn_on
+      entity_id: script.light_notify
+    - service: tts.google_say
+      entity_id: media_player.stue
+      data_template:
+        message: 'Nedtelt tid har nå gått'
+        cache: true
+
+
 
 input_slider:
   timer_minutes:

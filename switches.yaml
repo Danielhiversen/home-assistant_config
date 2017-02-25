@@ -102,4 +102,7 @@
       friendly_name: "lydplanke aux"
       command_on: 'JgAoAFYeDh4NEA4PKy0NEA0QHB4OEA0QDRANEA4PHBAODw4eDRAODw4ADQU=
 '
-
+- platform: broadlink
+  host: 192.168.1.100
+  mac: '34:EA:34:E4:6D:B0'
+  timeout: 15

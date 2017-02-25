@@ -56,7 +56,7 @@ def num2str(num):
 
 
 def setup(hass, config):
-    """Setup example component."""
+    """Setup component."""
 
     yr_precipitation = {}
     nowcast_precipitation = None

@@ -148,6 +148,12 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
+    - platform: state
+      entity_id: binary_sensor.door_soverom
+      state: 'on'
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d00010aac89
+      state: 'on'
   condition:
    - condition: state
      entity_id: script.leggetid_soverom
@@ -173,6 +179,9 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
+    - platform: state
+      entity_id: binary_sensor.door_soverom
+      state: 'on'
   condition:
    - condition: template
      value_template: '{% if states.script.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.attributes.last_triggered)) > 3600*4 }}  {% else %}  true {% endif %}'
@@ -215,9 +224,6 @@
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
-    - platform: state
-      entity_id: binary_sensor.door_soverom
-      state: 'on'
   condition:
    - condition: state
      entity_id: input_boolean.nattlys
@@ -281,7 +287,7 @@
      state: 'off'
   action:
    - delay:
-        seconds: 5
+        seconds: 1
    - service: script.turn_off
      entity_id: script.timed_lys_soverom
    - service: homeassistant.turn_off

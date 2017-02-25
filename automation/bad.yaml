@@ -1,12 +1,9 @@
 - alias: "Baderom fuktighet"
   trigger:
-    - platform: state
-      entity_id: binary_sensor.door_bad
-      state: 'on'
+    - platform: numeric_state
+      entity_id: sensor.mean_bad_fuktighet
+      above: 40
   condition:
-   - condition: numeric_state
-     entity_id: sensor.mean_bad_fuktighet
-     above: 60
    - condition: template
      value_template: '{% if states.automation.baderom_fuktighet.attributes.last_triggered %} {{(as_timestamp(now())-as_timestamp(states.automation.baderom_fuktighet.attributes.last_triggered)) > 60*60*4 }}  {% else %}  true {% endif %}'
   action:
@@ -15,7 +12,7 @@
   - service: media_player.volume_set
     data:
       entity_id: media_player.bad
-      volume_level: 0.55
+      volume_level: 0.95
   - service: tts.google_say
     entity_id: media_player.bad
     data_template:
@@ -28,12 +25,13 @@
       entity_id: binary_sensor.door_bad
       state: 'on'
       for:
-        minutes: 45
+        minutes: 20
   action:
     - service: homeassistant.turn_on
       entity_id: automation.baderomsdor_open_notify
 
 - alias: "Baderomsdor open notify"
+  initial_state: False
   trigger:
     - platform: state
       entity_id: binary_sensor.movement3
@@ -43,6 +41,8 @@
       state: 'on'
     - platform: state
       entity_id: binary_sensor.door_do
+    - platform: state
+      entity_id: binary_sensor.door_bad
   condition:
    - condition: state
      entity_id: binary_sensor.door_bad
@@ -57,7 +57,7 @@
     - service: media_player.volume_set
       data:
         entity_id: media_player.bad
-        volume_level: 0.4
+        volume_level: 0.85
     - service: tts.google_say
       entity_id: media_player.bad
       data_template:

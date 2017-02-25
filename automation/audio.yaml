@@ -29,7 +29,7 @@
     - condition: and
       conditions:
       - condition: template
-        value_template: '{% if states.automation.nyheter_hjemkomst_start.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.nyheter_hjemkomst_start.attributes.last_triggered)) > 1800 }}  {% else %}  true {% endif %}'
+        value_template: '{% if states.automation.nyheter_hjemkomst_start.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.nyheter_hjemkomst_start.attributes.last_triggered)) > 3600*4 }}  {% else %}  true {% endif %}'
       - condition: template
         value_template: '{% if states.automation.nyheter_hjemkomst.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.nyheter_hjemkomst.attributes.last_triggered)) < 900 }}  {% else %}  false {% endif %}'
 
@@ -83,7 +83,7 @@
      entity_id: media_player.stue
      state: 'idle'
      for:
-       seconds: 5
+       seconds: 3
   action:
     - service: homeassistant.turn_off
       entity_id: automation.auto_radio_stue
@@ -110,6 +110,8 @@
           true
         {% endif %}
   action:
+    - service: homeassistant.turn_off
+      entity_id: switch.google_music
     - service: media_player.turn_on
       entity_id: media_player.stue
     - service: media_player.volume_set
@@ -318,7 +320,7 @@
      entity_id: media_player.bad
      state: 'idle'
      for:
-       seconds: 5
+       seconds: 3
   action:
     - service: homeassistant.turn_off
       entity_id: automation.auto_radio_bad
@@ -345,6 +347,8 @@
           true
         {% endif %}
   action:
+    - service: homeassistant.turn_off
+      entity_id: switch.google_music
     - service: media_player.turn_on
       entity_id: media_player.bad
     - service: media_player.volume_set
@@ -374,6 +378,8 @@
           false
         {% endif %}
   action:
+  - service: homeassistant.turn_off
+    entity_id: switch.google_music
   - service: input_select.select_next
     entity_id: input_select.radio_bad
 
@@ -416,6 +422,8 @@
      entity_id: media_player.bad
      state: 'playing'
   action:
+    - service: homeassistant.turn_off
+      entity_id: switch.google_music
     - service: homeassistant.turn_off
       entity_id: automation.auto_radio_bad
     - service: media_player.turn_off
@@ -461,7 +469,24 @@
                       {%- endif %}
                       {{ state }}
 
-
+- alias: "Gmusic bad"
+  trigger:
+    platform: event
+    event_type: cube_action
+    event_data:
+      entity_id: binary_sensor.cube_158d0001182e4f
+      action_type: tap_twice
+  action:
+   - service: homeassistant.turn_off
+     entity_id: switch.google_music
+   - service: input_select.select_option
+     entity_id: input_select.media_player
+     data:
+       option: "bad"
+   - service: input_select.select_next
+     entity_id: input_select.music
+   - service: homeassistant.turn_on
+     entity_id: switch.google_music
 
 
 

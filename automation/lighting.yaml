@@ -1,14 +1,8 @@
 - alias: "Home and dark"
   trigger:
-    - platform: numeric_state
-      entity_id: sun.sun
-      value_template: '{{ state.attributes.elevation }}'
-      below: 5
     - platform: state
-      entity_id: binary_sensor.stue_lux
+      entity_id: binary_sensor.dark
       to: 'off'
-      for:
-        minutes: 15
 
     - platform: state
       entity_id: group.tracker
@@ -20,15 +14,9 @@
   condition:
     - condition: or
       conditions:
-      - condition: numeric_state
-        entity_id: sun.sun
-        value_template: '{{ state.attributes.elevation }}'
-        below: 5
       - condition: state
-        entity_id: binary_sensor.stue_lux
+        entity_id: binary_sensor.dark
         state: 'off'
-        for:
-          minutes: 5
 
     - condition: or
       conditions:
@@ -129,10 +117,10 @@
         brightness: 101
 
 - alias: "lys bokhylle og bilder"
-  initial_state: False
+  initial_state: True
   trigger:
     - platform: state
-      entity_id: binary_sensor.stue_lux
+      entity_id: binary_sensor.dark
       to: 'off'
       for:
         hours: 2
@@ -142,7 +130,7 @@
       to: 'home'
   condition:
     - condition: state
-      entity_id: binary_sensor.stue_lux
+      entity_id: binary_sensor.dark
       state: 'off'
       for:
         hours: 2
@@ -177,12 +165,11 @@
 - alias: "Turn off light stue"
   trigger:
     - platform: state
-      entity_id: binary_sensor.stue_lux
+      entity_id: binary_sensor.dark
       to: 'on'
-      for:
-        minutes: 3
+
     - platform: state
-      entity_id: binary_sensor.stue_lux
+      entity_id: binary_sensor.dark
       to: 'on'
       for:
         minutes: 60

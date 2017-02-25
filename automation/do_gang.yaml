@@ -9,6 +9,9 @@
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
+   - platform: state
+     entity_id: binary_sensor.movement3
+     state: 'on'
   condition:
    - condition: state
      entity_id: script.stovsuger_running
@@ -32,6 +35,9 @@
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
+   - platform: state
+     entity_id: binary_sensor.movement3
+     state: 'on'
   condition:
    - condition: template
      value_template: '{% if states.automation.lys_gang_dag.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_gang_dag.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
@@ -69,6 +75,9 @@
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
+   - platform: state
+     entity_id: binary_sensor.movement3
+     state: 'on'
   condition:
    - condition: template
      value_template: '{% if states.automation.lys_gang_natt.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_gang_natt.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
@@ -103,12 +112,9 @@
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
-   - platform: event
-     event_type: button_pressed
-     event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
-   - platform: event
-     event_type: button_pressed
-     event_data: {'entity_id': 'switch.movement3', 'state': 'unknown command (0x9da2da)'}
+   - platform: state
+     entity_id: binary_sensor.door_do
+     state: 'on'
   action:
     - service: script.turn_off
       data: 
@@ -117,6 +123,7 @@
     - service: script.turn_on
       data:
         entity_id: script.timed_lys_do
+        
 
 - alias: "Lys do dag"
   trigger:
@@ -126,6 +133,9 @@
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
+   - platform: state
+     entity_id: binary_sensor.door_do
+     state: 'on'
   condition:
    - condition: template
      value_template: '{% if states.automation.lys_do_dag.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_do_dag.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
@@ -149,12 +159,9 @@
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
-   - platform: event
-     event_type: button_pressed
-     event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
-   - platform: event
-     event_type: button_pressed
-     event_data: {'entity_id': 'switch.movement3', 'state': 'unknown command (0x9da2da)'}
+   - platform: state
+     entity_id: binary_sensor.door_do
+     state: 'on'
   condition:
    - condition: template
      value_template: '{% if states.automation.lys_do_natt.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_do_natt.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'

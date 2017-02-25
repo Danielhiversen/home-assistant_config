@@ -10,7 +10,7 @@ auto_temp_low:
   name: Auto heat low
   min: 16
   max: 22
-  initial: 17
+  initial: 16
   step: 0.5
   icon: mdi:fire
   unit_of_measurement: '°C'
@@ -69,9 +69,9 @@ temp_control_soverom_morgen_hour:
   step: 1
 temp_control_soverom_morgen_temp:
   name: Temp
-  min: 12
-  max: 18
-  initial: 14
+  min: 12.5
+  max: 18.5
+  initial: 14.5
   step: 1
   icon: mdi:fire
   unit_of_measurement: '°C'  
@@ -84,9 +84,9 @@ temp_control_soverom_kveld_hour:
   step: 1
 temp_control_soverom_kveld_temp:
   name: Temp
-  min: 14
-  max: 20
-  initial: 17
+  min: 14.5
+  max: 20.5
+  initial: 17.5
   step: 1
   icon: mdi:fire
   unit_of_measurement: '°C'

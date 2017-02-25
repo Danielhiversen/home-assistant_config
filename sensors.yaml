@@ -36,6 +36,10 @@
     - lowClouds
     - mediumClouds
 
+- platform: xiaomi_scale
+  mac: 'c8:0f:10:a1:4d:18'
+  name: Vekt
+
 - platform: command_line
   name: CPU Temperature
   command: "cat /sys/class/thermal/thermal_zone2/temp"
@@ -93,7 +97,7 @@
       value_template: >
                       {% set sum = 0 %}
                       {% set num = 0 %}
-                      {% for state in [states.sensor.blomst_tv_temperature, states.sensor.blomst_sofa_temperature, states.sensor.blomst_bokhylle_temperature, states.sensor.stue_temperature, states.sensor.stue_tvbenk_temperature, states.sensor.temperature_158d000159c9d0] %}
+                      {% for state in [states.sensor.blomst_tv_temperature, states.sensor.blomst_sofa_temperature, states.sensor.blomst_bokhylle_temperature, states.sensor.stue_temperature, states.sensor.stue_tvbenk_temperature, states.sensor.temperature_158d000159c9d0, states.sensor.stue_bokhylle_temperature] %}
                           {%- if  state != None and as_timestamp(now()) - as_timestamp(state.last_updated) < 300 -%}
                               {% set sum = sum + state.state|float %}
                               {% set num = num + 1|float %}
@@ -120,20 +124,6 @@
        - sensor.blomst_bokhylle_temperature
        - sensor.stue_temperature
        - sensor.stue_tvbenk_temperature
-    test_humidity_bad:
-      friendly_name: 'test humidity'
-      value_template: '{{ states.sensor.humidity_158d000159f1af.state|float- states.sensor.bad_humidity.state|float }}'
-      unit_of_measurement: " "
-      entity_id: 
-       - sensor.humidity_158d000159f1af
-       - sensor.bad_humidity
-    test_temp:
-      friendly_name: 'test temp'
-      value_template: '{{ states.sensor.temperature_158d000159c9d0.state|float - states.sensor.stue_temperature.state|float }}'
-      unit_of_measurement: " "
-      entity_id: 
-       - sensor.temperature_158d000159c9d0
-       - sensor.stue_temperature
     mean_bad_fuktighet:
       friendly_name: 'Bad fuktighet'
       value_template: >
@@ -196,6 +186,15 @@
     - air_quality
     - light
     - noise
+
+- platform: broadlink
+  update_interval: 160
+  host: 192.168.1.100
+  mac: '34:EA:34:E4:6D:B0'
+  name: "Stue_bokhylle"
+  timeout: 10
+  monitored_conditions:
+    - temperature
 
 - platform: rest
   resource: http://ip.jsontest.com
