@@ -7,7 +7,7 @@ automation:
        seconds: 2
     condition:
      - condition: template
-       value_template: '{{ now().hour == (states.input_slider.alarmhour.state  | round(0))  and  now().minute == (states.input_slider.alarmminutes.state  | round(0) )  }}'
+       value_template: '{{ now().hour == (states.input_number.alarmhour.state  | round(0))  and  now().minute == (states.input_number.alarmminutes.state  | round(0) )  }}'
     action:
       - service: script.turn_on
         entity_id: script.vekke_lys
@@ -18,14 +18,14 @@ automation:
   - alias: "alarm enabled"
     trigger:
       platform: state
-      entity_id: input_slider.alarmhour, input_slider.alarmminutes
+      entity_id: input_number.alarmhour, input_number.alarmminutes
     action:
     - service: homeassistant.turn_on
       data: 
         entity_id:
          - automation.wake_me_up
 
-input_slider:
+input_number:
   alarmhour:
     name: Hour
     icon: mdi:timer
@@ -46,10 +46,10 @@ sensor:
     sensors:
       alarm_time:
         friendly_name: 'Alarm'
-        value_template: '{% if states.input_slider.alarmhour.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_slider.alarmhour.state|round(0)|string }}:{% if states.input_slider.alarmminutes.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_slider.alarmminutes.state|round(0)|string }}'
+        value_template: '{% if states.input_number.alarmhour.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_number.alarmhour.state|round(0)|string }}:{% if states.input_number.alarmminutes.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_number.alarmminutes.state|round(0)|string }}'
         entity_id: 
-         - input_slider.alarmminutes
-         - input_slider.alarmhour
+         - input_number.alarmminutes
+         - input_number.alarmhour
 
 script:
   vekke_lyd:
@@ -63,7 +63,7 @@ script:
         data:
           entity_id: media_player.soverom
           media_content_type: audio/mp3
-          media_content_id: "http://192.168.1.140:8123/local/Wake_Up_fade_in.mp3"
+          media_content_id: "https://server1.dahoiv.net:8123/local/Wake_Up_fade_in.mp3"
       - delay: 00:12:00
       - service: homeassistant.turn_on
         entity_id: script.news_soverom
@@ -83,7 +83,7 @@ script:
     - service: homeassistant.turn_off
       data: 
         entity_id: input_boolean.alarmstatus
-    - service: homeassistant.turn_off
+    - service: homeassistant.turn_on
       entity_id:
         - light.soverom1
       data:

@@ -1,7 +1,7 @@
 - alias: "temp_control_stue enabled"
   trigger:
     platform: state
-    entity_id: input_slider.temp_control_stue_temp, input_slider.temp_control_stue_hour
+    entity_id: input_number.temp_control_stue_temp, input_number.temp_control_stue_hour
   action:
   - service: homeassistant.turn_on
     data: 
@@ -16,12 +16,12 @@
      seconds: 18
   condition:
    - condition: template
-     value_template: '{{ now().hour == (states.input_slider.temp_control_stue_hour.state  | round(0))  }}'
+     value_template: '{{ now().hour == (states.input_number.temp_control_stue_hour.state  | round(0))  }}'
   action:
     - service: climate.set_temperature
       data_template:
         entity_id: "climate.termostat_stue"
-        temperature: '{{ float(states.input_slider.temp_control_stue_temp.state) }}'
+        temperature: '{{ float(states.input_number.temp_control_stue_temp.state) }}'
     - service: homeassistant.turn_off
       data: 
         entity_id: automation.temp_control_stue
@@ -30,7 +30,7 @@
 - alias: "temp_control_stue_kveld_hour enabled"
   trigger:
     platform: state
-    entity_id: input_slider.temp_control_stue_kveld_temp, input_slider.temp_control_stue_kveld_hour
+    entity_id: input_number.temp_control_stue_kveld_temp, input_number.temp_control_stue_kveld_hour
   action:
   - service: homeassistant.turn_on
     data: 
@@ -45,18 +45,18 @@
      seconds: 29
   condition:
    - condition: template
-     value_template: '{{ now().hour == (states.input_slider.temp_control_stue_kveld_hour.state  | round(0))  }}'
+     value_template: '{{ now().hour == (states.input_number.temp_control_stue_kveld_hour.state  | round(0))  }}'
   action:
     - service: climate.set_temperature
       data_template:
         entity_id: "climate.termostat_stue"
-        temperature: '{{ float(states.input_slider.temp_control_stue_kveld_temp.state) }}'
+        temperature: '{{ float(states.input_number.temp_control_stue_kveld_temp.state) }}'
 
 
 - alias: "temp_control_stue_morgen_hour enabled"
   trigger:
     platform: state
-    entity_id: input_slider.temp_control_stue_morgen_temp, input_slider.temp_control_stue_morgen_hour
+    entity_id: input_number.temp_control_stue_morgen_temp, input_number.temp_control_stue_morgen_hour
   action:
   - service: homeassistant.turn_on
     data: 
@@ -71,12 +71,12 @@
      seconds: 21
   condition:
    - condition: template
-     value_template: '{{ now().hour == (states.input_slider.temp_control_stue_morgen_hour.state  | round(0))  }}'
+     value_template: '{{ now().hour == (states.input_number.temp_control_stue_morgen_hour.state  | round(0))  }}'
   action:
     - service: climate.set_temperature
       data_template:
         entity_id: "climate.termostat_stue"
-        temperature: '{{ float(states.input_slider.temp_control_stue_morgen_temp.state) }}'
+        temperature: '{{ float(states.input_number.temp_control_stue_morgen_temp.state) }}'
 
 
 
@@ -87,7 +87,7 @@
 - alias: "temp_control_soverom_kveld_hour enabled"
   trigger:
     platform: state
-    entity_id: input_slider.temp_control_soverom_kveld_temp, input_slider.temp_control_soverom_kveld_hour
+    entity_id: input_number.temp_control_soverom_kveld_temp, input_number.temp_control_soverom_kveld_hour
   action:
   - service: homeassistant.turn_on
     data: 
@@ -102,18 +102,18 @@
      seconds: 24
   condition:
    - condition: template
-     value_template: '{{ now().hour == (states.input_slider.temp_control_soverom_kveld_hour.state  | round(0))  }}'
+     value_template: '{{ now().hour == (states.input_number.temp_control_soverom_kveld_hour.state  | round(0))  }}'
   action:
     - service: climate.set_temperature
       data_template:
         entity_id: "climate.soverom"
-        temperature: '{{ float(states.input_slider.temp_control_soverom_kveld_temp.state) }}'
+        temperature: '{{ float(states.input_number.temp_control_soverom_kveld_temp.state) }}'
 
 
 - alias: "temp_control_soverom_morgen_hour enabled"
   trigger:
     platform: state
-    entity_id: input_slider.temp_control_soverom_morgen_temp, input_slider.temp_control_soverom_morgen_hour
+    entity_id: input_number.temp_control_soverom_morgen_temp, input_number.temp_control_soverom_morgen_hour
   action:
   - service: homeassistant.turn_on
     data: 
@@ -128,11 +128,11 @@
      seconds: 2
   condition:
    - condition: template
-     value_template: '{{ now().hour == (states.input_slider.temp_control_soverom_morgen_hour.state  | round(0))  }}'
+     value_template: '{{ now().hour == (states.input_number.temp_control_soverom_morgen_hour.state  | round(0))  }}'
   action:
     - service: climate.set_temperature
       data_template:
         entity_id: "climate.soverom"
-        temperature: '{{ float(states.input_slider.temp_control_soverom_morgen_temp.state) }}'
+        temperature: '{{ float(states.input_number.temp_control_soverom_morgen_temp.state) }}'
 
 

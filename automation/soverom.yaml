@@ -3,7 +3,7 @@
   trigger:
    - platform: state
      entity_id: media_player.soverom
-     state: 'idle'
+     to: 'idle'
      for:
        seconds: 1
   action:
@@ -150,10 +150,10 @@
       event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
     - platform: state
       entity_id: binary_sensor.door_soverom
-      state: 'on'
+      to: 'on'
     - platform: state
       entity_id: binary_sensor.motion_sensor_158d00010aac89
-      state: 'on'
+      to: 'on'
   condition:
    - condition: state
      entity_id: script.leggetid_soverom
@@ -181,7 +181,7 @@
       event_data: {'state': 'unknown command (0x94597a)', 'entity_id': 'switch.movement_soverom_seng'}
     - platform: state
       entity_id: binary_sensor.door_soverom
-      state: 'on'
+      to: 'on'
   condition:
    - condition: template
      value_template: '{% if states.script.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.attributes.last_triggered)) > 3600*4 }}  {% else %}  true {% endif %}'
@@ -271,7 +271,7 @@
       event_data: {'state': 'off', 'entity_id': 'switch.door_bedroom'}
     - platform: state
       entity_id: binary_sensor.door_soverom
-      state: 'off'
+      to: 'off'
   condition:
    - condition: state
      entity_id: light.soverom1
@@ -299,14 +299,14 @@
   trigger:
    - platform: state
      entity_id: light.soverom1
-     state: 'off'
+     to: 'off'
    - platform: state
      entity_id: light.soverom2
-     state: 'off'
+     to: 'off'
   condition:
    - condition: state
      entity_id: automation.nattlys
-     state: 'off'
+     state: 'on'
   action:
    - service: homeassistant.turn_off
      entity_id: automation.nattlys

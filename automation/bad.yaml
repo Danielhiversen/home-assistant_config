@@ -2,11 +2,36 @@
   trigger:
     - platform: numeric_state
       entity_id: sensor.mean_bad_fuktighet
-      above: 40
+      above: 45
   condition:
    - condition: template
      value_template: '{% if states.automation.baderom_fuktighet.attributes.last_triggered %} {{(as_timestamp(now())-as_timestamp(states.automation.baderom_fuktighet.attributes.last_triggered)) > 60*60*4 }}  {% else %}  true {% endif %}'
   action:
+  - service: tts.google_say
+    entity_id: media_player.bad
+    data_template:
+      message: 'Husk å skru på vifta, da luftfuktigheten er {{states.sensor.mean_bad_fuktighet.state | float | round(0)}} prosent.'
+      cache: false
+  - service: homeassistant.turn_on
+    entity_id: automation.baderom_fuktighet_lav
+
+- alias: "Baderom fuktighet lav"
+  initial_state: False
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.door_bad
+      to: 'on'
+  condition:
+   - condition: template
+     value_template: '{% if states.automation.baderom_fuktighet.attributes.last_triggered %} {{(as_timestamp(now())-as_timestamp(states.automation.baderom_fuktighet.attributes.last_triggered)) < 60*60*6 }}  {% else %}  false {% endif %}'
+   - condition: numeric_state
+     entity_id: sensor.mean_bad_fuktighet
+     below: 30
+   - condition: template
+     value_template: '{% if states.automation.baderom_fuktighet_lav.attributes.last_triggered %} {{(as_timestamp(now())-as_timestamp(states.automation.baderom_fuktighet_lav.attributes.last_triggered)) > 60*60*4 }}  {% else %}  true {% endif %}'
+  action:
+  - service: homeassistant.turn_off
+    entity_id: automation.baderom_fuktighet_lav
   - service: media_player.turn_on
     entity_id: media_player.bad
   - service: media_player.volume_set
@@ -16,14 +41,15 @@
   - service: tts.google_say
     entity_id: media_player.bad
     data_template:
-      message: 'Husk å skru på vifta, da luftfuktigheten er {{states.sensor.mean_bad_fuktighet.state | float | round(0)}} prosent.'
+      message: 'Nå kan du skru av vifta, for luftfuktigheten er {{states.sensor.mean_bad_fuktighet.state | float | round(0)}} prosent.'
       cache: false
+
 
 - alias: "Baderomsdor open"
   trigger:
     - platform: state
       entity_id: binary_sensor.door_bad
-      state: 'on'
+      to: 'on'
       for:
         minutes: 20
   action:
@@ -35,10 +61,10 @@
   trigger:
     - platform: state
       entity_id: binary_sensor.movement3
-      state: 'on'
+      to: 'on'
     - platform: state
       entity_id: binary_sensor.movement_do
-      state: 'on'
+      to: 'on'
     - platform: state
       entity_id: binary_sensor.door_do
     - platform: state
@@ -63,3 +89,26 @@
       data_template:
         message: 'Husk å lukke baderomsdøra, da det blir kaldt her.'
         cache: true
+
+
+- alias: "Baderomsdor open Leggetid"
+  initial_state: False
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.door_bad
+      to: 'on'
+  action:
+    - service: homeassistant.turn_off
+      entity_id: automation.baderomsdor_open_leggetid
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.bad
+        volume_level: 0.5
+    - condition: time      
+      after: '20:00:00'
+      before: '23:59:00'
+    - delay: '00:00:03'
+    - service: news.read_news
+      data:
+        message_type: "2"
+        entity_id: media_player.bad

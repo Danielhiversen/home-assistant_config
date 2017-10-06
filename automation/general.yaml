@@ -1,7 +1,7 @@
 - alias: "HA started"
   trigger:
-      platform: event
-      event_type: homeassistant_start
+     platform: homeassistant
+     event: start
   action:
    - service: homeassistant.turn_on
      entity_id: script.away_48
@@ -29,9 +29,9 @@
 - alias: "Turn off all devices"
   trigger:
     - platform: time
-      after: '00:30:00'
+      at: '00:30:00'
     - platform: time
-      after: '01:30:00'
+      at: '01:30:00'
     - platform: state
       entity_id: script.timed_movement
       to: 'off'
@@ -49,7 +49,7 @@
         entity_id: group.tracker
         state: 'not_home'
       - condition: time
-        after: '23:00:00'
+        after: '00:00:00'
         before: '07:00:00'
   action:
     - service: homeassistant.turn_on
@@ -85,21 +85,9 @@
       event_data:
         entity_id: binary_sensor.switch_158d00012ac03c
         click_type: double
-  condition:
-    - condition: template
-      value_template: '{% if states.script.all_devices_off.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.all_devices_off.attributes.last_triggered)) > 60 }}  {% else %}  true {% endif %}'
   action:
-  - service: script.turn_off
-    entity_id: script.leggetid_soverom
-  - service: script.turn_off
-    entity_id: script.leggetid_soverom_temp
-  - service: script.turn_off
-    entity_id: script.vekke_lys
-  - service: homeassistant.turn_off
-    entity_id: light.soverom
-  - service: homeassistant.turn_off
-    entity_id: light.vekke_lyd
-
+  - service: homeassistant.turn_on
+    entity_id: script.borte_soverom
 
 - alias: "Kjoleskap for varmt"
   trigger:
@@ -188,7 +176,9 @@
       to: 'not_home'
     - platform: state
       entity_id: script.timed_movement
-      state: 'off'
+      to: 'off'
+      for:
+        seconds: 2
   action:
     - service: script.turn_off
       data: 
@@ -202,7 +192,7 @@
   trigger:
     - platform: state
       entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.door_bad, binary_sensor.movement1,  binary_sensor.movement2, binary_sensor.movement3, binary_sensor.movement_do, binary_sensor.movement_kjokken, binary_sensor.movement_stue
-      state: 'on'
+      to: 'on'
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
@@ -214,7 +204,7 @@
       event_data: {'state': 'on', 'entity_id': 'switch.movement1'}
     - platform: state
       entity_id: group.tracker
-      state: 'home'
+      to: 'home'
   condition:
     - condition: state
       entity_id: script.stovsuger_running
@@ -229,7 +219,7 @@
     - condition: and
       conditions:
        - condition: template
-         value_template: '{% if states.script.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.attributes.last_triggered)) < 3600*4 }}  {% else %}  false {% endif %}'
+         value_template: '{% if states.script.leggetid_soverom.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.script.leggetid_soverom.attributes.last_triggered)) < 3600*4 }}  {% else %} true {% endif %}'
     - service: homeassistant.turn_on
       entity_id: input_boolean.xiaomi_devices
 
@@ -237,7 +227,7 @@
   trigger:
    - platform: state
      entity_id: script.timed_movement
-     state: 'on'
+     to: 'on'
   condition:
    - condition: state
      entity_id: group.tracker
@@ -255,7 +245,18 @@
   trigger:
     - platform: state
       entity_id: switch.movement1
-      state: 'on'
+      to: 'on'
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_158d000112de58
+      to: 'on'
+  condition:
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.entity_id !=  states.sensor.motion_sensor_158d000112de58.entity_id}}'
+      - condition: state
+        entity_id: input_boolean.xiaomi_devices
+        state: 'on'
   action:
     - service: script.turn_off
       entity_id: script.timed_movement1_1min_off
@@ -266,7 +267,7 @@
   trigger:
     - platform: state
       entity_id: switch.movement2
-      state: 'on'
+      to: 'on'
   action:
     - service: script.turn_off
       entity_id: script.timed_movement2_1min_off
@@ -277,7 +278,7 @@
   trigger:
     - platform: state
       entity_id: switch.movement_do
-      state: 'on'
+      to: 'on'
   action:
     - service: script.turn_off
       entity_id: script.timed_movement_do_1min_off
@@ -535,8 +536,24 @@
       entity_id: device_tracker.tine
       to: 'home'
   action:
-      service: homeassistant.turn_off
+    - service: homeassistant.turn_off
       entity_id: input_boolean.nattlys
+    - service: homeassistant.turn_off
+      entity_id: input_boolean.sovelyd
+
+- alias: "Tine away"
+  trigger:
+    - platform: state
+      entity_id: device_tracker.tine
+      to: 'not_home'
+      for:
+        hours: 8
+  action:
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.nattlys
+    - service: homeassistant.turn_on
+      entity_id: input_boolean.sovelyd
+
 
 #- alias: "Mobillader on"
 #  trigger:
@@ -616,9 +633,12 @@
 #
 - alias: "stovsuger"
   trigger:
-    platform: event
-    event_type: button_pressed
-    event_data: {'entity_id': 'switch.stovsuger_running', 'state': 'unknown command (0xd55555)'}
+   - platform: event
+     event_type: button_pressed
+     event_data: {'entity_id': 'switch.stovsuger_running', 'state': 'unknown command (0xd55555)'}
+  # - platform: event
+  #   event_type: motion
+  #   event_data: {'entity_id': 'binary_sensor.motion_sensor_158d00010fee08'}
   action:
     - service: script.turn_off
       entity_id: script.stovsuger_running
@@ -630,16 +650,16 @@
   trigger:
     - platform: state
       entity_id: group.tracker
-      state: 'not_home'
+      to: 'not_home'
       for:
         hours: 1
     - platform: state
       entity_id: script.timed_movement
-      state: 'off'
+      to: 'off'
       for:
         hours: 1
     - platform: time
-      after: '12:10:00'
+      at: '12:10:00'
   condition:
     - condition: state
       entity_id: switch.stovsuger
@@ -666,7 +686,7 @@
   trigger:
    - platform: state
      entity_id: script.stovsuger_running
-     state: 'off'
+     to: 'off'
      for:
        minutes: 20
   condition:
@@ -728,18 +748,22 @@
 - alias: "Ny ip"
   trigger:
    - platform: state
-     entity_id: sensor.external_ip
+     entity_id: sensor.myipopendnscom
+   - platform: homeassistant
+     event: start
   condition:
    - condition: template
-     value_template: '{% if states.automation.ha_started.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.ha_started.attributes.last_triggered)) > 5*60 }}  {% else %}false{% endif %}'
+     value_template: '{% if states.automation.ny_ip.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.ny_ip.attributes.last_triggered)) > 5*60 }}  {% else %}true{% endif %}'
    - condition: template
-     value_template: '{{ states.sensor.external_ip.state != "unknown" }}'
+     value_template: '{{ states.sensor.myipopendnscom.state != states.sensor.server1dahoivnet.state }}'
   action:
     service: notify.pushbullet
     data:
       title: "Ny ip"
       target: "device/daniel_telefon"
-      message: Home IP Address was changed. The new home IP address is "{{ states('sensor.external_ip') }}"
+      message: Home IP Address was changed. The new home IP address is "{{ states('sensor.myipopendnscom') }}"
+
+
 
 #- alias: "Offline sensor"
 #  trigger:
@@ -762,12 +786,15 @@
 #        Sensor is offline: 
 #        {{states("sensor.no_updates")}}
   
-- alias: "Mobillader on"
+- alias: "Lade telefonen"
   trigger:
     - platform: numeric_state
       entity_id: sensor.phone_battery
-      below: 20
+      below: 40
   condition:
+    - condition: time
+      after: '07:00:00'
+      before: '23:00:00'
     - condition: state
       entity_id: device_tracker.daniel
       state: 'home'
@@ -777,10 +804,41 @@
     - service: media_player.volume_set
       data:
         entity_id: media_player.stue
-        volume_level: 0.9
-    - delay: '00:00:15'
+        volume_level: 0.5
     - service: tts.google_say
       entity_id: media_player.stue
       data_template:
-        message: 'Husk å lade telefonen Daniel, da batteriestatusen er {{states.sensor.phone_battery.state | float | round(0)}} prosent.'
+        message: 'Husk å lade telefonen Daniel, da batterienivået er {{states.sensor.phone_battery.state | float | round(0)}} prosent.'
+        cache: false
+
+
+- alias: "Stopp lading av telefonen"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.phone_battery
+      above: 85
+  condition:
+    - condition: time
+      after: '07:00:00'
+      before: '23:00:00'
+  action:
+    - service: notify.pushbullet
+      data:
+        title: "Batteriet er fult"
+        message: 'Husk å koble fra mobiladeren, da batterienivået er {{states.sensor.phone_battery.state | float | round(0)}} prosent.'
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: device_tracker.daniel
+        state: 'home'
+    - service: media_player.turn_on
+      entity_id: media_player.stue
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.stue
+        volume_level: 0.5
+    - service: tts.google_say
+      entity_id: media_player.stue
+      data_template:
+        message: 'Husk å koble fra mobiladeren, da batterienivået er {{states.sensor.phone_battery.state | float | round(0)}} prosent.'
         cache: false

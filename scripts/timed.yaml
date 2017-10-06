@@ -20,8 +20,7 @@ timed_lights_5min_off:
        - light.Lys_stue
     - service: homeassistant.turn_off
       entity_id: script.light_turned_off_5min
-    - delay:
-        seconds: 3
+    - delay: '00:{% if now().hour < 11 or now().hour > 23  %}00:20{% else %}03:00{% endif %}'
     - service: homeassistant.turn_off
       entity_id: script.light_turned_off_5min
  

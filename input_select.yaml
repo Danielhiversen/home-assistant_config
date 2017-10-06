@@ -3,6 +3,7 @@ radio_stue:
   options:
    - P3
    - P1
+   - P2
    - Alltid Nyheter
    - Av
   initial: Av
@@ -22,6 +23,7 @@ radio_bad:
   options:
    - P3
    - P1
+   - P2
    - Alltid Nyheter
    - Av
   initial: Av
@@ -32,6 +34,7 @@ radio_soverom:
   options:
    - P3
    - P1
+   - P2
    - Alltid Nyheter
    - Av
   initial: Av
@@ -42,6 +45,7 @@ radio:
   options:
    - P3
    - P1
+   - P2
    - Alltid Nyheter
    - Av
   initial: Av

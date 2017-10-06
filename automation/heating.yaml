@@ -2,10 +2,10 @@
   trigger:
     - platform: state
       entity_id: group.tracker
-      state: 'home'
+      to: 'home'
     - platform: state
       entity_id: script.timed_movement
-      state: 'on'
+      to: 'on'
     - platform: numeric_state
       entity_id: sensor.relative_alarm_time
       below: 30
@@ -19,7 +19,7 @@
     - condition: template
       value_template: '{{(as_timestamp(now())-as_timestamp(states.sensor.target_temp_stue.last_updated)) > 900}}'
     - condition: template
-      value_template: '{{float(states.input_slider.auto_temp.state) > float(states.climate.termostat_stue.attributes.temperature)}}'
+      value_template: '{{float(states.input_number.auto_temp.state) > float(states.climate.termostat_stue.attributes.temperature)}}'
     - condition: state
       entity_id: input_boolean.auto_heat
       state: 'on'
@@ -51,36 +51,36 @@
         - condition: or
           conditions:
           - condition: template
-            value_template: '{{states.device_tracker.daniel.attributes.activity | lower != "in vehicle"}}'
+            value_template: '{{states.device_tracker.daniel.attributes.activity | lower != "in_vehicle"}}'
           - condition: template
             value_template: '{{states.proximity.home.state | float < 100}}'
   action:
     - service: climate.set_temperature
       data_template:
         entity_id: "climate.termostat_stue"
-        temperature: '{{ float(states.input_slider.auto_temp.state) }}'
+        temperature: '{{ float(states.input_number.auto_temp.state) }}'
 
 
 - alias: "Auto heating off"
   trigger:
     - platform: state
       entity_id: group.tracker
-      state: 'not_home'
+      to: 'not_home'
       for:
         minutes: 4
     - platform: state
       entity_id: script.timed_movement
-      state: 'off'
+      to: 'off'
       for:
         minutes: 4
     - platform: state
       entity_id: script.timed_movement
-      state: 'off'
+      to: 'off'
       for:
         minutes: 60
     - platform: state
       entity_id: script.borte
-      state: 'on'
+      to: 'on'
     - platform: event
       event_type: button_pressed
       event_data: {'state': 'unknown command (0x545503)', 'entity_id': 'switch.leggetid'}
@@ -104,7 +104,7 @@
         click_type: single
   condition:
     - condition: template
-      value_template: '{{float(states.input_slider.auto_temp_low.state) < float(states.climate.termostat_stue.attributes.temperature)}}'
+      value_template: '{{float(states.input_number.auto_temp_low.state) < float(states.climate.termostat_stue.attributes.temperature)}}'
     - condition: state
       entity_id: input_boolean.auto_heat
       state: 'on'
@@ -129,12 +129,12 @@
     - service: climate.set_temperature
       data_template:
         entity_id: "climate.termostat_stue"
-        temperature: '{{ float(states.input_slider.auto_temp_low.state) }}'
+        temperature: '{{ float(states.input_number.auto_temp_low.state) }}'
 
 - alias: "Auto heating enabled"
   trigger:
     platform: state
-    entity_id: input_slider.auto_temp, input_slider.auto_temp_low 
+    entity_id: input_number.auto_temp, input_number.auto_temp_low 
   action:
   - service: homeassistant.turn_on
     data: 

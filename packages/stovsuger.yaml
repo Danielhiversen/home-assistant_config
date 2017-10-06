@@ -78,7 +78,7 @@ automation:
     trigger:
     - platform: state
       entity_id: binary_sensor.motion_sensor_158d00010ab2d0,  binary_sensor.movement_stue
-      state: 'on'
+      to: 'on'
     condition:
      - condition: state
        entity_id: binary_sensor.stovsuger_ml
@@ -94,12 +94,11 @@ automation:
     - service: media_player.volume_set
       data:
         entity_id: media_player.stue
-        volume_level: 0.65
-    - delay: '00:00:12'
+        volume_level: 0.50
     - service: tts.google_say
       entity_id: media_player.stue
       data_template:
-        message: '. . . . Hei. Støvsugeren har satt seg fast. Kan du vvære så snill å sette den tilbake på plass?'
+        message: 'Hei. Støvsugeren har satt seg fast. Kan du vvære så snill å sette den tilbake på plass?'
         cache: true
     - service: homeassistant.turn_on
       entity_id: automation.stovsuger_checker_back
@@ -109,7 +108,7 @@ automation:
     trigger:
     - platform: state
       entity_id: binary_sensor.motion_sensor_158d00010ab2d0,  binary_sensor.movement_stue
-      state: 'on'
+      to: 'on'
     condition:
      - condition: state
        entity_id: binary_sensor.stovsuger_ml
@@ -122,11 +121,10 @@ automation:
     - service: media_player.volume_set
       data:
         entity_id: media_player.stue
-        volume_level: 0.65
-    - delay: '00:00:12'
+        volume_level: 0.5
     - service: tts.google_say
       entity_id: media_player.stue
       data_template:
-        message: '. . . . Hei. Tusen takk for hjelpa med støvsugeren.'
+        message: 'Hei. Tusen takk for hjelpa med støvsugeren.'
         cache: true
 

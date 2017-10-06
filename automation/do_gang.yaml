@@ -11,7 +11,7 @@
      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
    - platform: state
      entity_id: binary_sensor.movement3
-     state: 'on'
+     to: 'on'
   condition:
    - condition: state
      entity_id: script.stovsuger_running
@@ -37,7 +37,7 @@
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
    - platform: state
      entity_id: binary_sensor.movement3
-     state: 'on'
+     to: 'on'
   condition:
    - condition: template
      value_template: '{% if states.automation.lys_gang_dag.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_gang_dag.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
@@ -77,7 +77,7 @@
      event_data: {'state': 'on', 'entity_id': 'switch.door_bedroom'}
    - platform: state
      entity_id: binary_sensor.movement3
-     state: 'on'
+     to: 'on'
   condition:
    - condition: template
      value_template: '{% if states.automation.lys_gang_natt.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_gang_natt.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
@@ -114,7 +114,7 @@
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
    - platform: state
      entity_id: binary_sensor.door_do
-     state: 'on'
+     to: 'on'
   action:
     - service: script.turn_off
       data: 
@@ -135,7 +135,7 @@
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
    - platform: state
      entity_id: binary_sensor.door_do
-     state: 'on'
+     to: 'on'
   condition:
    - condition: template
      value_template: '{% if states.automation.lys_do_dag.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_do_dag.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
@@ -161,7 +161,7 @@
      event_data: {'state': 'on', 'entity_id': 'switch.door_do'}
    - platform: state
      entity_id: binary_sensor.door_do
-     state: 'on'
+     to: 'on'
   condition:
    - condition: template
      value_template: '{% if states.automation.lys_do_natt.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_do_natt.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'

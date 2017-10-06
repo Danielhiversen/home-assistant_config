@@ -4,7 +4,6 @@ div:
   entities:
 #  - switch.mobillader
   - sensor.phone_battery
-  - sensor.mean_lux
   - binary_sensor.dark
   - group.tracker
   - script.borte
@@ -38,6 +37,7 @@ stue:
   - group.stue_heater
   - group.stue_lys
   - group.media_stue
+  - media_player.stue_kjokken
   - group.stue_scene
 
 Soverom:
@@ -48,6 +48,7 @@ Soverom:
   - light.soverom2
   - group.soverom_heater
   - sensor.soverom_temperature
+  - sensor.mean_soverom_temp
   - binary_sensor.door_soverom
   - binary_sensor.movement_soverom
   - input_boolean.nattlys
@@ -69,6 +70,11 @@ Bad:
   - binary_sensor.door_bad
   - binary_sensor.movement3
   - group.media_bad
+  - sensor.badevekt
+  - sensor.vekt_daniel
+  - switch.aeotec_zw096_smart_switch_6_switch_2_0
+  - sensor.aeotec_zw096_smart_switch_6_energy_2_0
+  - sensor.aeotec_zw096_smart_switch_6_power_2_8
 
 Kjokken:
   view: yes
@@ -98,8 +104,8 @@ alarmclock:
   name: Wake Me Up
   entities: 
    - sensor.alarm_time
-   - input_slider.alarmhour
-   - input_slider.alarmminutes
+   - input_number.alarmhour
+   - input_number.alarmminutes
    - automation.wake_me_up
 
 soverom_heater:
@@ -111,18 +117,16 @@ soverom_heater:
    - group.temp_control_soverom_kveld
 temp_control_soverom_morgen:
     name: Temp control soverom morgen
-    control: hidden
     entities: 
      - automation.temp_control_soverom_morgen
-     - input_slider.temp_control_soverom_morgen_hour
-     - input_slider.temp_control_soverom_morgen_temp
+     - input_number.temp_control_soverom_morgen_hour
+     - input_number.temp_control_soverom_morgen_temp
 temp_control_soverom_kveld:
     name: Temp control soverom kveld
-    control: hidden
     entities: 
      - automation.temp_control_soverom_kveld
-     - input_slider.temp_control_soverom_kveld_hour
-     - input_slider.temp_control_soverom_kveld_temp
+     - input_number.temp_control_soverom_kveld_hour
+     - input_number.temp_control_soverom_kveld_temp
 
 stue_heater:
   name: Thermotstat stue
@@ -135,32 +139,28 @@ stue_heater:
    - group.auto_heat_stue
 auto_heat_stue:
   name: Auto heat
-  control: hidden
   entities: 
    - input_boolean.auto_heat
-   - input_slider.auto_temp
-   - input_slider.auto_temp_low
+   - input_number.auto_temp
+   - input_number.auto_temp_low
 temp_control_stue:
     name: Temp control stue
-    control: hidden
     entities: 
      - automation.temp_control_stue
-     - input_slider.temp_control_stue_hour
-     - input_slider.temp_control_stue_temp
+     - input_number.temp_control_stue_hour
+     - input_number.temp_control_stue_temp
 temp_control_stue_morgen:
     name: Temp control stue morgen
-    control: hidden
     entities: 
      - automation.temp_control_stue_morgen
-     - input_slider.temp_control_stue_morgen_hour
-     - input_slider.temp_control_stue_morgen_temp
+     - input_number.temp_control_stue_morgen_hour
+     - input_number.temp_control_stue_morgen_temp
 temp_control_stue_kveld:
     name: Temp control stue kveld
-    control: hidden
     entities: 
      - automation.temp_control_stue_kveld
-     - input_slider.temp_control_stue_kveld_hour
-     - input_slider.temp_control_stue_kveld_temp
+     - input_number.temp_control_stue_kveld_hour
+     - input_number.temp_control_stue_kveld_temp
 
 stovsuger:
   name: Støvsuger
@@ -212,7 +212,7 @@ steketermometer:
   name: Steketermometer
   entities: 
    - input_select.steketermometer
-   - input_slider.temp_steketermometer
+   - input_number.temp_steketermometer
    - input_boolean.steketermometer_notify_daniel
 
 
@@ -236,7 +236,7 @@ kjokken_timer:
   name: Timer
   entities: 
   - sensor.timer_minutes
-  - input_slider.timer_minutes
+  - input_number.timer_minutes
 
 blomster:
   name: Blomster

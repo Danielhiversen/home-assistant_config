@@ -2,20 +2,20 @@
   trigger:
    - platform: state
      entity_id: input_select.steketermometer
-     state: 'Fisk (50*)'
+     to: 'Fisk (50*)'
   action:
-  - service: input_slider.select_value
+  - service: input_number.set_value
     data:
-      entity_id: "input_slider.temp_steketermometer"
+      entity_id: "input_number.temp_steketermometer"
       value: "50"
         
 - alias: "steketermometer kylling"
   trigger:
    - platform: state
      entity_id: input_select.steketermometer
-     state: 'Kylling (70*)'
+     to: 'Kylling (70*)'
   action:
-  - service: input_slider.select_value
+  - service: input_number.set_value
     data:
-      entity_id: "input_slider.temp_steketermometer"
+      entity_id: "input_number.temp_steketermometer"
       value: "70"

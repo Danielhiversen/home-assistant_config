@@ -57,7 +57,6 @@ class MlSensor(BinarySensorDevice):
     @property
     def is_on(self):
         """Return true if sensor is on."""
-        print("here", self._state)
         return self._state
 
     @property
@@ -93,7 +92,6 @@ class MlSensor(BinarySensorDevice):
         image = flatten_image(matrix_image(image))
         state = self._knn.predict(self._pca.transform(image))[0]
         self._state = (state == 1)
-        print(self._state)
         self._hass.bus.fire('ml', {
             'entity_id': self.entity_id,
             'state': str(state)
@@ -103,7 +101,6 @@ class MlSensor(BinarySensorDevice):
 
 def matrix_image(image):
     "opens image and converts it to a m*n matrix"
-    print(image)
     image = Image.open(image)
     crop = 300
     w, h = image.size

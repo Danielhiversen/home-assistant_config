@@ -55,6 +55,10 @@
     friendly_name: "Bevegelse Gang"
   binary_sensor.motion_sensor_158d00010aac89:
     friendly_name: "Bevegelse Soverom"
+  binary_sensor.motion_sensor_158d000112de58:
+    friendly_name: "Bevegelse yttergang"
+  binary_sensor.motion_sensor_158d00010fee08:
+    friendly_name: "stovsuger"
 
   sensor.temperature_158d000159c9d0:
     friendly_name: "Temperatur Stue"
@@ -62,4 +66,28 @@
     friendly_name: "Temperatur Bad"
   sensor.humidity_158d000159f1af:
     friendly_name: "Fuktighet Bad"
+  sensor.temperature_158d00012cb96c:
+    friendly_name: "Temperatur soverom"
+  sensor.temperature_158d00012cc9d1:
+    friendly_name: "Temperatur kjøleskap"
+  sensor.temperature_158d00012cab34:
+    friendly_name: "Temperatur stue"
 
+  group.stue_lys:
+    emulated_hue_hidden: false
+    emulated_hue_name: "stue"
+  script.night_mode:
+    emulated_hue_hidden: false
+    emulated_hue_name: "night mode"
+  script.borte:
+    emulated_hue_hidden: false
+    emulated_hue_name: "away mode"
+
+
+# zwave
+  switch.aeotec_zw096_smart_switch_6_switch_2_0:
+    friendly_name: "Vaskemaskin"
+  sensor.aeotec_zw096_smart_switch_6_energy_2_0:
+    friendly_name: "Vaskemaskin strøm effekt"
+  sensor.aeotec_zw096_smart_switch_6_power_2_8:
+    friendly_name: "Vaskemaskin strømforbruk"

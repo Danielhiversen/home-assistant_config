@@ -145,8 +145,8 @@ class GmusicComponent(SwitchDevice):
             self._unsub_tracker()
             self._unsub_tracker = None
         data = {ATTR_ENTITY_ID: self._entity_ids}
-        self.hass.services.call(DOMAIN_MP, SERVICE_TURN_OFF, data, blocking=True)
-        self.update_ha_state()
+#        self.hass.services.call(DOMAIN_MP, SERVICE_TURN_OFF, data, blocking=True)
+        self.schedule_update_ha_state()
         
     def _update_entity_ids(self):
         media_player = self.hass.states.get(self._media_player)
@@ -185,7 +185,7 @@ class GmusicComponent(SwitchDevice):
         }
 
         data[ATTR_ENTITY_ID] = self._entity_ids
-        self.update_ha_state()
+        self.schedule_update_ha_state()
         self.hass.services.call(DOMAIN_MP, SERVICE_PLAY_MEDIA, data)
         self._next_track_no = self._next_track_no + 1
 

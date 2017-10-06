@@ -1,9 +1,17 @@
 leggetid:
   alias: "Leggetid"
   sequence:
+  - service: tts.google_say
+    entity_id: media_player.stue_kjokken
+    data:
+      message: 'God natt.'
+      cache: true
   - service: scene.turn_on
     data:
       entity_id: scene.Dempet_lys
+  - service: homeassistant.turn_on
+    entity_id: automation.baderomsdor_open_leggetid
+  - delay: '00:00:07'
   - service: homeassistant.turn_off
     entity_id:
      - media_player.stue
@@ -12,15 +20,6 @@ leggetid:
      - light.lys_bokhylle
      - light.lys_bilder
      - light.vindu
-  - service: media_player.volume_set
-    data:
-      entity_id: media_player.bad
-      volume_level: 0.5
-  - delay: '00:00:03'
-  - service: news.read_news
-    data:
-      message_type: "2"
-      entity_id: media_player.bad
   - service: homeassistant.turn_off
     entity_id:
      - light.lys_bokhylle
@@ -129,14 +128,13 @@ sove_lyd:
       data:
         entity_id: media_player.soverom
         media_content_type: audio/mp3
-        media_content_id: "http://192.168.1.140:8123/local/sleep.mp3"
+        media_content_id: "https://server1.dahoiv.net:8123/local/sleep.mp3"
 
 news_soverom:
   alias: "Nyheter"
   sequence:
     - service: media_player.volume_set
       data:
-        message_type: "1"
         entity_id: media_player.soverom
         volume_level: 0.3
     - service: news.read_news
@@ -163,3 +161,21 @@ brightness_soverom_temp:
   - delay: '00:00:01'
   - service: script.turn_on
     entity_id: script.brightness_soverom
+
+
+borte_soverom:
+  sequence:
+  - service: script.turn_off
+    entity_id: script.leggetid_soverom
+  - service: script.turn_off
+    entity_id: script.leggetid_soverom_temp
+  - service: script.turn_off
+    entity_id: script.vekke_lys
+  - service: script.turn_off
+    entity_id: script.vekke_lyd
+  - service: homeassistant.turn_off
+    entity_id: light.soverom
+  - service: homeassistant.turn_off
+    entity_id: light.vekke_lyd
+  - service: homeassistant.turn_off
+    entity_id: media_player.soverom

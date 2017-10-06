@@ -10,7 +10,7 @@
       to: 'home'
     - platform: state
       entity_id: script.timed_movement
-      state: 'on'
+      to: 'on'
   condition:
     - condition: or
       conditions:
@@ -69,7 +69,7 @@
   trigger:
     - platform: state
       entity_id: script.timed_movement
-      state: 'on'
+      to: 'on'
   condition:
     - condition: numeric_state
       entity_id: sun.sun
@@ -154,7 +154,7 @@
 - alias: "lys bokhylle og bilder av"
   trigger:
     platform: time
-    after: '23:03:00'
+    at: '23:03:00'
   action:
       service: homeassistant.turn_off
       entity_id: 
@@ -244,6 +244,9 @@
    - platform: event
      event_type: button_pressed
      event_data: {'state': 'on', 'entity_id': 'switch.door'}
+   - platform: state
+     entity_id: binary_sensor.door
+     to: 'on'
   condition:
    - condition: state
      entity_id: script.stovsuger_running
@@ -268,7 +271,7 @@
      event_data: {'state': 'on', 'entity_id': 'switch.door'}
    - platform: state
      entity_id: binary_sensor.door
-     state: 'on'
+     to: 'on'
   condition:
    - condition: template
      value_template: '{% if states.automation.lys_yttergang.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.lys_yttergang.attributes.last_triggered)) > 2 }}  {% else %}  true {% endif %}'
@@ -296,10 +299,10 @@
   trigger:
     - platform: state
       entity_id: light.Lys_stue
-      state: 'off'
+      to: 'off'
     - platform: state
       entity_id: light.Lys_TV
-      state: 'off'
+      to: 'off'
   action:
     - service: homeassistant.turn_off
       entity_id: script.light_turned_off_5min

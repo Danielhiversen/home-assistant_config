@@ -4,7 +4,7 @@ away_48:
         hours: 47
 alert:
   sequence:
-   - delay: 00:02:00
+   - delay: 00:03:00
    - condition: and
      conditions:
       - condition: state
@@ -48,21 +48,20 @@ borte:
     - service: homeassistant.turn_on
       entity_id: script.all_devices_off
     - service: homeassistant.turn_on
-      entity_id: media_player.stue
+      entity_id: media_player.stue_kjokken
     - service: media_player.volume_set
       data:
-        entity_id: media_player.stue
-        volume_level: 0.5
-    - delay: '00:00:06'
+        entity_id: media_player.stue_kjokken
+        volume_level: 0.3
     - service: tts.google_say
-      entity_id: media_player.stue
+      entity_id: media_player.stue_kjokken
       data:
-        message: ' . . . .                 Ha det bra.'
+        message: 'Ha det bra.'
         cache: true
 
 stovsuger_running:
   sequence:
-   - delay: 00:01:00
+   - delay: 00:01:15
    
 light_notify:
   alias: "Light notify"

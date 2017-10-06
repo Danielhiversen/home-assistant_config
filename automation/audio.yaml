@@ -7,12 +7,6 @@
      from: 'not_home'
      to: 'home'
   action:
-    - service: media_player.turn_on
-      entity_id: media_player.stue
-    - service: media_player.volume_set
-      data:
-        entity_id: media_player.stue
-        volume_level: 0.65
     - service: homeassistant.turn_on
       entity_id: automation.nyheter_hjemkomst_start
 
@@ -21,19 +15,27 @@
   trigger:
     - platform: state
       entity_id: binary_sensor.door, binary_sensor.door_do, binary_sensor.door_soverom, binary_sensor.movement1,  binary_sensor.movement2, binary_sensor.movement3, binary_sensor.movement_do
-      state: 'on'
+      to: 'on'
   action:
     - service: homeassistant.turn_off
       data: 
         entity_id: automation.nyheter_hjemkomst_start
     - condition: and
       conditions:
+      - condition: time
+        after: '07:00:00'
+        before: '22:00:00'
       - condition: template
         value_template: '{% if states.automation.nyheter_hjemkomst_start.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.nyheter_hjemkomst_start.attributes.last_triggered)) > 3600*4 }}  {% else %}  true {% endif %}'
       - condition: template
         value_template: '{% if states.automation.nyheter_hjemkomst.attributes.last_triggered  %} {{(as_timestamp(now())-as_timestamp(states.automation.nyheter_hjemkomst.attributes.last_triggered)) < 900 }}  {% else %}  false {% endif %}'
-
-    - delay: '00:00:15'
+    - service: media_player.turn_on
+      entity_id: media_player.stue
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.stue
+        volume_level: 0.5
+    - delay: '00:00:05'
     - service: news.read_news
       data:
         message_type: "0"
@@ -52,7 +54,7 @@
   trigger:
    - platform: state
      entity_id: input_select.radio_stue
-     state: 'Av'
+     to: 'Av'
   action:
    - service: media_player.turn_off
      entity_id: media_player.stue
@@ -64,7 +66,7 @@
     entity_id: input_select.radio_stue
   action:
    - service: media_player.play_media
-     entity_id: media_player.stue
+     entity_id: media_player.stue_kjokken
      data_template:
        media_content_id: >-
            {% if is_state('input_select.radio_stue', 'Alltid Nyheter') %}
@@ -73,6 +75,8 @@
                http://lyd.nrk.no/nrk_radio_p1_trondelag_mp3_h
            {% elif is_state('input_select.radio_stue', 'P3') %}
                http://nrk-mms-live.online.no/nrk_radio_p3_mp3_h
+           {% elif is_state('input_select.radio_stue', 'P2') %}
+               http://nrk-mms-live.online.no/nrk_radio_p2_mp3_h
            {% endif %}
        media_content_type: audio/mp3
 
@@ -80,8 +84,8 @@
   initial_state: False
   trigger:
    - platform: state
-     entity_id: media_player.stue
-     state: 'idle'
+     entity_id: media_player.stue_kjokken
+     to: 'idle'
      for:
        seconds: 3
   action:
@@ -104,7 +108,7 @@
   condition:
     - condition: template
       value_template: >
-        {% if is_state('media_player.stue', 'playing') %}
+        {% if is_state('media_player.stue', 'playing') or is_state('media_player.stue_kjokken', 'playing') %}
           false
         {% else %}
           true
@@ -113,10 +117,10 @@
     - service: homeassistant.turn_off
       entity_id: switch.google_music
     - service: media_player.turn_on
-      entity_id: media_player.stue
+      entity_id: media_player.stue_kjokken
     - service: media_player.volume_set
       data:
-        entity_id: media_player.stue
+        entity_id: media_player.stue_kjokken
         volume_level: 0.23
     - service: input_select.select_option
       entity_id: input_select.radio_stue
@@ -135,7 +139,7 @@
   condition:
     - condition: template
       value_template: >
-        {% if is_state('media_player.stue', 'playing') %}
+        {% if is_state('media_player.stue', 'playing') or is_state('media_player.stue_kjokken', 'playing') %}
           true
         {% else %}
           false
@@ -156,7 +160,7 @@
   condition:
     - condition: template
       value_template: >
-        {% if is_state('media_player.stue', 'playing') %}
+        {% if is_state('media_player.stue', 'playing') or is_state('media_player.stue_kjokken', 'playing') %}
           false
         {% else %}
           true
@@ -166,10 +170,10 @@
       entity_id: media_player.stue
     - service: media_player.volume_set
       data:
-        entity_id: media_player.stue
+        entity_id: media_player.stue_kjokken
         volume_level: 0.23
     - service: news.read_news
-      entity_id: media_player.stue
+      entity_id: media_player.stue_kjokken
     - service: homeassistant.turn_on
       entity_id: automation.auto_radio_stue
 
@@ -181,16 +185,20 @@
        entity_id: binary_sensor.cube_158d0001118a8a
        action_type: shake_air
   condition:
-   - condition: state
-     entity_id: media_player.stue
-     state: 'playing'
+    - condition: template
+      value_template: >
+        {% if is_state('media_player.stue', 'playing') or is_state('media_player.stue_kjokken', 'playing') %}
+          true
+        {% else %}
+          false
+        {% endif %}
   action:
     - service: homeassistant.turn_off
       entity_id: switch.google_music
     - service: homeassistant.turn_off
       entity_id: automation.auto_radio_stue
     - service: media_player.turn_off
-      entity_id: media_player.stue
+      entity_id: media_player.stue_kjokken
 
 - alias: "Cube i fritt fall, stue"
   trigger:
@@ -204,10 +212,10 @@
     entity_id: media_player.stue
   - service: media_player.volume_set
     data:
-      entity_id: media_player.stue
+      entity_id: media_player.stue_kjokken
       volume_level: 0.23
   - service: tts.google_say
-    entity_id: media_player.stue
+    entity_id: media_player.stue_kjokken
     data_template:
       message: 'Au, au. Vær litt forsiktig da.'
       cache: true
@@ -222,42 +230,15 @@
   action:
     - service: media_player.volume_set
       data_template:
-        entity_id: media_player.stue
+        entity_id: media_player.stue_kjokken
         volume_level: >
-                      {% set state = states.media_player.stue.attributes.volume_level + (trigger.event.data.action_value|float)/90 -%}
+                      {% set state = states.media_player.stue_kjokken.attributes.volume_level + (trigger.event.data.action_value|float)/90 -%}
                       {%-  if state > 1 -%}
                          {%- set state  = 1 -%}
                       {%-  elif state < 0 -%}
                          {%- set state  = 0 -%}
                       {%- endif %}
                       {{ state }}
-
-- alias: "Start media stue"
-  trigger:
-   - platform: state
-     entity_id: binary_sensor.state_mediaplayer_stue
-     state: 'on'
-   - platform: state
-     entity_id: media_player.stue
-     from: "off"
-     to : "idle"
-  action:
-   - service: homeassistant.turn_off
-     entity_id: automation.start_media_stue
-   - service: homeassistant.turn_on
-     entity_id: switch.lydplanke
-    # retry if failed
-
-- alias: "Stop media stue"
-  trigger:
-   - platform: state
-     entity_id: binary_sensor.state_mediaplayer_stue
-     state: 'off'
-     for:
-       minutes: 16
-  action:
-   - service: homeassistant.turn_on
-     entity_id: automation.start_media_stue
 
 - alias: "Gmusic stue"
   trigger:
@@ -289,7 +270,7 @@
   trigger:
    - platform: state
      entity_id: input_select.radio_bad
-     state: 'Av'
+     to: 'Av'
   action:
    - service: media_player.turn_off
      entity_id: media_player.bad
@@ -310,6 +291,8 @@
                http://lyd.nrk.no/nrk_radio_p1_trondelag_mp3_h
            {% elif is_state('input_select.radio_bad', 'P3') %}
                http://nrk-mms-live.online.no/nrk_radio_p3_mp3_h
+           {% elif is_state('input_select.radio_bad', 'P2') %}
+               http://nrk-mms-live.online.no/nrk_radio_p2_mp3_h
            {% endif %}
        media_content_type: audio/mp3
 
@@ -318,7 +301,7 @@
   trigger:
    - platform: state
      entity_id: media_player.bad
-     state: 'idle'
+     to: 'idle'
      for:
        seconds: 3
   action:
@@ -497,7 +480,7 @@
   trigger:
    - platform: state
      entity_id: input_select.radio_soverom
-     state: 'Av'
+     to: 'Av'
   action:
    - service: media_player.turn_off
      entity_id: media_player.soverom
@@ -518,6 +501,8 @@
                http://lyd.nrk.no/nrk_radio_p1_trondelag_mp3_h
            {% elif is_state('input_select.radio_soverom', 'P3') %}
                http://nrk-mms-live.online.no/nrk_radio_p3_mp3_h
+           {% elif is_state('input_select.radio_bad', 'P2') %}
+               http://nrk-mms-live.online.no/nrk_radio_p2_mp3_h
            {% endif %}
        media_content_type: audio/mp3
 
@@ -575,7 +560,7 @@
   trigger:
    - platform: state
      entity_id: input_select.radio
-     state: 'Av'
+     to: 'Av'
   action:
    - service: media_player.turn_off
      entity_id: media_player.hele_huset
@@ -596,6 +581,8 @@
                http://lyd.nrk.no/nrk_radio_p1_trondelag_mp3_h
            {% elif is_state('input_select.radio', 'P3') %}
                http://nrk-mms-live.online.no/nrk_radio_p3_mp3_h
+           {% elif is_state('input_select.radio_bad', 'P2') %}
+               http://nrk-mms-live.online.no/nrk_radio_p2_mp3_h
            {% endif %}
        media_content_type: audio/mp3
    - service: media_player.volume_set

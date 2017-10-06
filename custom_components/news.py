@@ -1,6 +1,9 @@
 """
 """
 import asyncio
+import async_timeout
+import aiohttp
+
 import logging
 import time
 import feedparser
@@ -13,11 +16,11 @@ import requests
 import xmltodict
 from datetime import timedelta
 
-from homeassistant.const import ATTR_ENTITY_ID
+from homeassistant.const import ATTR_ENTITY_ID, EVENT_HOMEASSISTANT_START
 from homeassistant.util import dt as dt_util
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import track_state_change, track_time_change
-from homeassistant.helpers.event import track_point_in_utc_time
+from homeassistant.helpers.event import track_point_in_utc_time, async_track_point_in_utc_time
 from homeassistant.components.sensor.rest import RestData
 
 
@@ -115,7 +118,7 @@ def setup(hass, config):
         temp = hass.states.get('sensor.ute_veranda_temperature')
         if temp and temp.state != "unknown":
             news = news + "og temperaturen er nå " + num2str(temp.state) + " grader ute. "
-        if nowcast_precipitation > 0:
+        if nowcast_precipitation and nowcast_precipitation > 0:
             news = news + "Den neste timen er det ventet " + num2str(nowcast_precipitation) + " mm nedbør. "
 
         if message_type == 2:
@@ -126,7 +129,7 @@ def setup(hass, config):
                 alarm_time_min = int(time_to_alarm - alarm_time_hour*60)
                 news = news + "Vekkerklokken ringer om " + str(alarm_time_hour) + " timer og " + str(alarm_time_min) + " minutter."
 
-        if message_type in [1, 2]:
+        if message_type in [0, 1, 2]:
             return news
 
         news = news + "Her kommer siste nytt:  "
@@ -190,24 +193,27 @@ def setup(hass, config):
             return
         news_rss.append("Værvarsel " + strip_tags(summary).replace("<strong>","").replace("</strong>",""))
 
-    def _yr_precipitation(now=None):
+    @asyncio.coroutine
+    def _yr_precipitation(*_):
         url = "http://api.met.no/weatherapi/nowcast/0.9/"
         urlparams = {'lat': str(hass.config.latitude),
                     'lon': str(hass.config.longitude)}
 
-        if not now:
-            now = dt_util.utcnow()
+        #print(url, urlparams)
+        now = dt_util.utcnow()
 
         try:
-            with requests.Session() as sess:
-                response = sess.get(url, params=urlparams)
-        except requests.RequestException:
-            track_point_in_utc_time(hass, _yr_precipitation, now + timedelta(minutes=2))
+            websession = async_get_clientsession(hass)
+            with async_timeout.timeout(10, loop=hass.loop):
+                resp = yield from websession.get(url, params=urlparams)
+            if resp.status != 200:
+                async_track_point_in_utc_time(hass, _yr_precipitation, now + timedelta(minutes=2))
+                return
+            text = yield from resp.text()
+
+        except (asyncio.TimeoutError, aiohttp.ClientError) as err:
+            async_track_point_in_utc_time(hass, _yr_precipitation, now + timedelta(minutes=2))
             return
-        if response.status_code != 200:
-            track_point_in_utc_time(hass, _yr_precipitation, now + timedelta(minutes=2))
-            return
-        text = response.text
 
         nonlocal nowcast_precipitation
         nonlocal yr_precipitation
@@ -218,6 +224,7 @@ def setup(hass, config):
             if '@nextrun' not in model:
                 model = model[0]
             nextrun = dt_util.parse_datetime(model['@nextrun'])
+            #print(nextrun, model['@nextrun'])
             nextrun = nextrun if (nextrun > now) else now + timedelta(minutes=2)
             for time_entry in data['product']['time']:
                 loc_data = time_entry['location']
@@ -235,9 +242,12 @@ def setup(hass, config):
                     del yr_precipitation[time]
 
         except (ExpatError, IndexError) as err:
-            track_point_in_utc_time(hass, _yr_precipitation, now + timedelta(minutes=2))       
+            async_track_point_in_utc_time(hass, _yr_precipitation, now + timedelta(minutes=2))       
             return
-        track_point_in_utc_time(hass, _yr_precipitation, nextrun + timedelta(seconds=2))
+        #print(data['product']['time'], nextrun)
+       # print(nowcast_precipitation)
+        #print(yr_precipitation)
+        async_track_point_in_utc_time(hass, _yr_precipitation, nextrun + timedelta(seconds=2))
 
     def _workout_text(now=None):
         nonlocal workout_text
@@ -258,13 +268,13 @@ def setup(hass, config):
 
     _rss_news()
     _workout_text()
-    _yr_precipitation()
-    track_time_change(hass, _yr_precipitation, minute=[31], second=0)
+    hass.bus.listen_once(EVENT_HOMEASSISTANT_START, _yr_precipitation)
+    # track_time_change(hass, _yr_precipitation, minute=[31], second=0)
     track_time_change(hass, _rss_news, minute=[10, 26, 41, 56], second=0)
     track_time_change(hass, _workout_text, minute=[11, 26, 41, 56], second=0)
 
     hass.services.register(DOMAIN, "read_news", _read_news)
-    print(_get_text())
+    #print(_get_text())
     workout_text = None
 
     return True

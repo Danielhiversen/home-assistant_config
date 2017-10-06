@@ -1,59 +1,61 @@
+- platform: aurora
+  
 - platform: template 
   sensors:
     movement1:
       value_template: "{{ states.switch.movement1.state == 'on' }}" 
-      sensor_class: motion
+      device_class: motion
       entity_id: switch.movement1
       friendly_name: "Bevegelse yttergang"
     movement2:
       value_template: "{{ states.switch.movement2.state == 'on' }}" 
-      sensor_class: motion
+      device_class: motion
       entity_id: switch.movement2
       friendly_name: "Bevegelse stue"
     movement_stue:
       value_template: "{{ states.input_boolean.movement_stue.state == 'on' }}" 
-      sensor_class: motion
+      device_class: motion
       entity_id: input_boolean.movement_stue
       friendly_name: "Bevegelse stue 2"
     movement_do:
       value_template: "{{ states.switch.movement_do.state == 'on' }}" 
-      sensor_class: motion
+      device_class: motion
       entity_id: switch.movement_do
       friendly_name: "Bevegelse do"
     movement_soverom:
       value_template: "{{ states.input_boolean.movement_soverom.state == 'on' }}" 
-      sensor_class: motion
+      device_class: motion
       entity_id: input_boolean.movement_soverom
       friendly_name: "Bevegelse soverom"
     movement_kjokken:
       value_template: "{{ states.input_boolean.movement_kjokken.state == 'on' }}" 
-      sensor_class: motion
+      device_class: motion
       entity_id: input_boolean.movement_kjokken
       friendly_name: "Bevegelse kjøkken"
     movement3:
       value_template: "{{ states.input_boolean.movement3.state == 'on' }}" 
-      sensor_class: motion
+      device_class: motion
       entity_id: input_boolean.movement3
       friendly_name: "Bevegelse gang"
     door:
       value_template: "{{ states.input_boolean.door.state == 'on' }}" 
-      sensor_class: opening
+      device_class: opening
       entity_id: input_boolean.door
       friendly_name: "Ytterdør"
     door_soverom:
       value_template: "{{ states.input_boolean.door_soverom.state == 'on' }}" 
-      sensor_class: opening
+      device_class: opening
       entity_id: input_boolean.door_soverom
       friendly_name: "Soveromsdør"
     door_bad:
       value_template: "{{ states.input_boolean.door_bad.state == 'on' }}" 
-      sensor_class: opening
+      device_class: opening
       entity_id: input_boolean.door_bad
       friendly_name: "Baderomsdør"
     door_do:
       value_template: "{{ states.input_boolean.door_do.state == 'on' }}" 
       entity_id: input_boolean.door_do
-      sensor_class: opening
+      device_class: opening
       friendly_name: "Dodør"
     hot_kjoleskap:
       friendly_name: hot_kjoleskap
@@ -62,14 +64,14 @@
     stue_lux:
       value_template: "{{ states.switch.lux.state == 'off' }}" 
       entity_id: switch.lux
-      sensor_class: light
+      device_class: light
       friendly_name: "Lux"
     stovsuger:
       friendly_name: Støvsuging
       value_template: "{{ states.script.stovsuger_running.state == 'on' or (as_timestamp(now()) - as_timestamp(states.script.stovsuger_running.last_updated) < 2)  }}"
       entity_id: 
          - sensor.time
-      sensor_class: moving
+      device_class: moving
     state_mediaplayer_stue:
       value_template:  >
           {% if is_state('media_player.stue', 'playing') %}

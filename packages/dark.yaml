@@ -3,7 +3,7 @@ binary_sensor:
     sensors:
       dark:
         value_template: "{{ states.input_boolean.dark.state == 'off' }}" 
-        sensor_class: light
+        device_class: light
         entity_id: input_boolean.dark
         friendly_name: "Dark"
 
@@ -54,8 +54,8 @@ automation:
 
   - alias: "HA started dark"
     trigger:
-    - platform: event
-      event_type: homeassistant_start
+      platform: homeassistant
+      event: start
     condition:
     - condition: numeric_state
       entity_id: sun.sun
