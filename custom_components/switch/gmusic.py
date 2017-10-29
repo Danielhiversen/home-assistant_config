@@ -7,7 +7,6 @@ import random
 import pickle
 import os.path
 from datetime import timedelta
-from gmusicapi import Mobileclient
 
 from homeassistant.const import ATTR_ENTITY_ID, SERVICE_TURN_OFF, EVENT_HOMEASSISTANT_START
 from homeassistant.util import dt as dt_util
@@ -23,7 +22,7 @@ from homeassistant.config import get_default_config_dir
 
 import homeassistant.components.input_select as input_select
 
-
+REQUIREMENTS = ['gmusicapi==10.1.2']
 # The domain of your component. Should be equal to the name of your component.
 DOMAIN = "gmusic"
 
@@ -37,33 +36,34 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     add_devices([GmusicComponent(hass, config)])
     return True
 
-# https://github.com/simon-weber/gmusicapi/issues/424
-class GMusic(Mobileclient):
-    def login(self, username, password, device_id, authtoken=None):
-        if authtoken:
-            self.android_id               = device_id
-            self.session._authtoken       = authtoken
-            self.session.is_authenticated = True
-
-            try:
-                # Send a test request to ensure our authtoken is still valide and working
-                self.get_registered_devices()
-                return True
-            except:
-                # Faild with the test-request so we set "is_authenticated=False"
-                # and go through the login-process again to get a new "authtoken"
-                self.session.is_authenticated = False
-
-        if device_id:
-            if super(GMusic, self).login(username, password, device_id):
-                return True
-
-        # Prevent further execution in case we failed with the login-process
-        raise SystemExit
-
-    
 class GmusicComponent(SwitchDevice):
+
     def __init__(self, hass, config):
+
+        from gmusicapi import Mobileclient
+        # https://github.com/simon-weber/gmusicapi/issues/424
+        class GMusic(Mobileclient):
+            def login(self, username, password, device_id, authtoken=None):
+                if authtoken:
+                    self.android_id               = device_id
+                    self.session._authtoken       = authtoken
+                    self.session.is_authenticated = True
+
+                    try:
+                        # Send a test request to ensure our authtoken is still valide and working
+                        self.get_registered_devices()
+                        return True
+                    except:
+                        # Faild with the test-request so we set "is_authenticated=False"
+                        # and go through the login-process again to get a new "authtoken"
+                        self.session.is_authenticated = False
+
+                if device_id:
+                    if super(GMusic, self).login(username, password, device_id):
+                        return True
+
+                # Prevent further execution in case we failed with the login-process
+                raise SystemExit
 
         self.hass = hass
         authtoken_path = get_default_config_dir() + "gmusic_authtoken"
