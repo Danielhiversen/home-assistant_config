@@ -1,0 +1,79 @@
+
+- alias: "Lade telefonen"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.phone_battery
+      below: 7
+  condition:
+    - condition: time
+      after: '07:00:00'
+      before: '23:00:00'
+    - condition: state
+      entity_id: device_tracker.daniel
+      state: 'home'
+  action:
+    - service: media_player.turn_on
+      entity_id: media_player.stue
+    - service: media_player.volume_set
+      data:
+        entity_id: media_player.stue
+        volume_level: 0.5
+    - service: tts.google_say
+      entity_id: media_player.stue
+      data_template:
+        message: 'Husk å lade telefonen Daniel, da batterienivået er {{states.sensor.phone_battery.state | float | round(0)}} prosent.'
+        cache: false
+
+
+- alias: "Stopp lading av telefonen"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.phone_battery
+      above: 85
+  condition:
+    - condition: time
+      after: '07:00:00'
+      before: '23:00:00'
+  action:
+    - service: notify.pushbullet
+      data:
+        title: "Batteriet er fult"
+        message: 'Husk å koble fra mobiladeren, da batterienivået er {{states.sensor.phone_battery.state | float | round(0)}} prosent.'
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: device_tracker.daniel
+        state: 'home'
+   # - service: media_player.turn_on
+   #   entity_id: media_player.stue
+   # - service: media_player.volume_set
+   #   data:
+   #     entity_id: media_player.stue
+   #     volume_level: 0.5
+   # - service: tts.google_say
+   #   entity_id: media_player.stue
+   #   data_template:
+   #     message: 'Husk å koble fra mobiladeren, da batterienivået er {{states.sensor.phone_battery.state | float | round(0)}} prosent.'
+   #     cache: false
+   
+- alias: 'Dim lights when playing Netflix in Living Room'
+  trigger:
+    platform: state
+    entity_id: media_player.tv
+    to: 'playing'
+  condition:  
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: light.stue
+      state: 'on'
+    - condition: sun
+      after: sunset
+      after_offset: "-0:20:00"
+    - condition: template
+      value_template: '{{  states.media_player.tv.attributes.app_name == "Netflix"  }}' 
+  action:
+    - service: homeassistant.turn_on
+      entity_id: light.stue
+      data:
+        brightness: 101
