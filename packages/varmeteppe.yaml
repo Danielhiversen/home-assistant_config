@@ -1,0 +1,63 @@
+automation:
+  - alias: 'Turn on varmeteppe'
+    initial_state: False
+    trigger:
+     - platform: time
+       minutes: '/5'
+       seconds: 2
+    condition:
+      condition: and
+      conditions:
+       - condition: template
+         value_template: '{{ now().hour == (states.input_number.alarmhour_varmeteppe.state  | round(0))  and  now().minute == (states.input_number.alarmminutes_varmeteppe.state  | round(0) )  }}'
+       - condition: template
+         value_template: '{{ states("device_tracker.tine") == "home" or states("device_tracker.daniel") == "home"  or (now()- states.device_tracker.tine.last_changed).seconds < 3600 or  (now()- states.device_tracker.daniel.last_changed).seconds < 3600 }}'
+    action:
+     # - service: homeassistant.turn_off
+     #   entity_id: automation.turn_on_varmeteppe
+      - service: homeassistant.turn_on
+        entity_id: switch.varmeteppe
+      - delay: '01:30'
+      - service: homeassistant.turn_off
+        entity_id: switch.varmeteppe
+      - delay: '00:01'
+      - service: homeassistant.turn_off
+        entity_id: switch.varmeteppe
+      - delay: '00:02'
+      - service: homeassistant.turn_off
+        entity_id: switch.varmeteppe
+
+  - alias: "varmeteppe enabled"
+    trigger:
+      platform: state
+      entity_id: input_number.alarmhour_varmeteppe, input_number.alarmminutes_varmeteppe
+    action:
+    - service: homeassistant.turn_on
+      data: 
+        entity_id:
+         - automation.turn_on_varmeteppe
+
+
+input_number:
+  alarmhour_varmeteppe:
+    name: Hour
+    icon: mdi:timer
+    min: 20
+    max: 23
+    step: 1
+  alarmminutes_varmeteppe:
+    name: Minutes
+    icon: mdi:timer
+    min: 0
+    max: 55
+    step: 5
+
+sensor:
+  - platform: template
+    sensors:
+      alarm_time_varmeteppe:
+        friendly_name: 'Varmeteppe'
+        value_template: '{% if states.input_number.alarmhour_varmeteppe.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_number.alarmhour_varmeteppe.state|round(0)|string }}:{% if states.input_number.alarmminutes_varmeteppe.state|round(0)|string|length == 1 %}0{% endif %}{{ states.input_number.alarmminutes_varmeteppe.state|round(0)|string }}'
+        entity_id: 
+         - input_number.alarmminutes_varmeteppe
+         - input_number.alarmhour_varmeteppe

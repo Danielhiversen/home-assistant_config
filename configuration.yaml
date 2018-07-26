@@ -2,7 +2,7 @@ homeassistant:
   # Location required to calculate the time the sun rises and sets
   latitude: !secret latitude
   longitude: !secret longitude
-  elevation: 103
+  elevation: 47
   unit_system: metric
   # Pick yours from here:
   # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
@@ -14,30 +14,30 @@ homeassistant:
 
 frontend:
 
+updater:
+  include_used_components: true
+
 config:
 
-http: 
+http:
  api_password: !secret http_password
   # Set to 1 to enable development mode
   # development: 1
  #sessions_enabled: 0
  trusted_networks:
-   - 127.0.0.1
+#   - 127.0.0.1
+   - 192.168.80.0/24
    - 192.168.1.0/24
  ip_ban_enabled: True
- login_attempts_threshold: 50
- ssl_certificate: !secret ssl_certificate
- ssl_key: !secret ssl_key
- base_url: !secret base_url
+ login_attempts_threshold: 5
+# ssl_certificate: !secret ssl_certificate
+# ssl_key: !secret ssl_key
+# base_url: !secret base_url
 
 recorder:
-  purge_interval: 2
-  purge_keep_days: 2
+  purge_interval: 10
+  purge_keep_days: 10
   db_url: !secret db_url
-
-#restore_states:
-
-alarm:
 
 logbook:
 
@@ -46,42 +46,35 @@ logger:
   logs:
     homeassistant.components.switch.broadlink: info
     homeassistant.components.automation: info
-    homeassistant.components.script: info
-#    homeassistant.components.device_tracker: info
+    homeassistant.components.mqtt: debug
+    homeassistant.components.light.hue: debug
+    homeassistant.components.hue: debug
+    custom_components.effect_control: debug
+    homeassistant.components.switch.xiaomi_aqara: debug
+#    homeassistant.components.device_tracker: debug
 #    homeassistant.components.http: info
-    homeassistant.components.rfxtrx: info
+ #   homeassistant.components.rfxtrx: debug
 #    homeassistant.components.sensor.miflora: debug
-    homeassistant.components.xiaomi: debug
-    homeassistant.components.sensor.xiaomi: debug
-    homeassistant.components.switch.xiaomi: debug
-    homeassistant.components.binary_sensor: debug
-#    custom_components.light.xiaomi: debug
-#    miflora.miflora_poller: debug
-#    homeassistant.components.sensor.miflora: debug
-#    homeassistant.core: info
+    pyTibber: debug
 
-
-history: 
+history:
   exclude:
     entities:
       - sensor.no_updates
     domains:
       - proximity
 
-#updater:
-
 sun:
 
-script: !include_dir_merge_named scripts
+
+script: !include_dir_merge_named scripts/
 #script: !include scripts.yaml
 
-automation: !include_dir_merge_list automation
+automation: !include_dir_merge_list automation/
 
-scene: !include scenes.yaml
+#scene: !include scenes.yaml
 
-light: !include lights.yaml
-
-input_number: !include input_number.yaml
+#light: !include lights.yaml
 
 binary_sensor: !include binary_sensor.yaml
 
@@ -91,14 +84,19 @@ switch: !include switches.yaml
 
 group: !include group.yaml
 
+zone: !include zone.yaml
+
 input_select: !include input_select.yaml
 
-input_boolean: !include input_boolean.yaml
+#input_boolean: !include input_boolean.yaml
 
 # update_ip:
 
+effect_control:
+
+
 proximity:
-  home: 
+  home:
     devices:
       - device_tracker.daniel
     tolerance: 50
@@ -112,29 +110,27 @@ notify:
 
 device_tracker:
 - platform: nmap_tracker
-  hosts: 192.168.1.1-255
-  track_new_devices: no
-  consider_home: 1800
+  hosts:
+   - 192.168.80.151
+   - 192.168.80.161
+#  track_new_devices: yes
+  consider_home: 600
   interval_seconds: 60
   home_interval: 5
   scan_options: " --privileged -sP "
-  # sudo setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap 
+  # sudo setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap
 
 - platform: gpslogger
-  # http://:8123/api/gpslogger?api_password=XXX&latitude=%LAT&longitude=%LON&battery=%BATT&device=daniel&accuracy=%ACC
+  # http://:8123/api/gpslogger?api_password=XXX&latitude=%LAT&longitude=%LON&device=daniel&accuracy=%ACC&battery=%BATT&speed=%SPD&direction=%DIR&altitude=%ALT&provider=%PROV&activity=%ACT
 
-#- platform: luci
-#  host: 192.168.1.1
-#  username: root
-#  password: 
-#  track_new_devices: no
-#  consider_home: 900
-#  interval_seconds: 10
+hue:
+  bridges:
+    - host: 192.168.80.105
 
-#- platform: bluetooth_tracker
-
-media_player:
-- platform: cast
+cast:
+  media_player:
+  - host: 192.168.80.158
+  - host: 192.168.80.13
 
 #- platform: vlc
 #  arguments: 'front:CARD=SB,DEV=0'
@@ -146,30 +142,8 @@ rfxtrx:
   dummy: False
 
 climate:
-- platform: generic_thermostat
-  name :  Termostat stue
-  heater :  switch.ovn_stue
-  target_sensor : sensor.mean_stue_temp
-  target_temp : 16
-  min_temp : 10
-  max_temp : 25
-  tolerance: 0.1
-
-- platform: generic_thermostat
-  name :  Soverom
-  heater :  switch.ovn_soverom
-  target_sensor : sensor.mean_soverom_temp
-  target_temp : 12
-  min_temp : 7
-  max_temp : 25
-  tolerance: 0.1
-
-#-  platform: generic_thermostat
-# name :  Slow cooker
-# heater :  switch.Slow_cooker
-# target_sensor : sensor.temperature_rubicson_61951
-# max_temp : 100
-
+  - platform: sensibo
+    api_key: !secret sensibo_key
 
 tts:
   - platform: google
@@ -177,33 +151,24 @@ tts:
 
 resume_mp 1:
  media_player: stue
-resume_mp 2:
- media_player: bad
 resume_mp 3:
  media_player: soverom
 
-news:
- token: !secret endomondo
+#news:
+# strava_token: !secret strava_token
 
-#camera:
-#  - platform: ffmpeg
-#    name: Cam
-#    input: -rtsp_transport tcp -i rtsp://192.168.1.210/1
+find:
 
-#camera:
-#  - platform: generic
-#    still_image_url: http://raspberrypi:8082/index.html
+#xiaomi_aqara:
+# gateways:
+#   - mac:
+#     key: !secret xiaomi
 
-xiaomi_aqara:
- gateways:
-   - mac:
-     key: !secret xiaomi
-
-emulated_hue:
-  type: google_home
-  listen_port: 80
-  expose_by_default: false
-  host_ip: 192.168.1.140
+#emulated_hue:
+#  type: google_home
+#  listen_port: 80
+#  expose_by_default: false
+#  host_ip: 192.168.1.140
 
 zwave:
   usb_path: /dev/ttyACM0
@@ -213,9 +178,55 @@ ifttt:
   key: !secret ifttt_key
 
 mqtt:
+  # password: WryfINz4YZrR$rvCqkBhOzsZRh
 
 netatmo:
   api_key: !secret netatmo_api_key
   secret_key: !secret netatmo_secret_key
   username: !secret email
   password: !secret netatmo_password
+
+
+history_graph:
+  gr1:
+    name: Stromforbruk_48
+    entities:
+      - sensor.electricity_price_hamretunet_10
+      - sensor.netatmo_indoor_temperature
+      - sensor.set_temp
+      - sensor.diff_cumulative_hourly_active_import_energy
+     # - sensor.total_effect
+      - sensor.filtered_total_effect
+    hours_to_show: 48
+    refresh: 60
+  gr2:
+    name: Stromforbruk_1
+    entities:
+      - sensor.total_effect
+      - sensor.varmtvann_temperature
+      - sensor.varmtvann_nede_temperature
+      - sensor.varmtvann_ut_temperature
+      - sensor.effekt_vaskemaskin
+      - sensor.aeotec_zw096_smart_switch_6_power
+    hours_to_show: 1
+    refresh: 60
+  gr3:
+    name: Stromforbruk_24
+    entities:
+      - sensor.electricity_price_hamretunet_10
+      - sensor.total_effect
+      - sensor.varmtvann_temperature
+      - sensor.varmtvann_nede_temperature
+      - sensor.varmtvann_ut_temperature
+      - sensor.effekt_vaskemaskin
+      - sensor.aeotec_zw096_smart_switch_6_power
+    hours_to_show: 24
+    refresh: 60
+
+tibber_prices:
+   access_token: !secret tibber
+
+camera:
+  - platform: local_file
+    name: "Prices"
+    file_path: /tmp/prices.png

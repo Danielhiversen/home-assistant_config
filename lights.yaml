@@ -1,29 +1,29 @@
-- platform: rfxtrx
-  automatic_add: False
-  signal_repetitions: 2
-  devices:
-    0b11000e00e9e5660b010f70:
-      name: Lys_stue
-    0b11001000e9e5660c010f70:
-      name: Lys_TV
-    0b11000c00e6ce7603010f50:
-      name: lys_bokhylle
-    0b11000100e6ce7609010f70:
-      name: lys_bilder
-    0b11000466bc0cfe05010f70:
-      name: IKKE_I_BRUK
-    0b11000689bc0cfe05010f70:
-      name: Vindu
+#- platform: rfxtrx
+#  automatic_add: False
+#  signal_repetitions: 2
+#  devices:
+#    0b11000e00e9e5660b010f70:
+#      name: Lys_stue
+#    0b11001000e9e5660c010f70:
+#      name: Lys_TV
+#    0b11000c00e6ce7603010f50:
+#      name: lys_bokhylle
+#    0b11000100e6ce7609010f70:
+#      name: lys_bilder
+#    0b11000466bc0cfe05010f70:
+#      name: IKKE_I_BRUK
+#    0b11000689bc0cfe05010f70:
+#      name: Vindu
 
 - platform: hue
   host: 192.168.1.170
 
-- platform: flux_led
-  automatic_add: False
-  devices:
-    192.168.1.136:
-      name: Gang
-    192.168.1.164:
-      name: Yttergang
-    192.168.1.110:
-      name: Veranda
+#- platform: flux_led
+#  automatic_add: False
+#  devices:
+#    192.168.1.136:
+#      name: Gang
+#    192.168.1.164:
+#      name: Yttergang
+#    192.168.1.110:
+#      name: Veranda

@@ -15,6 +15,7 @@ automation:
         entity_id: script.vekke_lyd
       - service: homeassistant.turn_off
         entity_id: automation.wake_me_up
+
   - alias: "alarm enabled"
     trigger:
       platform: state
@@ -63,26 +64,32 @@ script:
         data:
           entity_id: media_player.soverom
           media_content_type: audio/mp3
-          media_content_id: "https://server1.dahoiv.net:8123/local/Wake_Up_fade_in.mp3"
-      - delay: 00:12:00
-      - service: homeassistant.turn_on
-        entity_id: script.news_soverom
+          media_content_id: "https://server1.dahoiv.net/local/Wake_Up_fade_in.mp3"
+      - delay: 00:08:00
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.soverom
+          volume_level: 0.5
+      - service: input_select.select_option
+        entity_id: input_select.radio_soverom
+        data:
+          option: "P3"
       - delay: 00:02:00
       - service: media_player.volume_set
         data:
           entity_id: media_player.soverom
-          volume_level: 0.6
-      - delay: 00:02:00
+          volume_level: 0.7
+      - delay: 00:08:00
       - service: media_player.volume_set
         data:
           entity_id: media_player.soverom
-          volume_level: 0.8
+          volume_level: 0.2
+      - service: media_player.turn_off
+        entity_id: media_player.soverom
+
 
   vekke_lys:
     sequence:
-    - service: homeassistant.turn_off
-      data: 
-        entity_id: input_boolean.alarmstatus
     - service: homeassistant.turn_on
       entity_id:
         - light.soverom1
@@ -109,57 +116,126 @@ script:
         xy_color: [0.675,0.322]
     - delay:
           minutes: 3
+
     - service: homeassistant.turn_on
       entity_id:
-        - light.soverom
+        - light.soverom1
+      data:
+        transition: 780
+        brightness: 120
+        xy_color: [0.5704, 0.3978]
+    - service: homeassistant.turn_on
+      entity_id:
+        - light.soverom2
       data:
         transition: 780
         brightness: 120
         xy_color: [0.5704, 0.3978]
     - delay:
           minutes: 12
+
     - service: homeassistant.turn_on
       entity_id:
-        - light.soverom
+        - light.soverom1
+      data:
+        transition: 100
+        brightness: 255
+        xy_color: [0.3138,0.3238]
+    - service: homeassistant.turn_on
+      entity_id:
+        - light.soverom2
       data:
         transition: 100
         brightness: 255
         xy_color: [0.3138,0.3238]
     - delay:
           minutes: 2
+
     - service: homeassistant.turn_on
       entity_id:
-        - light.soverom
+        - light.soverom1
+      data:
+        flash: long
+    - service: homeassistant.turn_on
+      entity_id:
+        - light.soverom2
       data:
         flash: long
     - delay:
           seconds: 1
+
     - service: homeassistant.turn_on
       entity_id:
-        - light.soverom
+        - light.soverom1
+      data:
+        effect: colorloop
+    - service: homeassistant.turn_on
+      entity_id:
+        - light.soverom2
       data:
         effect: colorloop
     - delay:
           minutes: 10
+
     - service: homeassistant.turn_off
       entity_id:
-        - light.soverom
+        - light.soverom1
+    - service: homeassistant.turn_off
+      entity_id:
+        - light.soverom2
     - delay:
           seconds: 1
+
     - service: homeassistant.turn_on
       entity_id:
-        - light.soverom
+        - light.soverom1
+      data:
+        flash: long
+    - service: homeassistant.turn_on
+      entity_id:
+        - light.soverom2
       data:
         flash: long
     - delay:
           seconds: 10
+
     - service: homeassistant.turn_on
       entity_id:
-        - light.soverom
+        - light.soverom1
+      data:
+        flash: long
+    - service: homeassistant.turn_on
+      entity_id:
+        - light.soverom2
       data:
         flash: long
     - delay:
           seconds: 10
+
     - service: homeassistant.turn_off
       entity_id:
-        - light.soverom
+        - light.soverom1
+    - service: homeassistant.turn_off
+      entity_id:
+        - light.soverom2
+
+  stop_alarm:
+    sequence:
+
+    - service: homeassistant.turn_off
+      entity_id: script.vekke_lyd
+
+    - service: homeassistant.turn_off
+      entity_id: script.vekke_lys
+      
+    - service: homeassistant.turn_off
+      entity_id: automation.wake_me_up
+      
+    - service: homeassistant.turn_off
+      entity_id:
+        - light.soverom1
+    - service: homeassistant.turn_off
+      entity_id:
+        - light.soverom2
+    - service: homeassistant.turn_off
+      entity_id: media_player.soverom

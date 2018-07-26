@@ -8,8 +8,6 @@ import logging
 import time
 import feedparser
 from html.parser import HTMLParser
-from endomondo import MobileApi
-# pip install git+https://github.com/Danielhiversen/sports-tracker-liberator
 from bs4 import BeautifulSoup
 from xml.parsers.expat import ExpatError
 import requests
@@ -60,14 +58,11 @@ def num2str(num):
 
 def setup(hass, config):
     """Setup component."""
-
     yr_precipitation = {}
     nowcast_precipitation = None
     news_rss = []
     workout_text = None
-    last_workout_time = None
-    auth_token=config[DOMAIN].get("token")
-    endomondo = MobileApi(auth_token=auth_token)
+    strava_token = config[DOMAIN].get("strava_token")
 
     def _get_text(message_type=None):
         news = ""
@@ -249,29 +244,42 @@ def setup(hass, config):
         #print(yr_precipitation)
         async_track_point_in_utc_time(hass, _yr_precipitation, nextrun + timedelta(seconds=2))
 
+#    @asyncio.coroutine
     def _workout_text(now=None):
+        url = " https://www.strava.com/api/v3/athlete/activities/?include_all_efforts=true"
+        headers = {'Authorization': 'Bearer ' + strava_token}
+        res = requests.post(url,headers=headers).json()
         nonlocal workout_text
-        nonlocal last_workout_time
-        last_workout = endomondo.get_workouts()[0]
+        last_workout = res[0]
+        last_workout_time = dt_util.as_local(dt_util.parse_datetime(last_workout.get('start_date_local')))
         if not now:
             now = dt_util.utcnow()
         now = dt_util.as_local(now)
 
-        if (now - dt_util.as_local(last_workout.start_time)).total_seconds() > 3600*24:
+        if (now - last_workout_time).total_seconds() > 3600*10:
             workout_text = None
             return
 
-        last_workout_time = last_workout.start_time
-        workout_text = "Bra jobbet Daniel! I dag har du trent i " + str(int(last_workout.duration/3600)) + " timer og "  + str(int((last_workout.duration - int(last_workout.duration/3600)*3600)/60)) + " minutter. Distanse " + num2str(last_workout.distance) + " kilometer. Du har forbrent " + num2str(last_workout.burgers_burned) + " burgere. \n"
-        if last_workout.live:
-            track_point_in_utc_time(hass, _workout_text, now + timedelta(seconds=30))
+
+        timer = (str(int(last_workout.get('elapsed_time')/3600)) + " timer og ") if int(last_workout.get('elapsed_time')/3600) > 0 else ''
+        workout_text = "Bra jobbet Daniel! I dag har du trent i " + timer + str(int((last_workout.get('elapsed_time') - int(last_workout.get('elapsed_time')/3600)*3600)/60)) + " minutter. "
+        workout_text += "Distanse " + num2str(last_workout.get('distance')/1000) + " kilometer. \n"
+
+        if last_workout.get('has_heartrate'):
+            workout_text += 'Høyeste puls var ' + num2str(last_workout.get('max_heartrate')) + '. \n'
+
+        if last_workout.get('kudos_count'):
+            workout_text += 'Du har fått ' + num2str(last_workout.get('kudos_count')) + ' kudos. \n'
+
 
     _rss_news()
     _workout_text()
+    print(workout_text)
+    return True
     hass.bus.listen_once(EVENT_HOMEASSISTANT_START, _yr_precipitation)
     # track_time_change(hass, _yr_precipitation, minute=[31], second=0)
     track_time_change(hass, _rss_news, minute=[10, 26, 41, 56], second=0)
-    track_time_change(hass, _workout_text, minute=[11, 26, 41, 56], second=0)
+    track_time_change(hass, _workout_text, minute=[11, 26, 41, 56], second=8)
 
     hass.services.register(DOMAIN, "read_news", _read_news)
     #print(_get_text())

@@ -1,0 +1,50 @@
+
+heating:
+  access_token: !secret tibber
+
+input_datetime:
+  start_time_1:
+    name: Start heating 1
+    has_date: false
+    has_time: true
+  stop_time_1:
+    name: Stop heating 1
+    has_date: false 
+    has_time: true
+  start_time_2:
+    name: Start heating 2
+    has_date: false
+    has_time: true
+  stop_time_2:
+    name: Stop heating 2
+    has_date: false
+    has_time: true
+
+
+input_number:
+  comfort_temp_1:
+    name: Comport temp1
+    min: 16
+    max: 23
+    step: 1
+  comfort_temp_2:
+    name: Comfort temp2
+    min: 16
+    max: 23
+    step: 1
+  set_temp:
+    name:  Set temp
+    min: 0
+    max: 30
+    step: 0.5
+input_boolean:
+  away:
+    name: Set away mode
+    initial: off
+    icon: mdi:home
+
+
+script:
+  temporarly_disable_heating:
+    sequence:
+    - service: heating.temporarly_disable
