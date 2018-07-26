@@ -4,101 +4,73 @@ div:
   entities:
 #  - switch.mobillader
   - sensor.phone_battery
+  - sensor.phone_to_home
+  - sensor.phone_to_home_car
   - binary_sensor.dark
   - group.tracker
   - script.borte
   - group.stovsuger
   - input_select.radio
   - media_player.hele_huset
-  - group.blomster
-  - group.google_music
+
+strom:
+  name: Strom
+  view: yes
+  entities:
+  - history_graph.stromforbruk_1
+  - history_graph.stromforbruk_24
+  - history_graph.stromforbruk_48
+  - sensor.electricity_price_hamretunet_10
+  - sensor.cumulative_hourly_active_import_energy
+  - sensor.diff_cumulative_hourly_active_import_energy
+  - sensor.total_effect
+  - sensor.filtered_total_effect
+  - sensor.est_cons
+  - sensor.houtly_cons
+  - switch.vv
+  - switch.vv_automation
+  - camera.prices
 
 stue:
   name: Stue 
   view: yes
   entities:
-  - light.yttergang
-  - light.gateway_light_f0b429b41020
-  - binary_sensor.door
-  - binary_sensor.movement1
-  - binary_sensor.movement2
-  - binary_sensor.movement_stue
-  - binary_sensor.motion_sensor_158d00010ab2d0
-  - sensor.stue_temperature
-  - sensor.mean_stue_temp
-  - sensor.stue_humidity
-  - sensor.stue_vindu_temperature
-  - sensor.ute_soverom_temperature
-  - sensor.ute_veranda_temperature
   - script.stovsuger
   - sun.sun
+  - light.stue
   - sensor.yr_symbol
   - sensor.yr_condition
-  - group.stue_heater
-  - group.stue_lys
+  - sensor.stue_temperature
+  - sensor.ute_veranda_temperature
+  - sensor.netatmo_indoor_co2
+  - sensor.netatmo_veranda_temperature
+  - sensor.netatmo_indoor_noise
+  - sensor.netatmo_indoor_temperature
   - group.media_stue
   - media_player.stue_kjokken
   - group.stue_scene
+  - climate.stue
+  - binary_sensor.fibaro_system_fgms001zw5_motion_sensor_sensor
+  - binary_sensor.neo_coolcam_battery_powered_pir_sensor_sensor
 
 Soverom:
   view: yes
   entities:
   - group.alarmclock
+  - group.alarmclock_varmeteppe
   - light.soverom1
   - light.soverom2
-  - group.soverom_heater
-  - sensor.soverom_temperature
-  - sensor.mean_soverom_temp
-  - binary_sensor.door_soverom
-  - binary_sensor.movement_soverom
-  - input_boolean.nattlys
-  - input_boolean.sovelyd
+  - switch.varmeteppe
   - group.media_soverom
-  - script.sove_lyd
-  - script.leggetid_soverom
-  - script.news_soverom
-
-
-Bad:
-  view: yes
-  entities:
-  - sensor.mean_bad_temp
-  - sensor.mean_bad_fuktighet
-  - light.do
-  - light.gang
-  - binary_sensor.door_do
-  - binary_sensor.door_bad
-  - binary_sensor.movement3
-  - group.media_bad
-  - sensor.badevekt
-  - sensor.vekt_daniel
-  - switch.aeotec_zw096_smart_switch_6_switch_2_0
-  - sensor.aeotec_zw096_smart_switch_6_energy_2_0
-  - sensor.aeotec_zw096_smart_switch_6_power_2_8
 
 Kjokken:
   view: yes
   entities:
-  - binary_sensor.movement_kjokken
-  - binary_sensor.door_window_sensor_158d0001102226
-  - sensor.kjoleskap_temperature
-  - light.veranda
-  - group.kjokken_timer
-#  - group.steketermometer
-
-Kamera:
-  view: yes
-  entities:
-  - group.camera_1
-  - group.camera_2
+  - group.media_kjokken
 
 tracker:
  - device_tracker.daniel
- - device_tracker.soren
- - device_tracker.daniel_2
- - device_tracker.tine
- - device_tracker.nokia_130
- - device_tracker.eli
+ - device_tracker.tinehjensiphone
 
 alarmclock:
   name: Wake Me Up
@@ -107,60 +79,18 @@ alarmclock:
    - input_number.alarmhour
    - input_number.alarmminutes
    - automation.wake_me_up
+   - script.stop_alarm
 
-soverom_heater:
-  name: Thermotstat soverom
-  control: hidden
-  entities: 
-   - climate.soverom
-   - group.temp_control_soverom_morgen
-   - group.temp_control_soverom_kveld
-temp_control_soverom_morgen:
-    name: Temp control soverom morgen
-    entities: 
-     - automation.temp_control_soverom_morgen
-     - input_number.temp_control_soverom_morgen_hour
-     - input_number.temp_control_soverom_morgen_temp
-temp_control_soverom_kveld:
-    name: Temp control soverom kveld
-    entities: 
-     - automation.temp_control_soverom_kveld
-     - input_number.temp_control_soverom_kveld_hour
-     - input_number.temp_control_soverom_kveld_temp
 
-stue_heater:
-  name: Thermotstat stue
-  control: hidden
+alarmclock_varmeteppe:
+  name: Varmeteppe
   entities: 
-   - climate.termostat_stue
-   - group.temp_control_stue_morgen
-   - group.temp_control_stue_kveld
-   - group.temp_control_stue
-   - group.auto_heat_stue
-auto_heat_stue:
-  name: Auto heat
-  entities: 
-   - input_boolean.auto_heat
-   - input_number.auto_temp
-   - input_number.auto_temp_low
-temp_control_stue:
-    name: Temp control stue
-    entities: 
-     - automation.temp_control_stue
-     - input_number.temp_control_stue_hour
-     - input_number.temp_control_stue_temp
-temp_control_stue_morgen:
-    name: Temp control stue morgen
-    entities: 
-     - automation.temp_control_stue_morgen
-     - input_number.temp_control_stue_morgen_hour
-     - input_number.temp_control_stue_morgen_temp
-temp_control_stue_kveld:
-    name: Temp control stue kveld
-    entities: 
-     - automation.temp_control_stue_kveld
-     - input_number.temp_control_stue_kveld_hour
-     - input_number.temp_control_stue_kveld_temp
+   - sensor.alarm_time_varmeteppe
+   - input_number.alarmhour_varmeteppe
+   - input_number.alarmminutes_varmeteppe
+   - automation.turn_on_varmeteppe
+   - switch.varmeteppe
+
 
 stovsuger:
   name: Støvsuger
@@ -176,11 +106,11 @@ media_soverom:
    - media_player.soverom
    - input_select.radio_soverom
 
-media_bad:
+media_kjokken:
   name: Media
   entities:
-   - media_player.bad
-   - input_select.radio_bad
+   - media_player.kjokken
+   - input_select.radio_kjokken
 
 media_stue:
   name: Media
@@ -207,40 +137,4 @@ hw_devices:
    - device_tracker.cam1
    - device_tracker.cam2
    - device_tracker.xiaomi
-
-steketermometer:
-  name: Steketermometer
-  entities: 
-   - input_select.steketermometer
-   - input_number.temp_steketermometer
-   - input_boolean.steketermometer_notify_daniel
-
-
-stue_scene:
-  name: Presets
-  entities: 
-  - scene.dempet_lys
-  - scene.normal_lys
-  - scene.mye_lys
-
-stue_lys:
-  name: Lys
-  entities: 
-  - light.Lys_stue
-  - light.Lys_TV
-  - light.lys_bokhylle
-  - light.lys_bilder
-  - light.vindu
-
-kjokken_timer:
-  name: Timer
-  entities: 
-  - sensor.timer_minutes
-  - input_number.timer_minutes
-
-blomster:
-  name: Blomster
-  entities: 
-  - sensor.blomst_bokhylle_moisture
-  - sensor.blomst_sofa_moisture
-  - sensor.blomst_tv_moisture
+   - device_tracker.netatmopersonalweatherstationlan

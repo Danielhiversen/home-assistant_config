@@ -9,26 +9,6 @@ radio_stue:
   initial: Av
   icon: mdi:music-note
 
-steketermometer:
-  name: Steketermometer
-  options:
-   - "Fisk (50*)"
-   - "Kylling (70*)"
-   - " "
-  initial: " "
-  icon: mdi:fish
-
-radio_bad:
-  name: Radio
-  options:
-   - P3
-   - P1
-   - P2
-   - Alltid Nyheter
-   - Av
-  initial: Av
-  icon: mdi:music-note
-
 radio_soverom:
   name: Radio
   options:
@@ -39,6 +19,19 @@ radio_soverom:
    - Av
   initial: Av
   icon: mdi:music-note
+
+
+radio_kjokken:
+  name: Radio
+  options:
+   - P3
+   - P1
+   - P2
+   - Alltid Nyheter
+   - Av
+  initial: Av
+  icon: mdi:music-note
+
 
 radio:
   name: Radio

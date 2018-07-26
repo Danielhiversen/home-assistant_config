@@ -1,32 +1,16 @@
 - platform: rfxtrx
   automatic_add: False
   devices:
-    0a52080601010038480349:
-      name: Kjoleskap
-    0a520806020100c7340159: # 02
-      name: Stue_Vindu
-    0a52080103010012260259:
-      name: Ute_soverom
     0a5208030401001f1d0259:
       name: Ute_veranda
     0a52080705020095220269:
-      name: Soverom
-    0a520802060100ff0e0269: # 1 06
-      name: Bad
-      data_type: 
-        - Humidity
-        - Temperature
-    0a520800070100d2140269:
       name: Stue
-      data_type: 
-        - Humidity
-        - Temperature
-    0a5208980a0100d5310169:
-      name: Utepotte
-      data_type: 
-        - Humidity
-    08500902cbff017469:
-      name: Steketermometer
+    0a5208450a0101e8160279:
+      name: varmtvann
+    0a5208020201019e230249:
+      name: varmtvann_ut
+    0a52080b070100eb230259:
+      name: varmtvann_nede
 
 - platform: yr
   monitored_conditions:
@@ -58,203 +42,110 @@
       unit_of_measurement: "%"
       entity_id: 
        - device_tracker.daniel
-    target_temp_stue:
-      value_template: '{{ states.climate.termostat_stue.attributes.temperature }}'
-      entity_id: 
-       - climate.termostat_stue
-    mean_stue_temp:
-      friendly_name: 'Avg stue temp'
-      value_template: >
-                      {% set sum = 0 %}
-                      {% set num = 0 %}
-                      {% for state in [states.sensor.temperature_158d000159c9d0, states.sensor.stue_temperature] %}
-                          {%- if  state.state !="unknown" and as_timestamp(now()) - as_timestamp(state.last_updated) < 300 -%}
-                              {% set sum = sum + state.state|float %}
-                              {% set num = num + 1|float %}
-                          {%- endif %}
-                          {%- if loop.last %}
-                              {%- if  states.sensor.stue_temperature.state !="unknown" and states.sensor.temperature_158d000159c9d0.state !="unknown" and (as_timestamp(now()) - as_timestamp(states.sensor.stue_temperature.last_updated) < 180) and (as_timestamp(now()) - as_timestamp(states.sensor.temperature_158d000159c9d0.last_updated)<180) -%}
-                               {{   ((states.sensor.stue_temperature.state|float + states.sensor.temperature_158d000159c9d0.state|float)/2.0) | round(1)}}
-                              {%- elif   states.sensor.temperature_158d000159c9d0.state !="unknown" and as_timestamp(now()) - as_timestamp(states.sensor.temperature_158d000159c9d0.last_updated) < 180 -%}
-                               {{   states.sensor.temperature_158d000159c9d0.state  | round(1) }}
-                              {%- elif   states.sensor.stue_temperature.state !="unknown" and  as_timestamp(now()) - as_timestamp(states.sensor.stue_temperature.last_updated) < 240 -%}
-                               {{   states.sensor.stue_temperature.state }}
-                              {%- elif  num > 0  -%}
-                              {{ (sum/num) | round(1) }}
-                              {%- else -%}
-                               {{   states.sensor.stue_temperature.state }}
-                              {%- endif %}
-                          {%- endif %}
-                      {%- endfor -%}
-      unit_of_measurement: "°C"
-      entity_id: 
-       - sensor.temperature_158d000159c9d0
-       - sensor.blomst_tv_temperature
-       - sensor.blomst_sofa_temperature
-       - sensor.blomst_bokhylle_temperature
-       - sensor.stue_temperature
-       - sensor.stue_tvbenk_temperature
-    mean_bad_fuktighet:
-      friendly_name: 'Bad fuktighet'
-      value_template: >
-                      {%- if  states.sensor.bad_humidity.state !="unknown" and states.sensor.humidity_158d000159f1af.state !="unknown" and (as_timestamp(now()) - as_timestamp(states.sensor.bad_humidity.last_updated) < 180) and (as_timestamp(now()) - as_timestamp(states.sensor.humidity_158d000159f1af.last_updated)<180) -%}
-                                             {{   ((states.sensor.bad_humidity.state|float + states.sensor.humidity_158d000159f1af.state|float)/2.0) | round(1)}}
-                      {%- elif   states.sensor.humidity_158d000159f1af.state !="unknown" and as_timestamp(now()) - as_timestamp(states.sensor.humidity_158d000159f1af.last_updated) < 180 -%}
-                                             {{   states.sensor.humidity_158d000159f1af.state|float| round(1) }}
-                      {%- else -%}
-                                             {{   states.sensor.bad_humidity.state|float| round(1) }}
-                      {%- endif %}
-      unit_of_measurement: "%"
-      entity_id: 
-       - sensor.humidity_158d000159f1af
-       - sensor.bad_humidity
-    mean_bad_temp:
-      friendly_name: 'Bad temperatur'
-      value_template: >
-                      {%- if  states.sensor.bad_temperature.state !="unknown" and states.sensor.temperature_158d000159f1af.state !="unknown" and (as_timestamp(now()) - as_timestamp(states.sensor.bad_temperature.last_updated) < 180) and (as_timestamp(now()) - as_timestamp(states.sensor.temperature_158d000159f1af.last_updated)<180) -%}
-                                             {{   ((states.sensor.bad_temperature.state|float + states.sensor.temperature_158d000159f1af.state|float)/2.0) | round(1)}}
-                      {%- elif   states.sensor.temperature_158d000159f1af.state !="unknown" and (as_timestamp(now()) - as_timestamp(states.sensor.temperature_158d000159f1af.last_updated) < 180) -%}
-                                             {{   states.sensor.temperature_158d000159f1af.state|float| round(1) }}
-                      {%- else -%}
-                                             {{   states.sensor.bad_temperature.state|float| round(1) }}
-                      {%- endif %}
-      unit_of_measurement: "°C"
-      entity_id: 
-       - sensor.temperature_158d000159f1af
-       - sensor.bad_temperature
-    mean_soverom_temp:
-      friendly_name: 'Soverom temperatur'
-      value_template: >
-                      {%- if  states.sensor.soverom_temperature.state !="unknown" and states.sensor.temperature_158d00012cb96c.state !="unknown" and (as_timestamp(now()) - as_timestamp(states.sensor.soverom_temperature.last_updated) < 180) and (as_timestamp(now()) - as_timestamp(states.sensor.temperature_158d00012cb96c.last_updated)<180) -%}
-                                             {{   ((states.sensor.soverom_temperature.state|float + states.sensor.temperature_158d00012cb96c.state|float)/2.0) | round(1)}}
-                      {%- elif   states.sensor.temperature_158d00012cb96c.state !="unknown" and (as_timestamp(now()) - as_timestamp(states.sensor.temperature_158d00012cb96c.last_updated) < 180) -%}
-                                             {{   states.sensor.temperature_158d00012cb96c.state|float| round(1) }}
-                      {%- else -%}
-                                             {{   states.sensor.soverom_temperature.state|float| round(1) }}
-                      {%- endif %}
-      unit_of_measurement: "°C"
-      entity_id: 
-       - sensor.temperature_158d00012cb96c
-       - sensor.soverom_temperature
-    auroa_visibility_level:
-      value_template: '{{ states.binary_sensor.aurora_visibility.attributes.visibility_level }}'
+    phone_speed:
+      friendly_name: 'Telefon speed'
+      value_template: '{{ states.device_tracker.daniel.attributes.speed|float }}'
       unit_of_measurement: " "
       entity_id: 
-       - binary_sensor.aurora_visibility
-#    no_updates:
-#      friendly_name: 'No updates'
-#      value_template: >
-#          {% set val = "" %}
-#          {% for state in states.sensor%}
-#                 {%- if  as_timestamp(now()) - as_timestamp(state.last_updated) > 60*60*10-%}
-#                    {% set val = val + state.entity_id + "\n"  %}
-#                 {%- endif %}
-#                 {%- if loop.last %}
-#                         {%- if  val == ""  -%}
-#                               {{ False }}
-#                         {%- else -%}
-#                               {{ val }}
-#                         {%- endif %} 
-#                  {%- endif %}
-#          {%- endfor-%}
-
-
+       - device_tracker.daniel
+    phone_direction:
+      friendly_name: 'Telefon direction'
+      value_template: '{{ states.device_tracker.daniel.attributes.direction  }}'
+      unit_of_measurement: ""
+      entity_id: 
+       - device_tracker.daniel
+    phone_activity:
+      friendly_name: 'Telefon activity'
+      value_template: '{{ states.device_tracker.daniel.attributes.activity }}'
+      unit_of_measurement: ""
+      entity_id: 
+       - device_tracker.daniel
+    effekt_vaskemaskin:
+      friendly_name: 'Effekt vaskemasin'
+      value_template: '{{ states.sensor.fibaro_system_fgwpef_wall_plug_gen5_power.state|float }}'
+      unit_of_measurement: "W"
+      entity_id: 
+       - sensor.fibaro_system_fgwpef_wall_plug_gen5_power
+    set_temp:
+      value_template: '{{states.climate.stue.attributes.temperature|float }}'
+      unit_of_measurement: "°C"
+      entity_id: 
+       - climate.stue
+    max_tibber:
+      friendly_name: "Max price"
+      unit_of_measurement: 'kr'
+      value_template: "{{states.sensor.electricity_price_hamretunet_10.attributes.max_price}}"
+       
 - platform: time_date
   display_options:
     - 'time'
-
-#- platform: broadlink
-#  scan_interval: 160
-#  update_interval: 160
-#  host: 192.168.1.173
-#  mac: 'B4:43:0D:D1:02:F7'
-#  name: "Stue_tvbenk"
-#  timeout: 10
-#  monitored_conditions:
-#    - temperature
-#    - humidity
-#    - air_quality
-#    - light
-#    - noise
-
-#- platform: broadlink
-#  scan_interval: 160
-#  update_interval: 160
-#  host: 192.168.1.100
-#  mac: '34:EA:34:E4:6D:B0'
-#  name: "Stue_bokhylle"
-#  timeout: 10
-#  monitored_conditions:
-#    - temperature
 
 - platform: brain_fm
   email: !secret email
   password: !secret brain_fm_password
 
-# platform: tellstick
-# 11: Kjoleskap
-# 22: Blomst_stue
-# 41: Ute_veranda
-# 31: Ute_soverom
-# 52: Soverom
-# 61: Bad
-# 71: Stue
-# only_named: 1
-# temperature_scale: °C
-# datatype_mask: 127
-
-- platform: miflora
-  update_interval: 900
-  mac: C4:7C:8D:61:7E:3B 
-  name: Blomst tv
-  force_update: false
-  median: 3
-  monitored_conditions:
-   - moisture
-#   - light
-#   - temperature
-#   - conductivity
-#   - battery
-
-- platform: miflora
-  update_interval: 912
-  mac: C4:7C:8D:61:7F:EC 
-  name: Blomst sofa
-  force_update: false
-  median: 3
-  monitored_conditions:
-   - moisture
- #  - light
- #  - temperature
- #  - conductivity
- #  - battery
-
-- platform: miflora
-  update_interval: 921
-  mac: C4:7C:8D:61:7E:5D 
-  name: Blomst bokhylle
-  force_update: false
-  median: 3
-  monitored_conditions:
-   - moisture
-#   - light
-#   - temperature
-#   - conductivity
-#   - battery
-
-- platform: dnsip
-  
-- platform: dnsip
-  hostname: server1.dahoiv.net
-
-- platform: mqtt
-  name: "badevekt"
-  state_topic: "miscale/weight/kg"
-  value_template: "{{ value }}"
-  unit_of_measurement: "kg"
 
 - platform: tibber
-  access_token: d610f070b55347ee7aa90ed51da8307612b55b77266247315a6fce2a6eaccf1a
+  access_token: !secret tibber
 
-- platform: spot_price
-  postal_code: 7033
+#- platform: nordpool
+#  currency: 'NOK'
+#  region: 'Molde'
+#  name: "Elspot kWh"
+
+- platform: google_travel_time
+  name: Phone To Home
+  api_key: !secret google_api_key
+  origin: device_tracker.daniel
+  destination: zone.home
+  options:
+    mode: bicycling
+
+- platform: google_travel_time
+  name: Phone To home car
+  api_key: !secret google_api_key
+  origin: device_tracker.daniel
+  destination: zone.home
+  options:
+    mode: driving
+
+- platform: mqtt
+  name: "Total effect"
+  state_topic: "6970631400499129/effect/watt"
+  value_template: "{{ float(value)/1000.0 }}"
+  unit_of_measurement: "kW"
+  
+  
+- platform: mqtt
+  name: "Cumulative_hourly_reactive_import_energy"
+  state_topic: "6970631400499129/Cumulative_hourly_reactive_import_energy/wh"
+  value_template: "{{ value }}"
+  unit_of_measurement: "Wh"
+  
+  
+- platform: mqtt
+  name: "Cumulative_hourly_active_import_energy"
+  state_topic: "6970631400499129/Cumulative_hourly_active_import_energy/wh"
+  value_template: "{{ float(value) /1000.0 }}"
+  unit_of_measurement: "kWh"
+  
+- platform: mqtt
+  name: "Diff_cumulative_hourly_active_import_energy"
+  state_topic: "6970631400499129/Diff_cumulative_hourly_active_import_energy/wh"
+  value_template: "{{ float(value) /1000.0 }}"
+  unit_of_measurement: "kWh"
+ 
+- platform: mqtt
+  name: "Houtly_cons"
+  state_topic: "6970631400499129/hourly_cons/ws"
+  value_template: "{{ float(value) /3600000.0 }}"
+  unit_of_measurement: "kWh"
+
+
+- platform: filter
+  name: "filtered total effect"
+  entity_id: sensor.total_effect
+  filters:
+   - filter: time_simple_moving_average
+     window_size: 00:30
+     precision: 2
