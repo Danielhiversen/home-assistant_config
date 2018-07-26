@@ -1,13 +1,7 @@
-# hass_config
-[![Build Status](https://travis-ci.com/Danielhiversen/hass_config.svg?token=VnLvwWiKx6V2ymqpgXFo&branch=master)](https://travis-ci.com/Danielhiversen/hass_config)
+# home-assistant_config
+Example Home Assistant Configs, home-assistant.io
 
 
-pip install sklearn gmusicapi git+https://github.com/Danielhiversen/sports-tracker-liberator feedparser image numpy scipy==0.18.1 mysqlclient xmltodict
+Tested with version 0.73
 
-
-
-
-curl https://getcaddy.com | bash -s  personal hook.service,http.jwt,http.login,http.ipfilter
-
-wget http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz
-tar -xvzf GeoLite2-Country.tar.gz  -C /home/dahoiv/
+[Buy me a beer :)](http://paypal.me/dahoiv)
