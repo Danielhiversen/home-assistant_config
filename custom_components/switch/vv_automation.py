@@ -14,14 +14,14 @@ import voluptuous as vol
 from homeassistant.components.switch import SwitchDevice, PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
 
-_LOGGER = logging.getLogger(__name__) 
+_LOGGER = logging.getLogger(__name__)
 
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_ACCESS_TOKEN): cv.string
 })
 
-    
+
 async def async_setup_platform(hass, config, add_devices, discovery_info=None):
     """Setup component."""
     print("aa")
@@ -38,20 +38,18 @@ async def async_setup_platform(hass, config, add_devices, discovery_info=None):
     except (asyncio.TimeoutError, aiohttp.ClientError):
         raise PlatformNotReady()
     add_devices([vv(tibber_home, hass)])
-    
 
-    
-    
+
 class vv(SwitchDevice):
     def __init__(self, tibber_home, hass):
-        self.tibber_home = tibber_home  
+        self.tibber_home = tibber_home
         self.turn_ons = []
         self.turn_offs = []
         self._state = True
         self.hass = hass
         async_track_time_change(hass, self.set_state, hour=range(24), minute=[0,15], second=6)
         async_track_time_change(hass, self._fetch_data, hour=[0], minute=[0,12], second=1)
-    
+
     async def _fetch_data(self, args=None):
         print("aav")
         try:
@@ -67,18 +65,33 @@ class vv(SwitchDevice):
                 prices[price_time.hour] = price_total
 
         min_price = 1000
-        time = 7
+        time = 6
         for k in range(6):
-            price = prices[k] + prices[k+1]*0.5
+            price = prices[k]
+            if k > 4:
+                price += 1/100.0
             if price < min_price:
                 min_price = price
-            if price < min_price + 1/100:
                 time = k
         turn_ons = [time]
-        turn_offs = [20]
+        turn_offs = []
 
         time += 2
-        print(turn_ons, turn_offs)
+        min_price = 1000
+        _time = time
+        for k in range(time, 16):
+            price = prices[k]
+            if price < min_price:
+                min_price = price
+                _time = k
+        print(_time, "-----aaaaa")
+        if _time > 8:
+            print("h2")
+            time = _time
+            turn_ons.append(time)
+            turn_offs.append(6)
+            time += 2
+        print("----", turn_ons, turn_offs, time)
 
         large_change = False
         for rate in [1.10, 1.04, 1.03, 1.02]:
@@ -88,6 +101,9 @@ class vv(SwitchDevice):
                 temp_turn_on = None
                 temp_turn_off = None
                 for _time in range(time + d, 19):
+                    print(_time-d, _time)
+                    if prices[_time-d] < prices[_time]:
+                        continue
                     _sum = np.sum(prices[(_time - d):_time])
                     if _sum/d > rate * prices[_time]:
                         large_change = True
@@ -108,30 +124,39 @@ class vv(SwitchDevice):
                     turn_ons.append(temp_turn_on)
                     turn_offs.append(temp_turn_off)
                     time = temp_turn_on
+                    time += 2
                     print("break")
                     break
             if temp_turn_on and temp_turn_off:
-                break      
-                
-        print(turn_ons, turn_offs)
-        time += 1
+                break
+
+        print(3, turn_ons, turn_offs)
 
         if (len(turn_offs) < 2 and time < 17):
             max_price = 0
-            for k in range(time, 16):
+            _time = None
+            for k in range(time, 17):
+                print(k, max_price, _time)
                 price = prices[k] + prices[k+1]
                 if price > max_price:
                     max_price = price
-                    time = k
-            turn_offs.append(time)
-            turn_ons.append(time + 2)
-            time += 3
-        
+                    _time = k
+            if _time and prices[_time + 2] + 1/100 < prices[_time]:
+                turn_offs.append(_time)
+                turn_ons.append(_time + 2)
+                time = _time + 3
+        print(4, turn_ons, turn_offs)
+
         if (len(turn_offs) < 2 and time < 20) or time < 18:
             time = np.argmax(prices[time:20]) + time
-            turn_offs.append(time)
-            if time + 1 < 20:
-                turn_ons.append(time + 1)
+            if prices[time + 1] + 1/100  < prices[time]:
+                turn_offs.append(time)
+                if time + 1 < 20:
+                    print("---dfaf")
+                    turn_ons.append(time + 1)
+
+        turn_offs.append(20)
+
 
         print(prices)
         print(turn_ons, turn_offs)
