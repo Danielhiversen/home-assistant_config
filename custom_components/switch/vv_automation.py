@@ -24,7 +24,6 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 async def async_setup_platform(hass, config, add_devices, discovery_info=None):
     """Setup component."""
-    print("aa")
     import tibber
     tibber_connection = tibber.Tibber(config.get(CONF_ACCESS_TOKEN),
                                       websession=async_get_clientsession(hass))
@@ -51,7 +50,6 @@ class vv(SwitchDevice):
         async_track_time_change(hass, self._fetch_data, hour=[0], minute=[0,12], second=1)
 
     async def _fetch_data(self, args=None):
-        print("aav")
         try:
             await self.tibber_home.update_price_info()
         except (asyncio.TimeoutError, aiohttp.ClientError):
@@ -68,10 +66,12 @@ class vv(SwitchDevice):
         time = 6
         for k in range(6):
             price = prices[k]
-            if k > 4:
+            if k > 1:
+                price += 0.1/100.0
+            if k > 3:
                 price += 1/100.0
             if price < min_price:
-                min_price = price
+                min_price = price - 0.1/100.0
                 time = k
         turn_ons = [time]
         turn_offs = []
@@ -82,7 +82,7 @@ class vv(SwitchDevice):
         for k in range(time, 16):
             price = prices[k]
             if price < min_price:
-                min_price = price
+                min_price = price - 0.1/100.0
                 _time = k
         print(_time, "-----aaaaa")
         if _time > 8:
@@ -95,13 +95,10 @@ class vv(SwitchDevice):
 
         large_change = False
         for rate in [1.10, 1.04, 1.03, 1.02]:
-            print("rate", rate)
             for d in range(8, 1, -1):
-                print(d)
                 temp_turn_on = None
                 temp_turn_off = None
                 for _time in range(time + d, 19):
-                    print(_time-d, _time)
                     if prices[_time-d] < prices[_time]:
                         continue
                     _sum = np.sum(prices[(_time - d):_time])
@@ -114,18 +111,15 @@ class vv(SwitchDevice):
                 diff = 0
                 for _time in range(time + d, 19):
                     _sum = np.sum(prices[(_time - d):_time])
-                    print(_time, _sum/d, 1.04 * prices[_time], d, (_sum/d) / prices[_time], _sum/d - prices[_time])
                     if _sum/d - prices[_time] > diff:
                         diff = _sum/d - prices[_time]
                         temp_turn_off = _time - max(d, 3)
                         temp_turn_on = _time
-                        print("time", _time)
                 if temp_turn_on and temp_turn_off:
                     turn_ons.append(temp_turn_on)
                     turn_offs.append(temp_turn_off)
                     time = temp_turn_on
                     time += 2
-                    print("break")
                     break
             if temp_turn_on and temp_turn_off:
                 break
@@ -136,7 +130,6 @@ class vv(SwitchDevice):
             max_price = 0
             _time = None
             for k in range(time, 17):
-                print(k, max_price, _time)
                 price = prices[k] + prices[k+1]
                 if price > max_price:
                     max_price = price
@@ -152,7 +145,6 @@ class vv(SwitchDevice):
             if prices[time + 1] + 1/100  < prices[time]:
                 turn_offs.append(time)
                 if time + 1 < 20:
-                    print("---dfaf")
                     turn_ons.append(time + 1)
 
         turn_offs.append(20)
@@ -167,17 +159,14 @@ class vv(SwitchDevice):
     async def set_state(self, args=None):
         if not self.is_on:
             return
-        print(self.turn_ons, self.turn_offs)
         now = dt_util.now()
         service_data = {}
         service_data[ATTR_ENTITY_ID] = "switch.vv"
         if now.hour in self.turn_ons:
-            print("turn on")
             await self.hass.services.async_call("switch", SERVICE_TURN_ON, service_data)
             return
         if now.hour in self.turn_offs:
             await self.hass.services.async_call("switch", SERVICE_TURN_OFF, service_data)
-            print("turn off")
 
     async def async_added_to_hass(self):
         """Handle when an entity is about to be added to Home Assistant."""
@@ -204,7 +193,6 @@ class vv(SwitchDevice):
         return False
 
     def turn_on(self, **kwargs):
-        print(self.turn_ons, self.turn_offs)
         """Turn the switch on."""
         self._state = True
         self.schedule_update_ha_state()
