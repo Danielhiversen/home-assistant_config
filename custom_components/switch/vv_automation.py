@@ -94,7 +94,7 @@ class vv(SwitchDevice):
         print("----", turn_ons, turn_offs, time)
 
         large_change = False
-        for rate in [1.10, 1.04, 1.03, 1.02]:
+        for rate in [1.10, 1.04, 1.03, 1.02, 1.01]:
             for d in range(8, 1, -1):
                 temp_turn_on = None
                 temp_turn_off = None
@@ -141,14 +141,28 @@ class vv(SwitchDevice):
         print(4, turn_ons, turn_offs)
 
         if (len(turn_offs) < 2 and time < 20) or time < 18:
-            time = np.argmax(prices[time:20]) + time
-            if prices[time + 1] + 1/100  < prices[time]:
-                turn_offs.append(time)
-                if time + 1 < 20:
-                    turn_ons.append(time + 1)
+            _time = np.argmax(prices[time:20]) + time
+            if prices[_time + 1] + 0.5/100  < prices[_time]:
+                turn_offs.append(_time)
+                if _time + 1 < 20:
+                    turn_ons.append(_time + 1)
+                time = _time + 3
 
-        turn_offs.append(20)
+        print(time)
+        if len(turn_offs) < 2 and time < 15:
+            _time = np.argmax(prices[time:15]) + time
+            _time = np.argmin(prices[_time:20]) + _time - 1
+            print(_time)
+            if prices[_time + 1] + 0.5/100  < prices[_time]:
+                turn_offs.append(_time)
+                if _time + 1 < 20:
+                    turn_ons.append(_time + 1)
+                time = _time + 3
 
+        if len(turn_offs) < 2 and time < 16:
+            turn_offs.append(18)
+        else:
+            turn_offs.append(20)
 
         print(prices)
         print(turn_ons, turn_offs)
