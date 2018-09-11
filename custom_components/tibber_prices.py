@@ -43,11 +43,9 @@ def setup(hass, config):
             if not dates:
                 return False
             for _date in dates:
-                print(_date, dt_util.now(), skip)
                 if (dt_util.now() - datetime.timedelta(days=1)).date == _date.date:
                     return False
             for _date in dates:
-                print(_date, dt_util.now(), skip)
                 if (dt_util.now() + datetime.timedelta(days=1)).date == _date.date and dt_util.now().hour >= 12:
                     return True
             return False
@@ -95,23 +93,22 @@ def setup(hass, config):
 
         ax.fill_between(dates, 0, prices, facecolor='#039be5', alpha=0.25)
         plt.text(dates[hour]+dt, prices[hour], str(round(prices[hour], 1)), fontsize=14)
-        last_hour = 0
-        min_length = 4 if len(dates) > 24 else 3
+        min_length = 5 if len(dates) > 24 else 3
+        last_hour = -1 * min_length
         for _hour in range(1, len(prices)-1):
-            if abs(_hour - last_hour) < min_length or abs(_hour - hour) < 3:
+            if abs(_hour - last_hour) < min_length or abs(_hour - hour) < min_length:
                 continue
             if (prices[_hour - 1] > prices[_hour] < prices[_hour + 1]) \
                     or (prices[_hour - 1] < prices[_hour] > prices[_hour + 1]):
                 last_hour = _hour
                 plt.text(dates[_hour], prices[_hour],
-                         str(round(prices[_hour], 1)) + "\n{:02}:00".format(_hour%24),
+                         str(round(prices[_hour], 1)) + "\n{:02}".format(_hour%24),
                          fontsize=14, va='bottom')
 
         ax.set_xlim((dates[0] - datetime.timedelta(minutes=3), dates[-1] + datetime.timedelta(minutes=3)))
         ax.set_ylim((min(prices)-0.5, max(prices)+0.5))
         ax.set_facecolor('white')
         # import plotly.plotly as py
-        # print(py.plot_mpl(fig))
         ax.xaxis.set_major_formatter(xFmt)
         fig.autofmt_xdate()
         fig.savefig('/tmp/prices.png')  # file name in your local system
